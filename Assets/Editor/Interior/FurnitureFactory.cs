@@ -338,7 +338,7 @@ namespace GameUI.EditorTools.Interior
                 f.Sph("Leaf_1", 0, 0.95f, 0, 0.45f, 0.38f, 0.45f, M.Leaf);
                 f.Sph("Leaf_2", 0.14f, 0.75f, 0.05f, 0.3f, 0.26f, 0.3f, M.LeafLight);
                 f.Sph("Leaf_3", -0.13f, 0.72f, -0.06f, 0.3f, 0.26f, 0.3f, M.Leaf);
-                f.Col(0, 0.15f, 0, 0.34f, 0.3f, 0.34f);
+                f.Col(0, 0.3f, 0, 0.34f, 0.6f, 0.34f);   // 화분은 계단턱(0.3m) 위로 올라서지 못하게 0.6m 높이
             });
             R("DiningTable", true, false, f =>   // 폭 1.0 x 깊이 0.6 x 높이 0.75
             {

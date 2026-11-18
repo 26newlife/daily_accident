@@ -13,7 +13,9 @@ namespace GameUI.EditorTools.Interior
 
             Furn("WashingMachine", r, 4.6f, 0.5f, 0f);
             Furn("UtilityShelf", r, 6.3f, 0.45f, 270f);          // 세제·박스 선반 (밸브 z=1.2 와 겹치지 않는 남쪽 끝)
-            Furn("DryingRack", r, 5.55f, 0.6f, 0f);               // 빨래건조대 (문 열림 반경 밖)
+            // 빨래건조대는 접어서 남쪽 벽에 세워둔다 (깊이 0.14m). 밸브(6.46,1.2) 앞 0.9m 는 비움
+            Furn("DryingRack", r, new Vector3(5.5f, 0f, 0.195f), 0f, new Vector3(1f, 1.2f, 0.25f), "DryingRack_Folded");
+            Furn("TrashBin", r, 4.44f, 0.94f);                    // 주방에서 옮겨 온 쓰레기통 (세탁기 옆)
             Furn("Boiler", r, 4.33f, 1.65f, 90f, 1.25f);          // 벽걸이 보일러
 
             // 가스 배관: 메인 밸브 기둥 상단 → 천장 부근 수평 → 보일러 위에서 내려오는 구조 (Cylinder)
@@ -34,16 +36,17 @@ namespace GameUI.EditorTools.Interior
 
             Furn("Toilet", r, 0.35f, 0.45f, 0f);                  // 남쪽 벽에 탱크를 붙임
             Furn("Vanity", r, 1.3f, 2.125f, 180f);                // 세면대 아래 장 (위에 기존 세면대/수도꼭지 상호작용)
-            Furn("Bathtub", r, 0.475f, 1.6f, 0f);                 // 욕조: 서쪽 벽, 수건걸이(0.16,1.15)가 욕조 위 벽에 있다
+            // 욕조(0.65 x 1.3): 서쪽 벽. 문 열림 반경(+0.3) 밖으로 줄였다. 수건걸이(0.16,1.15)가 욕조 위 벽에 있다
+            Furn("Bathtub", r, new Vector3(0.45f, 0f, 1.65f), 0f, new Vector3(0.93f, 1f, 0.93f));
             Furn("StandMirror", r, new Vector3(1.3f, 1.0f, 2.305f), 180f, new Vector3(1.1f, 0.45f, 1f), "Mirror_Bath");
 
             // 샤워: 벽 파이프 + 샤워기 헤드 + 커튼 레일/커튼(북쪽 끝에 모음 — 수건 상호작용을 가리지 않는다)
             Prim.Cyl(r, "ShowerPipe", new Vector3(0.16f, 1.2f, 2.1f), 0.012f, 1.8f, M.Chrome);
             Prim.Box(r, "ShowerArm", new Vector3(0.24f, 2.08f, 2.1f), new Vector3(0.16f, 0.02f, 0.02f), M.Chrome);
             Prim.Cyl(r, "ShowerHead", new Vector3(0.34f, 2.06f, 2.1f), 0.06f, 0.025f, M.Chrome);
-            Prim.Cyl(r, "CurtainRod", new Vector3(0.83f, 1.95f, 1.6f), 0.01f, 1.4f, M.Metal, new Vector3(90f, 0, 0));
+            Prim.Cyl(r, "CurtainRod", new Vector3(0.79f, 1.95f, 1.65f), 0.01f, 1.4f, M.Metal, new Vector3(90f, 0, 0));
             for (int i = 0; i < 3; i++)
-                Prim.Box(r, "ShowerCurtain", new Vector3(0.83f, 1.28f, 2.2f - i * 0.1f), new Vector3(0.012f, 1.3f, 0.11f), i % 2 == 0 ? M.CurtainSheer : M.Pillow);
+                Prim.Box(r, "ShowerCurtain", new Vector3(0.79f, 1.28f, 2.2f - i * 0.1f), new Vector3(0.012f, 1.3f, 0.11f), i % 2 == 0 ? M.CurtainSheer : M.Pillow);
 
             // 타일 벽 (허리~가슴 높이까지) — 기존 벽 면에서 3mm 띄움
             const float tileH = 1.4f;
@@ -67,8 +70,10 @@ namespace GameUI.EditorTools.Interior
 
             // 신발장 (shoe_cabinet 상호작용 박스와 같은 자리, 앞면이 서쪽). 소화기는 신발장 남쪽 끝 바로 앞 바닥에 그대로 있다
             // 콜라이더는 shoe_cabinet(x 3.68~4.08)이 담당. 뒷면 일부는 벽 속에 묻힌다
-            UseInteractableCollider(Furn("ShoeCabinet", r, 3.88f, 0.9f, 270f));
-            Furn("UmbrellaStand", r, 2.15f, 0.75f);
+            // 현관문 열림 반경(+0.3) 밖으로 z 0.6~1.6 으로 옮김 (shoe_cabinet 상호작용도 같이 이동)
+            MoveInteractable("shoe_cabinet", new Vector3(3.88f, 0.55f, 1.1f));
+            UseInteractableCollider(Furn("ShoeCabinet", r, 3.88f, 1.1f, 270f));
+            Furn("UmbrellaStand", r, 2.1f, 0.3f);                 // 화장실 문 앞을 피해 남서쪽 구석으로
             Furn("ShoePair", r, 2.15f, 0.3f, 8f, 0f, "Shoes_1");
             Furn("ShoePair", r, 2.4f, 0.36f, -10f, 0f, "Shoes_2");
             Furn("ShoePair", r, 2.2f, 1.2f, 85f, 0f, "Shoes_3");

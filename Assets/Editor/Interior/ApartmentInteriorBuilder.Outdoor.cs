@@ -12,10 +12,11 @@ namespace GameUI.EditorTools.Interior
         {
             Transform r = Room("Balcony");
 
-            Furn("Planter", r, 1.5f, 8.75f, 180f);
-            Furn("Planter", r, 2.2f, 8.75f, 180f, 0f, "Planter_2");
-            Furn("OutdoorUnit", r, 3.2f, 8.7f, 180f);              // 에어컨 실외기
-            Furn("CrateStack", r, 4.2f, 8.7f, 180f);                // 짐 상자 (방화문 접근 경로 x>4.5 는 비움)
+            // 북쪽 벽 서쪽 끝으로 몰아서 일렬 배치 (칸막이 앞·방화문 앞·베란다 문 앞은 비움)
+            MoveInteractable("flower_pot", new Vector3(0.45f, 0.2f, 8.72f));
+            Furn("Planter", r, 1.0f, 8.75f, 180f);
+            Furn("OutdoorUnit", r, 1.8f, 8.725f, 180f);            // 에어컨 실외기
+            Furn("CrateStack", r, 2.5f, 8.675f, 180f);              // 짐 상자 (Act 4 에서 치울 수 있는 소수)
 
             // 빨래걸이: 천장 고리 + 봉 + 걸린 옷 (콜라이더 없음 — 머리 위 장식)
             Prim.Cyl(r, "LaundryRod", new Vector3(1.9f, 2.0f, 8.3f), 0.012f, 3.0f, M.Metal, new Vector3(0, 0, 90f));
@@ -46,7 +47,10 @@ namespace GameUI.EditorTools.Interior
         {
             Transform r = Room("Shelter");
 
-            Furn("ShelterShelf", r, 5.975f, 8.7f, 180f);            // 비상용품 선반(북쪽 벽, 생수·구급상자·손전등·담요)
+            // 방화문이 대피공간 안쪽으로 열리면 1.0 x 1.35m 방이 문 열림 반경으로 거의 덮인다 → 베란다 쪽(바깥)으로 열리게 바꾼다 (id/위치 동일)
+            SetDoorOpenYaw("fire_door_shelter", -90f);
+            // 비상용품 선반: 북쪽 벽에 폭 0.775 x 깊이 0.25 로 붙인다 (방화문 입구 0.78m 와 안쪽 서 있을 공간 확보)
+            Furn("ShelterShelf", r, new Vector3(6.0875f, 0f, 8.75f), 180f, new Vector3(0.775f, 1f, 0.714f));
             OnWall("VentWindow", r, new Vector3(6.452f, 1.85f, 8.2f), 270f, "VentWindow");   // 환기창(루버)
 
             // 바닥 비상 표지

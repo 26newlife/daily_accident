@@ -365,7 +365,7 @@ RectTransform:
   - {fileID: 2226461319384774927}
   - {fileID: 4193170457804898818}
   - {fileID: 3954100790723180170}
-  - {fileID: 653310415202337815}
+  - {fileID: 242647990574442897}
   m_Father: {fileID: 9032049567181956897}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -445,7 +445,7 @@ MonoBehaviour:
   hiddenScale: 0.95
   messageText: {fileID: 7449412796476174340}
   yesButton: {fileID: 2623752060699940338}
-  noButton: {fileID: 653310415202337816}
+  noButton: {fileID: 1290481605856168681}
 --- !u!1 &6582426804377596330
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,12 +737,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 25707c77150cee2478bc66805297041a, type: 3}
---- !u!224 &653310415202337815 stripped
+--- !u!224 &242647990574442897 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 742822718471417223, guid: 25707c77150cee2478bc66805297041a, type: 3}
   m_PrefabInstance: {fileID: 653310415202337814}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &653310415202337816 stripped
+--- !u!114 &1290481605856168681 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
   m_PrefabInstance: {fileID: 653310415202337814}
@@ -848,11 +848,11 @@ PrefabInstance:
     - target: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Navigation.m_SelectOnLeft
       value: 
-      objectReference: {fileID: 653310415202337816}
+      objectReference: {fileID: 1290481605856168681}
     - target: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Navigation.m_SelectOnRight
       value: 
-      objectReference: {fileID: 653310415202337816}
+      objectReference: {fileID: 1290481605856168681}
     - target: {fileID: 1975344899822455339, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Name
       value: Btn_Yes

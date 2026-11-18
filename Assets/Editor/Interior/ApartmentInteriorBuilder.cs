@@ -55,6 +55,10 @@ namespace GameUI.EditorTools.Interior
             Build(lv);
             EditorSceneManager.MarkSceneDirty(lv.gameObject.scene);
             Debug.Log("[Interior] 인테리어 생성 완료. 씬을 저장하세요 (Ctrl+S).");
+
+            // 생성 직후 통로/접근성 자동 검증 (결과는 Console + 씬 뷰 표시)
+            try { Debug.Log(ApartmentClearanceValidator.RunAndSummarize()); SceneView.RepaintAll(); }
+            catch (System.Exception e) { Debug.LogWarning("[Interior] 자동 검증을 건너뜁니다: " + e.Message + " (Tools > GameUI > Validate Apartment Clearance 로 직접 실행하세요)"); }
         }
 
         /// <summary>배치모드: -executeMethod GameUI.EditorTools.Interior.ApartmentInteriorBuilder.BuildInteriorBatch (GameScene 이 열려 있어야 함)</summary>
@@ -171,6 +175,28 @@ namespace GameUI.EditorTools.Interior
         }
 
         private static Transform Interactable(string id) => interactables.Find(id);
+
+        /// <summary>
+        /// 배치를 바꾸면서 상호작용 오브젝트를 새 위치로 옮긴다 (id/컴포넌트/자식은 그대로, 위치만 변경).
+        /// 절대 좌표를 대입하므로 여러 번 실행해도 같은 결과다.
+        /// </summary>
+        private static void MoveInteractable(string id, Vector3 position)
+        {
+            Transform t = Interactable(id);
+            if (t != null) t.position = position;
+            else Debug.LogWarning("[Interior] 이동할 상호작용 오브젝트를 찾지 못했습니다: " + id);
+        }
+
+        /// <summary>방화문처럼 열림 방향만 바꿔야 할 때 (닫힌 위치/id 는 그대로)</summary>
+        private static void SetDoorOpenYaw(string id, float yawDegrees)
+        {
+            Transform t = Interactable(id);
+            var tog = t != null ? t.GetComponent<ToggleInteractable>() : null;
+            if (tog == null) return;
+            var so = new SerializedObject(tog);
+            so.FindProperty("onLocalEuler").vector3Value = new Vector3(0f, yawDegrees, 0f);
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
 
         /// <summary>벽에 붙이는 프리팹: 벽 안쪽 면(wallFace)에 두께 절반만큼 띄워 배치. facing 은 방 안쪽을 향하는 yaw</summary>
         private static GameObject OnWall(string prefab, Transform room, Vector3 pos, float yaw, string name = null)
