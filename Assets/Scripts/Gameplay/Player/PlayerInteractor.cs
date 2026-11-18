@@ -13,7 +13,7 @@ namespace GameGameplay
     {
         [SerializeField] private GameInput input;
         [SerializeField] private Camera viewCamera;
-        [SerializeField, Min(0.5f)] private float interactDistance = 2.5f;
+        [SerializeField, Min(0.5f)] private float interactDistance = 2.0f;
         [SerializeField] private LayerMask interactMask = ~0;
 
         private InteractableObject holdTarget;

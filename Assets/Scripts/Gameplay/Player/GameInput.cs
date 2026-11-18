@@ -16,6 +16,8 @@ namespace GameGameplay
         private const string KbSprint = "<Keyboard>/leftShift", PadSprint = "<Gamepad>/leftStickPress";
         private const string KbCrouch = "<Keyboard>/leftCtrl", PadCrouch = "<Gamepad>/buttonEast";
         private const string KbInteract = "<Keyboard>/e", PadInteract = "<Gamepad>/buttonSouth";
+        // 게임패드 A(South)는 이미 상호작용에 쓰이므로 점프는 Y(North)에 둔다 (바꾸려면 이 상수만 수정)
+        private const string KbJump = "<Keyboard>/space", PadJump = "<Gamepad>/buttonNorth";
         private const string MouseSpray = "<Mouse>/leftButton", PadSpray = "<Gamepad>/rightTrigger";
         private const string KbPause = "<Keyboard>/escape", PadPause = "<Gamepad>/start";
         private const string KbPhone = "<Keyboard>/tab", PadPhone = "<Gamepad>/select";
@@ -26,7 +28,7 @@ namespace GameGameplay
         private static readonly string[] InvSlotKeys =
             { "<Keyboard>/1", "<Keyboard>/2", "<Keyboard>/3", "<Keyboard>/4", "<Keyboard>/5", "<Keyboard>/6", "<Keyboard>/7", "<Keyboard>/8" };
 
-        private InputAction spray, move, look, sprint, crouch, interact, pause, phone, flashlight, invUse, invNext, invPrev, invSlot;
+        private InputAction jump, spray, move, look, sprint, crouch, interact, pause, phone, flashlight, invUse, invNext, invPrev, invSlot;
 
         /// <summary>마지막으로 입력이 들어온 장치가 게임패드인가 (프롬프트 키 표시용)</summary>
         public static bool UsingGamepad { get; private set; }
@@ -39,6 +41,7 @@ namespace GameGameplay
         public bool InteractHeld => interact.IsPressed();
         public bool SprayHeld => spray.IsPressed();
 
+        public event Action JumpPressed;
         public event Action InteractPressed;
         public event Action PausePressed;
         public event Action PhonePressed;
@@ -60,6 +63,7 @@ namespace GameGameplay
             sprint = Button("Sprint", KbSprint, PadSprint);
             crouch = Button("Crouch", KbCrouch, PadCrouch);
             interact = Button("Interact", KbInteract, PadInteract);
+            jump = Button("Jump", KbJump, PadJump);
             spray = Button("Spray", MouseSpray, PadSpray);
             pause = Button("Pause", KbPause, PadPause);
             phone = Button("Phone", KbPhone, PadPhone);
@@ -72,6 +76,7 @@ namespace GameGameplay
             foreach (string key in InvSlotKeys) invSlot.AddBinding(key);
 
             interact.performed += _ => { UsingGamepad = IsPad(_); InteractPressed?.Invoke(); };
+            jump.performed += _ => JumpPressed?.Invoke();
             pause.performed += _ => { UsingGamepad = IsPad(_); PausePressed?.Invoke(); };
             phone.performed += _ => { UsingGamepad = IsPad(_); PhonePressed?.Invoke(); };
             flashlight.performed += _ => FlashlightPressed?.Invoke();
@@ -106,7 +111,7 @@ namespace GameGameplay
             if (c != null) UsingGamepad = c.device is Gamepad;
         }
 
-        private InputAction[] All() => new[] { spray, move, look, sprint, crouch, interact, pause, phone, flashlight, invUse, invNext, invPrev, invSlot };
+        private InputAction[] All() => new[] { jump, spray, move, look, sprint, crouch, interact, pause, phone, flashlight, invUse, invNext, invPrev, invSlot };
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics() => UsingGamepad = false;

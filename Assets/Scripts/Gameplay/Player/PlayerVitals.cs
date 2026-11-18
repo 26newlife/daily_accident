@@ -26,6 +26,9 @@ namespace GameGameplay
         [SerializeField] private float recoveryDelay = 2f;
         [SerializeField] private DeathReason deathReason = DeathReason.Suffocation;
 
+        [Header("점프")]
+        [SerializeField, Min(0f), Tooltip("연기 농도 1.0 에서 점프 1회당 추가로 깎이는 호흡기 체력. 연기가 없으면 소모 없음")] private float jumpExtraDrainAtFullSmoke = 6f;
+
         [Header("기침")]
         [SerializeField, Range(0f, 1f), Tooltip("게이지 비율이 이 값 이하이고 연기 속이면 기침")] private float coughBelowRatio = 0.7f;
         [SerializeField] private Vector2 coughInterval = new Vector2(2f, 5f);
@@ -54,6 +57,20 @@ namespace GameGameplay
         {
             value = maxValue;
             ScheduleCough();
+        }
+
+        private void OnEnable() { if (player != null) player.Jumped += OnPlayerJumped; }
+        private void OnDisable() { if (player != null) player.Jumped -= OnPlayerJumped; }
+
+        /// <summary>연기 속에서 점프하면 숨이 더 차서 호흡기 체력이 추가로 닳는다 (연기가 짙을수록 큼)</summary>
+        private void OnPlayerJumped()
+        {
+            if (IsDead || !IsInSmoke) return;
+            float smoke = HazardManager.Instance != null ? HazardManager.Instance.PlayerSmoke : 0f;
+            float mult = 1f;
+            if (inventory != null && inventory.IsEquipped(wetTowelItem)) mult *= wetTowelMultiplier;
+            Modify(-smoke * jumpExtraDrainAtFullSmoke * mult);
+            timeSinceDamage = 0f;
         }
 
         private void Update()

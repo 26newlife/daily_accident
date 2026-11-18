@@ -788,6 +788,10 @@ namespace GameUI.EditorTools
             AddZone("zone_stairwell", new Vector3(-17.4f, 0f, -3.1f), new Vector3(-14.1f, 2.4f, -0.1f));
             BuildFireSources();
             BuildDoorHandleCheck();
+
+            // 인테리어: 상호작용/불/조명 그룹이 모두 만들어진 뒤에 그 위치를 피해서 가구·재질·조명을 입힌다.
+            // (단독 재생성은 Tools > GameUI > Build Apartment Interior)
+            GameUI.EditorTools.Interior.ApartmentInteriorBuilder.Build(level);
             return level;
         }
 

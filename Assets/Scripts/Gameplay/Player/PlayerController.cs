@@ -1,10 +1,11 @@
+using System;
 using GameCore;
 using UnityEngine;
 
 namespace GameGameplay
 {
     /// <summary>
-    /// 1인칭 이동/시점. CharacterController 기반: WASD(이동), Shift(달리기), Ctrl(웅크리기), 마우스·오른쪽 스틱(시점).
+    /// 1인칭 이동/시점. CharacterController 기반: WASD(이동), Shift(달리기), Ctrl(웅크리기), Space(점프), 마우스·오른쪽 스틱(시점).
     /// 감도 / Y축 반전은 GameSettings 값을 읽고 OnChanged 에 반응한다.
     /// 웅크리면 캡슐 높이와 카메라 높이가 부드럽게 낮아진다 (머리 위가 막혀 있으면 일어서지 않는다).
     /// </summary>
@@ -16,16 +17,26 @@ namespace GameGameplay
         [SerializeField] private Transform cameraRoot;      // 피치(상하) 회전 + 눈높이
 
         [Header("이동")]
-        [SerializeField] private float walkSpeed = 3.0f;
-        [SerializeField] private float sprintSpeed = 5.2f;
-        [SerializeField] private float crouchSpeed = 1.4f;
+        [SerializeField] private float walkSpeed = 1.8f;
+        [SerializeField] private float sprintSpeed = 3.8f;
+        [SerializeField] private float crouchSpeed = 1.0f;
         [SerializeField] private float acceleration = 14f;
         [SerializeField] private float gravity = -20f;
 
+        [Header("점프")]
+        [SerializeField, Tooltip("점프 높이(m). 0.6~0.8 권장")] private float jumpHeight = 0.6f;
+        [SerializeField, Tooltip("바닥에서 떨어진 뒤에도 점프가 허용되는 시간(초)")] private float coyoteTime = 0.1f;
+        [SerializeField, Tooltip("착지 직전에 누른 점프 입력을 기억하는 시간(초)")] private float jumpBufferTime = 0.1f;
+        [SerializeField, Tooltip("이 속도(m/s) 이상으로 떨어져 착지하면 흔들림/소리")] private float landMinSpeed = 3.5f;
+        [SerializeField] private float landShakeAmplitude = 0.02f;
+        [SerializeField] private float landShakeDuration = 0.15f;
+        [SerializeField, Tooltip("착지 발소리 슬롯 (클립은 나중에)")] private AudioSource footstepSource;
+        [SerializeField] private AudioClip[] landClips;
+
         [Header("자세")]
-        [SerializeField] private float standHeight = 1.8f;
-        [SerializeField] private float crouchHeight = 1.0f;
-        [SerializeField, Tooltip("캡슐 꼭대기에서 눈까지의 거리")] private float eyeBelowTop = 0.12f;
+        [SerializeField] private float standHeight = 1.75f;
+        [SerializeField] private float crouchHeight = 1.05f;
+        [SerializeField, Tooltip("캡슐 꼭대기에서 눈까지의 거리")] private float eyeBelowTop = 0.15f;
         [SerializeField] private float postureSpeed = 8f;
         [SerializeField] private LayerMask obstructionMask = ~0;
 
@@ -49,10 +60,15 @@ namespace GameGameplay
         private float mouseSensitivity, gamepadSensitivity;
         private bool invertY;
         private float shakeTime, shakeDuration, shakeAmplitude, dizziness;
+        private float coyoteTimer, jumpBufferTimer, airFallSpeed;
+        private bool grounded, standRequested;
 
         public bool IsCrouching { get; private set; }
         public bool IsSprinting { get; private set; }
         public Transform CameraRoot => cameraRoot;
+        public bool IsGrounded => grounded;
+        /// <summary>점프가 실행된 순간 (호흡기 체력 소모 등에서 구독)</summary>
+        public event Action Jumped;
 
         private void Awake()
         {
@@ -63,8 +79,25 @@ namespace GameGameplay
             LoadSettings();
         }
 
-        private void OnEnable() => GameSettings.OnChanged += LoadSettings;
-        private void OnDisable() => GameSettings.OnChanged -= LoadSettings;
+        private void OnEnable()
+        {
+            GameSettings.OnChanged += LoadSettings;
+            if (input != null) input.JumpPressed += OnJumpPressed;
+        }
+
+        private void OnDisable()
+        {
+            GameSettings.OnChanged -= LoadSettings;
+            if (input != null) input.JumpPressed -= OnJumpPressed;
+        }
+
+        /// <summary>점프 입력. 일시정지/종료/팝업(커서 해제) 중에는 무시, 웅크린 상태에서는 일어나기만 한다.</summary>
+        private void OnJumpPressed()
+        {
+            if (GameFlow.GameplayBlocked || GameFlow.CursorFree) return;
+            if (IsCrouching) { standRequested = true; return; }
+            jumpBufferTimer = jumpBufferTime;
+        }
 
         private void LoadSettings()
         {
@@ -122,7 +155,8 @@ namespace GameGameplay
         // ───────── 자세 ─────────
         private void UpdatePosture()
         {
-            bool wantCrouch = input.CrouchHeld;
+            if (!input.CrouchHeld) standRequested = false;     // 웅크리기 키를 떼면 다시 웅크릴 수 있다
+            bool wantCrouch = input.CrouchHeld && !standRequested;
             if (!wantCrouch && IsCrouching && !CanStandUp()) wantCrouch = true; // 머리 위가 막혀 있으면 계속 웅크림
             IsCrouching = wantCrouch;
 
@@ -163,11 +197,40 @@ namespace GameGameplay
             if (wish.sqrMagnitude > 1f) wish.Normalize();
             planarVelocity = Vector3.Lerp(planarVelocity, wish * speed, 1f - Mathf.Exp(-acceleration * Time.deltaTime));
 
-            if (controller.isGrounded && verticalVelocity < 0f) verticalVelocity = -2f;
-            verticalVelocity += gravity * Time.deltaTime;
+            float dt = Time.deltaTime;
+            coyoteTimer = grounded ? coyoteTime : coyoteTimer - dt;
+            jumpBufferTimer -= dt;
+
+            if (grounded && verticalVelocity < 0f) verticalVelocity = -2f;
+
+            // 점프: 버퍼 입력 + 코요테 시간 이내 + 서 있는 상태
+            if (jumpBufferTimer > 0f && coyoteTimer > 0f && !IsCrouching)
+            {
+                verticalVelocity = Mathf.Sqrt(2f * jumpHeight * -gravity);
+                jumpBufferTimer = 0f;
+                coyoteTimer = 0f;
+                grounded = false;
+                Jumped?.Invoke();
+            }
+            verticalVelocity += gravity * dt;
+            if (!grounded) airFallSpeed = Mathf.Min(airFallSpeed, verticalVelocity);
 
             Vector3 velocity = planarVelocity + Vector3.up * verticalVelocity;
-            controller.Move(velocity * Time.deltaTime);
+            CollisionFlags flags = controller.Move(velocity * dt);
+
+            if ((flags & CollisionFlags.Above) != 0 && verticalVelocity > 0f) verticalVelocity = 0f; // 천장에 머리를 부딪힘
+            bool wasGrounded = grounded;
+            grounded = (flags & CollisionFlags.Below) != 0;
+            if (grounded && !wasGrounded) OnLanded();
+            if (grounded) airFallSpeed = 0f;
+        }
+
+        private void OnLanded()
+        {
+            if (-airFallSpeed < landMinSpeed) return;
+            Shake(landShakeAmplitude, landShakeDuration);
+            if (footstepSource != null && landClips != null && landClips.Length > 0)
+                footstepSource.PlayOneShot(landClips[UnityEngine.Random.Range(0, landClips.Length)]);
         }
 
         // ───────── 흔들림 ─────────

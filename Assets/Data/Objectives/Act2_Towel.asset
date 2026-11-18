@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Act2_Towel
   m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:ObjectiveData
-  id: act2_towel
-  title: "\uD654\uC7A5\uC2E4\uC5D0\uC11C \uC218\uAC74\uC744 \uC801\uC154 \uC785\uACFC \uCF54 \uB9C9\uAE30"
+  id: objective_id
+  title: "\uBAA9\uD45C"
   description: 
-  isMain: 0
+  isMain: 1

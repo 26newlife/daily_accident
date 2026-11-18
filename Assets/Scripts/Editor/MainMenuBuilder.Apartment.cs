@@ -33,6 +33,10 @@ namespace GameUI.EditorTools
         private const string PlayerPrefabPath = "Assets/Prefabs/Gameplay/Player.prefab";
         private const string ApartmentScenarioPath = "Assets/Data/Scenarios/Scenario_03.asset";
 
+        // 플레이어 치수 (Scale 은 항상 1). 실제 성인 기준: 키 1.75 / 눈높이 1.6 / 반지름 0.28
+        private const float PlayerHeight = 1.75f, PlayerRadius = 0.28f, PlayerEyeBelowTop = 0.15f, PlayerFov = 78f;
+        private const float PlayerWalk = 1.8f, PlayerSprint = 3.8f, PlayerCrouchSpeed = 1.0f, PlayerJump = 0.6f, PlayerInteractDistance = 2.0f;
+
         private static readonly Vector3 PlayerStart = new Vector3(1.7f, 0.02f, 4.0f);
 
         // ═════════════════════════ 진입점 ═════════════════════════
@@ -280,7 +284,7 @@ namespace GameUI.EditorTools
             var root = new GameObject("Player");
             root.tag = "Player";
             var cc = root.AddComponent<CharacterController>();
-            cc.height = 1.8f; cc.radius = 0.3f; cc.center = new Vector3(0f, 0.9f, 0f);
+            cc.height = PlayerHeight; cc.radius = PlayerRadius; cc.center = new Vector3(0f, PlayerHeight * 0.5f, 0f);
             cc.slopeLimit = 45f; cc.stepOffset = 0.3f; cc.skinWidth = 0.03f; cc.minMoveDistance = 0f;
 
             var input = root.AddComponent<GameInput>();
@@ -292,13 +296,13 @@ namespace GameUI.EditorTools
 
             var camRoot = new GameObject("CameraRoot").transform;
             camRoot.SetParent(root.transform, false);
-            camRoot.localPosition = new Vector3(0f, 1.68f, 0f);
+            camRoot.localPosition = new Vector3(0f, PlayerHeight - PlayerEyeBelowTop, 0f);   // 눈높이 1.6
 
             var camGo = new GameObject("PlayerCamera", typeof(Camera), typeof(AudioListener));
             camGo.tag = "MainCamera";
             camGo.transform.SetParent(camRoot, false);
             var cam = camGo.GetComponent<Camera>();
-            cam.fieldOfView = 70f; cam.nearClipPlane = 0.05f; cam.farClipPlane = 200f;
+            cam.fieldOfView = PlayerFov; cam.nearClipPlane = 0.05f; cam.farClipPlane = 200f;
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = Hex("8FB4D9");
 
@@ -315,14 +319,29 @@ namespace GameUI.EditorTools
             var cough = coughGo.GetComponent<AudioSource>();
             cough.playOnAwake = false; cough.spatialBlend = 0f;
 
+            // 착지 발소리 슬롯 (클립은 비워둠)
+            var stepGo = new GameObject("FootstepAudio", typeof(AudioSource));
+            stepGo.transform.SetParent(root.transform, false);
+            var step = stepGo.GetComponent<AudioSource>();
+            step.playOnAwake = false; step.spatialBlend = 0f;
+
             var so = SO(controller);
             so.FindProperty("input").objectReferenceValue = input;
             so.FindProperty("cameraRoot").objectReferenceValue = camRoot;
+            so.FindProperty("footstepSource").objectReferenceValue = step;
+            so.FindProperty("standHeight").floatValue = PlayerHeight;
+            so.FindProperty("crouchHeight").floatValue = 1.05f;
+            so.FindProperty("eyeBelowTop").floatValue = PlayerEyeBelowTop;
+            so.FindProperty("walkSpeed").floatValue = PlayerWalk;
+            so.FindProperty("sprintSpeed").floatValue = PlayerSprint;
+            so.FindProperty("crouchSpeed").floatValue = PlayerCrouchSpeed;
+            so.FindProperty("jumpHeight").floatValue = PlayerJump;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             so = SO(interactor);
             so.FindProperty("input").objectReferenceValue = input;
             so.FindProperty("viewCamera").objectReferenceValue = cam;
+            so.FindProperty("interactDistance").floatValue = PlayerInteractDistance;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             so = SO(vitals);

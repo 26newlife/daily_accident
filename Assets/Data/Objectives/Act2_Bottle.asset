@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: Act2_Bottle
   m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:ObjectiveData
-  id: act2_bottle
-  title: "\uC0DD\uC218\uBCD1 \uCC59\uAE30\uAE30"
+  id: objective_id
+  title: "\uBAA9\uD45C"
   description: 
-  isMain: 0
+  isMain: 1
