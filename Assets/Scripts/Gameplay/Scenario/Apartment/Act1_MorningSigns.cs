@@ -6,12 +6,13 @@ using UnityEngine;
 namespace GameGameplay
 {
     /// <summary>
-    /// Act 1 — 아침의 징후 (00:00 ~ 03:00, 평온한 아침과 전조 증상).
+    /// Act 1 — 아침의 징후 (0:00 ~ 약 1:40, 평온한 아침과 전조 증상).
     ///
-    /// 타임라인(게임 시간 기준, GameClock):
-    ///   00:00 알람과 함께 기상 → 알람 끄기 → 일상 행동(세수 / 물 / 스마트폰) 튜토리얼
-    ///   01:30 가스 냄새 + 누출음 + 멀티탭 스파크 시작 (가스 농도 상승 시작)
-    ///   02:30 긴급 안내방송(자막) → 생존 행동 목표 제시
+    /// 타임라인 (모든 시각은 GameTimingConfig 한 곳에서 조절, 게임 시간 기준):
+    ///   0:00 알람과 함께 기상 (5초 안에 잦아든다. 끄기·세수·물 마시기·폰은 선택 사항 — 진행 조건 아님)
+    ///   0:20 가스 냄새 + 누출음 + 멀티탭 스파크 시작 (가스 농도 상승 시작)
+    ///   0:40 긴급 안내방송(자막 약 13초) → 생존 행동 목표 제시
+    ///   모든 생존 조치를 끝내면 약 3초 뒤 폭발(Act 2). 못 끝내도 1:45 에 하드 타이머로 폭발 (플래그 act1_timeout)
     ///
     /// 사망: 가스 농도가 기준 이상일 때 전기/화기 조작(전등 스위치, 커피포트, 전자레인지, 후드, 가스레인지) → 가스 폭발
     ///       스파크가 나는 멀티탭의 전원 스위치 조작 → 점화
@@ -28,10 +29,8 @@ namespace GameGameplay
         }
 
         // ───────── 타임라인 ─────────
-        [Header("타임라인 (게임 시간, 초)")]
-        [SerializeField, Min(0f)] private float signsTime = 90f;       // 01:30 이상 징후
-        [SerializeField, Min(0f)] private float broadcastTime = 150f;  // 02:30 긴급 방송
-        [SerializeField, Min(0f)] private float nextActDelay = 3f;     // 클리어 후 Act 2 로 넘어가기까지 (실시간 초)
+        // 시각/지연은 GameTimingConfig(Assets/Data/GameTimingConfig.asset) 에서 한 곳에서 조절한다
+        private static GameTimingConfig T => GameTimingConfig.Current;
 
         // ───────── 참조 ─────────
         [Header("시스템/오브젝트 참조")]
@@ -79,7 +78,6 @@ namespace GameGameplay
         [Header("문구")]
         [SerializeField, TextArea(1, 2)] private string smellText;
         [SerializeField, TextArea(1, 2)] private string smellStrongText;
-        [SerializeField, Min(5f)] private float smellRepeatSeconds = 25f;
         [SerializeField, Range(0f, 1f)] private float smellStrongGas = 0.3f;
         [SerializeField] private SubtitleCue[] announcementCues;
         [SerializeField] private string clearMessage = "Act 1 클리어";
@@ -104,6 +102,9 @@ namespace GameGameplay
         [SerializeField] private string recMorningTime = "act1_morning_routine_done_time";
         [SerializeField] private string recClearTime = "act1_clear_time";
         [SerializeField] private string recDeathAt = "act1_death_time";
+        [SerializeField] private string recTimeoutAt = "act1_timeout_time";
+        [SerializeField] private string recAlarmAuto = "act1_alarm_auto_silenced";
+        [SerializeField, Tooltip("하드 타이머로 폭발했을 때 true (Act 2 가 폭발 지연을 고른다)")] private string flagTimeout = "act1_timeout";
         [SerializeField] private string recGasAtClear = "act1_gas_level_at_clear";
 
         // ───────── 상태 ─────────
@@ -123,10 +124,19 @@ namespace GameGameplay
         // ═════════════════════════ 진행 ═════════════════════════
         protected override void OnEnter()
         {
+            ScenarioFlags.Set(flagTimeout, false);
             if (Clock != null)
             {
-                Clock.ScheduleAt(signsTime, StartSigns);
-                Clock.ScheduleAt(broadcastTime, StartBroadcast);
+                Clock.ScheduleAt(T.alarmAutoSilenceSeconds, AutoSilenceAlarm);
+                Clock.ScheduleAt(T.act1SignsTime, StartSigns);
+                Clock.ScheduleAt(T.act1BroadcastTime, StartBroadcast);
+                Clock.ScheduleAt(T.act1HardTimeoutTime, OnHardTimeout);
+                if (T.act1Beats != null)
+                    foreach (GameTimingConfig.TimedBeat beat in T.act1Beats)
+                    {
+                        GameTimingConfig.TimedBeat b = beat;
+                        Clock.ScheduleAt(b.time, () => PlayBeat(b));
+                    }
             }
 
             // 00:00 기상: 알람이 울린다
@@ -148,12 +158,44 @@ namespace GameGameplay
             if (!signsStarted || cleared || GameFlow.GameplayBlocked) return;
             scentTimer -= Time.deltaTime;
             if (scentTimer > 0f) return;
-            scentTimer = smellRepeatSeconds;
+            scentTimer = T.smellRepeatSeconds;
             if (gas != null && gas.GasLevel > smellStrongGas) EventBus.ShowScent(smellStrongText);
             else if (gas != null && gas.GasLevel > 0.02f) EventBus.ShowScent(smellText);
         }
 
-        /// <summary>01:30 이상 징후: 가스 냄새, 누출음, 멀티탭 스파크</summary>
+        /// <summary>알람은 일정 시간(기본 5초) 안에 잦아든다. 끄지 않아도 일상 목표가 이어진다</summary>
+        private void AutoSilenceAlarm()
+        {
+            if (alarmOff || cleared) return;
+            Record(recAlarmAuto, 1f);
+            OnAlarmOff();
+        }
+
+        /// <summary>환경 연출(웅성거림, 사이렌 등): 큰 사건 사이의 긴장 유지</summary>
+        private void PlayBeat(GameTimingConfig.TimedBeat beat)
+        {
+            if (cleared || GameFlow.IsEnded) return;
+            switch (beat.kind)
+            {
+                case GameTimingConfig.BeatKind.Scent: EventBus.ShowScent(beat.text); break;
+                case GameTimingConfig.BeatKind.Subtitle: EventBus.ShowSubtitle(beat.text, beat.seconds); break;
+                default: EventBus.ShowMessage(beat.text); break;
+            }
+        }
+
+        /// <summary>하드 타이머: 조치를 끝내지 못했어도 폭발(Act 2)로 넘어간다 (조치 수에 따른 영향은 기존 로직 유지)</summary>
+        private void OnHardTimeout()
+        {
+            if (cleared || GameFlow.IsEnded) return;
+            cleared = true;
+            ScenarioFlags.Set(flagTimeout, true);
+            Record(recTimeoutAt, Now);
+            Record(recClearTime, Now);
+            Record(recGasAtClear, gas != null ? gas.GasLevel : 0f);
+            CompleteAct();
+        }
+
+        /// <summary>0:20 이상 징후: 가스 냄새, 누출음, 멀티탭 스파크</summary>
         private void StartSigns()
         {
             if (signsStarted) return;
@@ -168,22 +210,28 @@ namespace GameGameplay
                 if (sparkAudio != null && sparkAudio.clip != null) sparkAudio.Play();
             }
 
-            scentTimer = smellRepeatSeconds;
+            scentTimer = T.smellRepeatSeconds;
+            TimingLog.Mark("Act1 signs (gas/spark)");
             EventBus.ShowScent(smellText);
             Add(objSmell);
         }
 
-        /// <summary>02:30 긴급 방송: 자막 + 오디오, 목표 갱신</summary>
+        /// <summary>0:40 긴급 방송: 자막(약 13초) + 오디오, 목표 갱신</summary>
         private void StartBroadcast()
         {
             if (broadcastDone) return;
             if (!signsStarted) StartSigns();
             broadcastDone = true;
+            TimingLog.Mark("Act1 broadcast");
             GoToStep("broadcast");
 
             if (announcementSource != null && announcementSource.clip != null) announcementSource.Play();
             if (announcementCues != null)
-                foreach (SubtitleCue cue in announcementCues) EventBus.ShowSubtitle(cue.text, cue.seconds);
+                for (int i = 0; i < announcementCues.Length; i++)
+                {
+                    float seconds = T.broadcastCueSeconds != null && i < T.broadcastCueSeconds.Length ? T.broadcastCueSeconds[i] : announcementCues[i].seconds;
+                    EventBus.ShowSubtitle(announcementCues[i].text, seconds);
+                }
 
             // 목표 갱신: 냄새 원인 찾기 → 가스 누출 대응
             Complete(objSmell);
@@ -371,6 +419,7 @@ namespace GameGameplay
         {
             if (cleared) return;
             cleared = true;
+            TimingLog.Mark("Act1 clear");
             Complete(objGasResponse);
             Record(recClearTime, Now);
             Record(recGasAtClear, gas != null ? gas.GasLevel : 0f);
@@ -380,7 +429,7 @@ namespace GameGameplay
 
         private IEnumerator GoNext()
         {
-            yield return new WaitForSecondsRealtime(nextActDelay);
+            yield return new WaitForSeconds(T.act1ClearToAct2Delay);   // timeScale 0(일시정지) 에서는 멈춘다
             CompleteAct();   // → ScenarioStateMachine.NextAct() (Act 2 로)
         }
 

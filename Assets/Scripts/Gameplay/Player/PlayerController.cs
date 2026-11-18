@@ -37,6 +37,7 @@ namespace GameGameplay
         [SerializeField] private float standHeight = 1.75f;
         [SerializeField] private float crouchHeight = 1.05f;
         [SerializeField, Tooltip("캡슐 꼭대기에서 눈까지의 거리")] private float eyeBelowTop = 0.15f;
+        [SerializeField, Tooltip("카메라(눈높이) 로컬 Y 미세 조정(m). 음수 = 낮춤. 서 있을 때 이 값만큼, 웅크릴 때는 키 비율(crouchHeight/standHeight)만큼 같이 보정된다. CharacterController/상호작용 거리/점프에는 영향 없음")] private float cameraHeightOffset = -0.06f;
         [SerializeField] private float postureSpeed = 8f;
         [SerializeField] private LayerMask obstructionMask = ~0;
 
@@ -67,6 +68,10 @@ namespace GameGameplay
         public bool IsSprinting { get; private set; }
         public Transform CameraRoot => cameraRoot;
         public bool IsGrounded => grounded;
+        /// <summary>이동 속도 외부 배율 (화상 등 PlayerVitals 가 설정). 1 = 정상</summary>
+        public float ExternalSpeedMultiplier { get; set; } = 1f;
+        /// <summary>true 이면 이동/시점/자세 입력을 무시한다 (문구멍 등 다른 곳이 카메라를 제어할 때). 호흡기·시간 등 다른 시스템은 계속 동작한다.</summary>
+        public bool ControlSuspended { get; set; }
         /// <summary>점프가 실행된 순간 (호흡기 체력 소모 등에서 구독)</summary>
         public event Action Jumped;
 
@@ -94,7 +99,7 @@ namespace GameGameplay
         /// <summary>점프 입력. 일시정지/종료/팝업(커서 해제) 중에는 무시, 웅크린 상태에서는 일어나기만 한다.</summary>
         private void OnJumpPressed()
         {
-            if (GameFlow.GameplayBlocked || GameFlow.CursorFree) return;
+            if (GameFlow.GameplayBlocked || GameFlow.CursorFree || ControlSuspended) return;
             if (IsCrouching) { standRequested = true; return; }
             jumpBufferTimer = jumpBufferTime;
         }
@@ -109,7 +114,7 @@ namespace GameGameplay
         private void Update()
         {
             UpdateCursor();
-            if (GameFlow.GameplayBlocked) return;
+            if (GameFlow.GameplayBlocked || ControlSuspended) return;
 
             if (!GameFlow.CursorFree) UpdateLook();
             ApplyCameraRotation();
@@ -165,6 +170,9 @@ namespace GameGameplay
             ApplyHeight(currentHeight);
         }
 
+        /// <summary>현재 캡슐 높이에서의 카메라 로컬 Y. 보정값은 키 비율에 맞춰 함께 줄어 서기/웅크리기 전환이 어색하지 않다</summary>
+        private float EyeY(float height) => height - eyeBelowTop + cameraHeightOffset * (height / Mathf.Max(0.01f, standHeight));
+
         private void ApplyHeight(float height)
         {
             if (controller == null) return;
@@ -173,7 +181,7 @@ namespace GameGameplay
             if (cameraRoot != null)
             {
                 Vector3 p = cameraRoot.localPosition;
-                p.y = height - eyeBelowTop;
+                p.y = EyeY(height);
                 cameraRoot.localPosition = p;
             }
         }
@@ -192,7 +200,7 @@ namespace GameGameplay
             Vector2 move = input.Move;
             IsSprinting = input.SprintHeld && !IsCrouching && move.y > 0.1f;
 
-            float speed = IsCrouching ? crouchSpeed : (IsSprinting ? sprintSpeed : walkSpeed);
+            float speed = (IsCrouching ? crouchSpeed : (IsSprinting ? sprintSpeed : walkSpeed)) * ExternalSpeedMultiplier;
             Vector3 wish = (transform.right * move.x + transform.forward * move.y);
             if (wish.sqrMagnitude > 1f) wish.Normalize();
             planarVelocity = Vector3.Lerp(planarVelocity, wish * speed, 1f - Mathf.Exp(-acceleration * Time.deltaTime));
@@ -246,7 +254,7 @@ namespace GameGameplay
         {
             if (cameraRoot == null) return;
             Vector3 p = cameraRoot.localPosition;
-            float baseY = currentHeight - eyeBelowTop;
+            float baseY = EyeY(currentHeight);
             if (shakeTime > 0f)
             {
                 shakeTime -= Time.deltaTime;

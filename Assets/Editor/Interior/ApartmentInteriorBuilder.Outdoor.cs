@@ -1,3 +1,5 @@
+using GameGameplay;
+using UnityEditor;
 using UnityEngine;
 using M = GameUI.EditorTools.Interior.InteriorMaterialFactory;
 
@@ -57,6 +59,23 @@ namespace GameUI.EditorTools.Interior
             Prim.Box(r, "ShelterFloorMark", new Vector3(5.95f, 0.014f, 8.2f), new Vector3(0.5f, 0.004f, 0.5f), M.GreenSign);
         }
 
+        /// <summary>호출 패널에 상호작용(elevator_call_button)을 붙인다. 항상 사용 가능 — 결과는 ElevatorHazardSystem 이 정한다</summary>
+        private static void AddElevatorCallButton(GameObject panel)
+        {
+            var col = panel.GetComponent<BoxCollider>();
+            if (col == null) col = panel.AddComponent<BoxCollider>();
+            col.center = new Vector3(0f, 0.15f, 0.01f);
+            col.size = new Vector3(0.16f, 0.32f, 0.06f);
+            var item = panel.GetComponent<ElevatorInteractable>();
+            if (item == null) item = panel.AddComponent<ElevatorInteractable>();
+            var so = new SerializedObject(item);
+            so.FindProperty("id").stringValue = "elevator_call_button";
+            so.FindProperty("prompt").stringValue = "엘리베이터 호출";
+            so.FindProperty("role").enumValueIndex = (int)ElevatorInteractable.PartRole.CallButton;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            MakeDynamic(panel);
+        }
+
         // ═════════════════════════ 10층 복도 (x -14~9.5, z -2.2~0) ═════════════════════════
         private static void BuildCorridor()
         {
@@ -67,14 +86,31 @@ namespace GameUI.EditorTools.Interior
             Prim.Box(r, "FireAlarmButton", new Vector3(-5.9f, 1.3f, -0.15f), new Vector3(0.1f, 0.12f, 0.04f), M.RedPaint);
 
             // 엘리베이터: 호출 버튼 + 층 표시
-            OnWall("ElevatorPanel", r, new Vector3(-0.4f, 1.0f, -2.062f), 0f, "ElevatorCallPanel");
+            GameObject callPanel = OnWall("ElevatorPanel", r, new Vector3(-0.4f, 1.0f, -2.062f), 0f, "ElevatorCallPanel");
+            if (callPanel != null) AddElevatorCallButton(callPanel);
             Prim.Box(r, "FloorIndicator", new Vector3(-1.5f, 2.22f, -2.05f), new Vector3(0.3f, 0.12f, 0.03f), M.Screen);
             AddLabel(r, "FloorIndicatorText", "10", new Vector3(-1.5f, 2.22f, -2.03f), 0.025f, new Color(1f, 0.35f, 0.25f), 180f);
+
+            // 문구멍으로 보이는 이웃 NPC 실루엣 (평소엔 꺼 둠). Act 3 에서 ScenarioFlags "act3_npc_corridor_1003/1002" 를 true 로 하면 보인다
+            Transform npcs = Group("CorridorNpcs", r);
+            BuildNpcSilhouette(npcs, "Npc_1003", new Vector3(4.7f, 0f, -0.95f), 1.45f, 0.26f, new Color(0.45f, 0.4f, 0.42f));   // 1003호 할머니
+            BuildNpcSilhouette(npcs, "Npc_1002", new Vector3(1.6f, 0f, -1.25f), 1.75f, 0.3f, new Color(0.22f, 0.25f, 0.32f));   // 1002호 청년
 
             // 세대 호수 번호판 (1004호 판은 기존 Plate_1004 위에 숫자만 올린다)
             AddLabel(r, "Number_1004", "1004", new Vector3(3.0f, 1.65f, -0.172f), 0.03f, Color.white);
             AddPlate(r, "Plate_1003", "1003", Interactable("door_1003"));
             AddPlate(r, "Plate_1002", "1002", Interactable("door_1002"));
+        }
+
+        private static void BuildNpcSilhouette(Transform parent, string name, Vector3 pos, float height, float radius, Color color)
+        {
+            var root = new GameObject(name).transform;
+            root.SetParent(parent, false);
+            root.position = pos;
+            var mat = new Material(M.Rubber) { color = color, name = "Int_Npc_" + name };
+            Prim.Cyl(root, "Body", new Vector3(0f, height * 0.4f, 0f), radius, height * 0.8f, mat);
+            Prim.Sph(root, "Head", new Vector3(0f, height * 0.88f, 0f), Vector3.one * radius * 1.3f, mat);
+            root.gameObject.SetActive(false);
         }
 
         private static void AddPlate(Transform parent, string name, string text, Transform door)

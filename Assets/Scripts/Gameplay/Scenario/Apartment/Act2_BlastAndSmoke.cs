@@ -5,13 +5,16 @@ using UnityEngine;
 namespace GameGameplay
 {
     /// <summary>
-    /// Act 2 — 8층의 폭발과 연쇄 화재 (03:00 ~ 07:00).
+    /// Act 2 — 8층의 폭발과 연쇄 화재 (약 1:40 ~ 3:10, 약 90초).
     ///
-    /// 타임라인 (Act 1 이 늦게 끝나면 explosionGameTime 대신 "Act 시작 + minDelay" 를 기준으로 상대 진행):
-    ///   03:30 아래층 대형 폭발 → 카메라 흔들림 / 섬광 / 베란다 유리 파손 / 전체 정전(비상구 유도등만 점등)
-    ///   04:00 (+30s) 거실 커튼과 주방 식용유 팬에 불이 옮겨붙음 → 연기가 차오름 (FireManager)
-    ///   05:30 (+120s) 복도에도 불길이 번짐 → 현관문 손잡이가 뜨거워진다
-    ///   07:00 (+210s) 시간 초과 시 현재 상태로 Act 2 종료
+    /// 타임라인 (폭발 시각 기준 상대 초, 모두 GameTimingConfig 에서 조절):
+    ///   +0   아래층 대형 폭발 → 카메라 흔들림 / 섬광 / 베란다 유리 파손 / 전체 정전(비상구 유도등만 점등)
+    ///        (Act 1 을 모두 끝냈으면 약 3초 뒤, 하드 타이머로 넘어왔으면 즉시)
+    ///   +9   거실 커튼과 주방 식용유 팬에 불이 옮겨붙음 → 연기가 차오름 (FireManager). 성장/번짐 1.5~1.75배
+    ///        일정 크기(uncontrollableIntensity) 를 넘으면 소화기로 진압 불가 → 2-B(수건 농성)로 유도
+    ///   +45  복도에도 불길이 번짐 → 현관문 손잡이가 뜨거워진다
+    ///   +85  시간 초과 시 현재 상태로 Act 2 종료 (AFK 도 진행)
+    ///   환경 연출(천장 균열음, 이웃 비명, 사이렌)이 사이를 채운다
     ///
     /// 분기: 2-A 소화기로 불을 모두 진압 (이후 연기 거의 없음) / 2-B 수건을 적셔 입막음 후 방어 (불은 계속 번져 연기 짙음)
     /// 탈출 직전 체크: 현관문 손잡이 온도 확인 → 뜨거우면 현관 탈출 포기(Act 3 농성 루트 플래그), 확인 없이 열면 사망.
@@ -21,13 +24,9 @@ namespace GameGameplay
     public class Act2_BlastAndSmoke : ActBase
     {
         // ───────── 타임라인 ─────────
-        [Header("타임라인 (게임 시간, 초)")]
-        [SerializeField, Min(0f)] private float explosionGameTime = 210f;     // 03:30
-        [SerializeField, Min(0f), Tooltip("Act 1 이 03:30 이후에 끝난 경우, 시작 후 이만큼 뒤에 폭발")] private float minDelayAfterAct1 = 6f;
-        [SerializeField, Min(0f)] private float fireDelayAfterExplosion = 30f;     // 04:00
-        [SerializeField, Min(0f)] private float corridorFireAfterExplosion = 120f; // 05:30
-        [SerializeField, Min(0f)] private float endAfterExplosion = 210f;          // 07:00
-        [SerializeField, Min(0f)] private float nextActDelay = 3f;
+        // 시각/지연은 GameTimingConfig(Assets/Data/GameTimingConfig.asset) 에서 한 곳에서 조절한다
+        private static GameTimingConfig T => GameTimingConfig.Current;
+        [SerializeField, Tooltip("Act 1 이 하드 타이머로 끝났는지 읽는 플래그 키")] private string flagAct1Timeout = "act1_timeout";
 
         // ───────── 참조 ─────────
         [Header("참조")]
@@ -127,13 +126,21 @@ namespace GameGameplay
             if (Objectives != null) Objectives.RemoveFinished();   // Act 1 의 끝난 목표 정리
             if (gas != null) gas.StopLeak();
 
-            explosionAt = Mathf.Max(explosionGameTime, Now + minDelayAfterAct1);
+            // 폭발 시각 = Act 2 시작 + 지연 (조치를 모두 끝냈으면 짧게, 하드 타이머로 넘어왔으면 거의 즉시)
+            bool timedOut = ScenarioFlags.GetBool(flagAct1Timeout);
+            explosionAt = Now + (timedOut ? T.explosionDelayAfterTimeout : T.explosionDelayAfterClear);
             if (Clock != null)
             {
                 Clock.ScheduleAt(explosionAt, Explode);
-                Clock.ScheduleAt(explosionAt + fireDelayAfterExplosion, StartFires);
-                Clock.ScheduleAt(explosionAt + corridorFireAfterExplosion, IgniteCorridor);
-                Clock.ScheduleAt(explosionAt + endAfterExplosion, OnTimeout);
+                Clock.ScheduleAt(explosionAt + T.act2FireDelay, StartFires);
+                Clock.ScheduleAt(explosionAt + T.act2CorridorFireDelay, IgniteCorridor);
+                Clock.ScheduleAt(explosionAt + T.act2EndDelay, OnTimeout);
+                if (T.act2Beats != null)
+                    foreach (GameTimingConfig.TimedBeat beat in T.act2Beats)
+                    {
+                        GameTimingConfig.TimedBeat b = beat;
+                        Clock.ScheduleAt(explosionAt + b.time, () => PlayBeat(b));
+                    }
             }
             GoToStep("wait");
         }
@@ -143,8 +150,12 @@ namespace GameGameplay
         {
             if (exploded) return;
             exploded = true;
+            TimingLog.Mark("Act2 explosion");
             GoToStep("blast");
 
+            ScenarioFlags.Set(ElevatorHazardSystem.FireModeFlag, true);   // 이후 엘리베이터는 화재 중 위험 규칙을 따른다
+            ScenarioFlags.SetNumber(ElevatorHazardSystem.FireStartTimeKey, TimingLog.Now);
+            EventBus.RaiseExplosion();   // 창밖 연출(NPC 반응/연기/사이렌)이 구독한다
             if (explosionAudio != null && explosionAudio.clip != null) explosionAudio.Play();
             if (player != null) player.Shake(shakeAmplitude, shakeSeconds);
             if (ScreenFlash.Instance != null) ScreenFlash.Instance.Flash(new Color(1f, 0.85f, 0.6f), 0.9f, 1.6f);
@@ -178,6 +189,7 @@ namespace GameGameplay
             if (firesStarted) return;
             if (!exploded) Explode();
             firesStarted = true;
+            TimingLog.Mark("Act2 fire start");
             GoToStep("fire");
 
             if (initialFires != null) foreach (FireSource f in initialFires) if (f != null) f.Ignite();
@@ -193,8 +205,21 @@ namespace GameGameplay
         {
             if (corridorFire == null || corridorFire.IsLit) return;
             corridorFire.Ignite();
+            TimingLog.Mark("Act2 corridor fire");
             ScenarioFlags.Set(flagCorridorHot, true);
             if (exploded) EventBus.ShowScent(corridorFireText);
+        }
+
+        /// <summary>환경 연출 (천장 균열음, 이웃 비명, 사이렌 등) — 큰 사건 사이의 긴장 유지</summary>
+        private void PlayBeat(GameTimingConfig.TimedBeat beat)
+        {
+            if (cleared || GameFlow.IsEnded) return;
+            switch (beat.kind)
+            {
+                case GameTimingConfig.BeatKind.Scent: EventBus.ShowScent(beat.text); break;
+                case GameTimingConfig.BeatKind.Subtitle: EventBus.ShowSubtitle(beat.text, beat.seconds); break;
+                default: EventBus.ShowMessage(beat.text); break;
+            }
         }
 
         private void OnTimeout()
@@ -231,7 +256,14 @@ namespace GameGameplay
 
                 case ScenarioEventType.Toggled:
                     // 뜨거운(= 복도에 불길이 있는) 현관문을 확인 없이 열면 불길이 밀려든다
-                    if (e.SourceId == frontDoorId && e.State && corridorFire != null && corridorFire.IsLit) Die(doorBackdraftDeath);
+                    // 손잡이를 확인했더라도 강행해서 열면 동일하게 백드래프트 (문을 잠가 막지 않는다)
+                    if (e.SourceId == frontDoorId && e.State && corridorFire != null && corridorFire.IsLit)
+                    {
+                        if (ScreenFlash.Instance != null) ScreenFlash.Instance.Flash(new Color(1f, 0.5f, 0.1f), 1f, 1.5f);
+                        if (ScoreSystem.Instance != null) { ScoreSystem.Instance.Increment("risk_backdraft_attempts"); ScoreSystem.Instance.Increment("risk_attempts_total"); }
+                        Debug.Log($"[Risk] hot front door opened (handleChecked={handleChecked}) → backdraft");
+                        Die(doorBackdraftDeath);
+                    }
                     break;
             }
             Evaluate();
@@ -258,12 +290,7 @@ namespace GameGameplay
 
             if (handleHot)
             {
-                if (frontDoor != null)
-                {
-                    frontDoor.SetLocked(true);
-                    frontDoor.SetLockedMessage(hotDoorLockedMessage);
-                }
-                if (announce) EventBus.ShowMessage(handleHotText);
+                if (announce) EventBus.ShowMessage(handleHotText);   // 경고만 한다 — 문은 잠그지 않는다
             }
             else if (announce) EventBus.ShowMessage(handleCoolText);
         }
@@ -287,6 +314,7 @@ namespace GameGameplay
         {
             if (cleared) return;
             cleared = true;
+            TimingLog.Mark("Act2 clear");
 
             InventorySystem inv = InventorySystem.Instance;
             bool routeA = allOut;
@@ -306,7 +334,7 @@ namespace GameGameplay
 
         private IEnumerator GoNext()
         {
-            yield return new WaitForSecondsRealtime(nextActDelay);
+            yield return new WaitForSeconds(T.act2ClearToAct3Delay);   // timeScale 0(일시정지) 에서는 멈춘다
             CompleteAct();   // → Act 3 (flagFrontBlocked 로 분기)
         }
 

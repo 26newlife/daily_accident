@@ -33,7 +33,7 @@ namespace GameGameplay
         private void Update()
         {
             InteractableObject found = null;
-            if (!GameFlow.GameplayBlocked && !GameFlow.CursorFree && viewCamera != null)
+            if (!GameFlow.GameplayBlocked && !GameFlow.CursorFree && viewCamera != null && !PeepholeCameraController.IsActive)
             {
                 Ray ray = new Ray(viewCamera.transform.position, viewCamera.transform.forward);
                 if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactMask, QueryTriggerInteraction.Ignore))

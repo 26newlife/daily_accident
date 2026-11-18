@@ -38,7 +38,10 @@ namespace GameGameplay
             float pulse = 1f + Mathf.Sin(Time.unscaledTime * pulseSpeed) * pulseAmount * danger;
 
             fogAlpha = Mathf.Lerp(fogAlpha, danger * maxFogAlpha, Time.unscaledDeltaTime * smoothing);
-            vignetteAlpha = Mathf.Lerp(vignetteAlpha, Mathf.Clamp01(danger * pulse) * maxVignetteAlpha, Time.unscaledDeltaTime * smoothing);
+            float burnDanger = vitals.Burn01;   // 화상 수치가 높을수록 붉은 비네팅 (비그래픽)
+            float burnPulse = 1f + Mathf.Sin(Time.unscaledTime * pulseSpeed * 1.5f) * pulseAmount * burnDanger;
+            float vignetteTarget = Mathf.Max(Mathf.Clamp01(danger * pulse), Mathf.Clamp01(burnDanger * burnPulse));
+            vignetteAlpha = Mathf.Lerp(vignetteAlpha, vignetteTarget * maxVignetteAlpha, Time.unscaledDeltaTime * smoothing);
 
             if (fogOverlay != null) fogOverlay.color = WithAlpha(fogColor, fogAlpha);
             if (redVignette != null) { Color c = redVignette.color; c.a = vignetteAlpha; redVignette.color = c; }

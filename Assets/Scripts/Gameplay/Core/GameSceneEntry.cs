@@ -30,7 +30,7 @@ namespace GameGameplay
 
         private void Awake()
         {
-            GameFlow.Reset();
+            GameRunContext.Begin("scene-enter");   // 새 게임 / 다시 시작 / 메뉴 왕복 후 재진입 모두 여기를 거친다
 
             ScenarioData selected = GameSession.SelectedScenario;
             bool ok = selected != null && requiredScenario != null

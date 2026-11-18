@@ -67,7 +67,7 @@ namespace GameGameplay
 
             float rise = 0f;
             if (leaking && valves != null && valves.Length > 0)
-                rise = risePerSecond * OpenValveCount / valves.Length;
+                rise = risePerSecond * GameTimingConfig.Current.gasRiseMultiplier * OpenValveCount / valves.Length;
             float decay = naturalDecayPerSecond + ventilationPerOpenWindow * OpenWindowCount;
 
             float current = hazard.GasLevel;

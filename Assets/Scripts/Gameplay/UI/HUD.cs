@@ -26,6 +26,7 @@ namespace GameGameplay
         [SerializeField] private Image crosshair;
         [SerializeField] private Color crosshairIdle = new Color(1f, 1f, 1f, 0.55f);
         [SerializeField] private Color crosshairActive = new Color(0.18f, 0.61f, 1f, 1f);
+        [SerializeField, Min(1f), Tooltip("상호작용 대상을 조준했을 때 크로스헤어 배율")] private float crosshairActiveScale = 1.8f;
         [SerializeField] private CanvasGroup promptGroup;
         [SerializeField] private TMP_Text promptText;
         [SerializeField, Tooltip("{0} = 키, {1} = 동작")] private string promptFormat = "[{0}] {1}";
@@ -53,6 +54,9 @@ namespace GameGameplay
         [SerializeField] private float bannerSlideDistance = 24f;
         [SerializeField] private float bannerFadeTime = 0.3f;
         [SerializeField] private float bannerHoldTime = 2.2f;
+        [SerializeField, Tooltip("새 목표가 추가될 때 목표 목록이 한 번 커졌다 돌아오는 정도")] private float objectivePulseScale = 1.1f;
+        [SerializeField] private float objectivePulseTime = 0.6f;
+        [SerializeField] private Color objectivePulseColor = new Color(0.6f, 0.85f, 1f);
 
         [Header("시계")]
         [SerializeField] private TMP_Text clockText;
@@ -79,7 +83,7 @@ namespace GameGameplay
         [SerializeField] private float scentHoldTime = 3.5f;
 
         private readonly Queue<(string text, Color color)> bannerQueue = new Queue<(string, Color)>();
-        private Coroutine bannerRoutine, messageRoutine;
+        private Coroutine bannerRoutine, messageRoutine, pulseRoutine;
         private RectTransform bannerRect;
         private Vector2 bannerHome;
 
@@ -136,7 +140,13 @@ namespace GameGameplay
                 promptText.text = string.Format(promptFormat, key, target.GetPrompt()) + (target.HoldSeconds > 0f ? holdSuffix : string.Empty);
             }
             if (promptGroup != null) promptGroup.alpha = Mathf.MoveTowards(promptGroup.alpha, show ? 1f : 0f, Time.unscaledDeltaTime * 10f);
-            if (crosshair != null) crosshair.color = show ? crosshairActive : crosshairIdle;
+            if (crosshair != null)
+            {
+                crosshair.color = show ? crosshairActive : crosshairIdle;
+                // 상호작용 가능한 대상을 조준하면 점이 커진다 ("하얀 점이 커지면 상호작용 가능" 힌트와 연동)
+                float s = Mathf.Lerp(crosshair.rectTransform.localScale.x, show ? crosshairActiveScale : 1f, Time.unscaledDeltaTime * 14f);
+                crosshair.rectTransform.localScale = new Vector3(s, s, 1f);
+            }
 
             float hold = interactor != null ? interactor.HoldProgress : 0f;
             if (holdFill != null) holdFill.fillAmount = hold;
@@ -183,10 +193,30 @@ namespace GameGameplay
 
             switch (kind)
             {
-                case ObjectiveSystem.ChangeKind.Added: EnqueueBanner(string.Format(bannerAddedFormat, entry.Data.Title), bannerAddedColor); break;
+                case ObjectiveSystem.ChangeKind.Added:
+                    EnqueueBanner(string.Format(bannerAddedFormat, entry.Data.Title), bannerAddedColor);
+                    if (objectiveText != null) { if (pulseRoutine != null) StopCoroutine(pulseRoutine); pulseRoutine = StartCoroutine(PulseObjectives()); }
+                    break;
                 case ObjectiveSystem.ChangeKind.Completed: EnqueueBanner(string.Format(bannerCompletedFormat, entry.Data.Title), bannerCompletedColor); break;
                 case ObjectiveSystem.ChangeKind.Failed: EnqueueBanner(string.Format(bannerFailedFormat, entry.Data.Title), bannerFailedColor); break;
             }
+        }
+
+        /// <summary>새 목표 추가 시 목록을 잠깐 키우고 색을 밝혔다가 돌려 놓는다 (약한 강조)</summary>
+        private IEnumerator PulseObjectives()
+        {
+            Transform t = objectiveText.transform;
+            Color baseColor = objectiveText.color;
+            for (float e = 0f; e < objectivePulseTime; e += Time.unscaledDeltaTime)
+            {
+                float k = Mathf.Sin(e / objectivePulseTime * Mathf.PI);   // 0 → 1 → 0
+                t.localScale = Vector3.one * Mathf.Lerp(1f, objectivePulseScale, k);
+                objectiveText.color = Color.Lerp(baseColor, objectivePulseColor, k);
+                yield return null;
+            }
+            t.localScale = Vector3.one;
+            objectiveText.color = baseColor;
+            pulseRoutine = null;
         }
 
         private void RefreshObjectives()

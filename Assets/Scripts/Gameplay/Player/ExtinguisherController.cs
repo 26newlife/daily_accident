@@ -37,9 +37,13 @@ namespace GameGameplay
         private bool wasSpraying;
 
         public bool PinPulled { get; private set; }
-        public float Charge01 => chargeSeconds > 0f ? charge / chargeSeconds : 0f;
+        public float Charge01 => ChargeTotal > 0f ? charge / ChargeTotal : 0f;
 
-        private void Awake() { charge = chargeSeconds; }
+        // 분사 세기/총량은 GameTimingConfig 가 우선한다 (진압 약 15~20초)
+        private float SuppressRate => GameTimingConfig.Current.extinguisherSuppressPerSecond;
+        private float ChargeTotal => GameTimingConfig.Current.extinguisherChargeSeconds;
+
+        private void Awake() { charge = ChargeTotal; }
         private void OnEnable() => EventBus.ScenarioEventRaised += OnScenarioEvent;
         private void OnDisable() => EventBus.ScenarioEventRaised -= OnScenarioEvent;
 
@@ -96,7 +100,7 @@ namespace GameGameplay
             foreach (RaycastHit h in hits)
             {
                 FireSource fire = h.collider.GetComponentInParent<FireSource>();
-                if (fire != null && fire.IsLit) fire.Suppress(suppressPerSecond * dt);
+                if (fire != null && fire.IsLit) fire.Suppress(SuppressRate * dt);
             }
         }
 

@@ -37,6 +37,7 @@ namespace GameGameplay
             IsActive = true;
             enabled = true;
             CurrentStepId = stepIds != null && stepIds.Length > 0 ? stepIds[0] : null;
+            TimingLog.Mark($"Act{machine.CurrentIndex + 1} start");
             OnEnter();
         }
 
@@ -44,7 +45,9 @@ namespace GameGameplay
         {
             if (!IsActive) return;
             IsActive = false;
+            if (Machine != null) TimingLog.Mark($"Act{Machine.CurrentIndex + 1} end");
             OnExit();
+            StopAllCoroutines();   // 이 Act 가 돌리던 대기 코루틴이 다음 Act 로 새지 않게
             enabled = false;
         }
 

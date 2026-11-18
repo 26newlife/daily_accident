@@ -20,6 +20,7 @@ namespace GameCore
         {
             IsPaused = paused;
             Time.timeScale = paused ? 0f : 1f;
+            AudioListener.pause = paused;   // 일시정지 중에는 효과음/환경음/알람도 멈춘다 (UI 소리는 ignoreListenerPause 로 예외 지정 가능)
         }
 
         public static void SetEnded() { IsEnded = true; }
@@ -30,6 +31,7 @@ namespace GameCore
         {
             IsPaused = false; IsEnded = false; IsPhoneOpen = false;
             Time.timeScale = 1f;
+            AudioListener.pause = false;
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

@@ -2569,7 +2569,7 @@ Camera:
   m_GameObject: {fileID: 3726580020713921861}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.56078434, g: 0.7058824, b: 0.8509804, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -2592,7 +2592,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.05
-  far clip plane: 200
+  far clip plane: 1800
   field of view: 78
   orthographic: 0
   orthographic size: 5
@@ -2902,7 +2902,7 @@ Transform:
   m_GameObject: {fileID: 8414538510674095869}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5400001, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3017,6 +3017,7 @@ MonoBehaviour:
   standHeight: 1.75
   crouchHeight: 1.05
   eyeBelowTop: 0.15
+  cameraHeightOffset: -0.06
   postureSpeed: 8
   obstructionMask:
     serializedVersion: 2
@@ -3069,6 +3070,16 @@ MonoBehaviour:
   recoveryPerSecond: 6
   recoveryDelay: 2
   deathReason: 1
+  sprintMultiplier: 1.6
+  unprotectedRampPerSecond: 0.012
+  unprotectedRampMax: 1.4
+  burnMax: 100
+  burnRecoveryPerSecond: 0.8
+  burnRecoveryDelay: 6
+  burnSpeedPenaltyAtFull: 0.3
+  burnFireAmplify: 1
+  burnShakeAmplitude: 0.03
+  burnDeathReason: 13
   jumpExtraDrainAtFullSmoke: 6
   coughBelowRatio: 0.7
   coughInterval: {x: 2, y: 5}

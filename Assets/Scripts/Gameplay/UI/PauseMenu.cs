@@ -17,6 +17,8 @@ namespace GameGameplay
         [SerializeField] private CanvasGroup panel;
         [SerializeField] private Button resumeButton;
         [SerializeField] private Button settingsButton;
+        [SerializeField] private Button controlsButton;
+        [SerializeField] private ControlsGuideCard controlsCard;
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private SettingsPanel settingsPopup;
         [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -30,18 +32,19 @@ namespace GameGameplay
             if (panel != null) { panel.alpha = 0f; panel.interactable = false; panel.blocksRaycasts = false; }
             if (resumeButton != null) resumeButton.onClick.AddListener(Resume);
             if (settingsButton != null) settingsButton.onClick.AddListener(OpenSettings);
+            if (controlsButton != null) controlsButton.onClick.AddListener(OpenControls);
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(GoToMainMenu);
         }
 
         private void OnEnable()
         {
-            if (input != null) input.PausePressed += OnPausePressed;
+            if (input != null) { input.PausePressed += OnPausePressed; input.BackPressed += OnBackPressed; }
             PopupBase.VisibilityChanged += OnPopupVisibilityChanged;
         }
 
         private void OnDisable()
         {
-            if (input != null) input.PausePressed -= OnPausePressed;
+            if (input != null) { input.PausePressed -= OnPausePressed; input.BackPressed -= OnBackPressed; }
             PopupBase.VisibilityChanged -= OnPopupVisibilityChanged;
         }
 
@@ -55,6 +58,10 @@ namespace GameGameplay
             {
                 PopupBase top = PopupBase.Top;
                 if (top != null) { top.RecoverFocus(); return; }
+                // 조작법 패널이 떠 있는 동안은 패널의 X 버튼만 조작되게 메뉴 버튼을 잠근다
+                bool cardOpen = controlsCard != null && controlsCard.IsVisible;
+                if (panel != null) panel.interactable = !cardOpen;
+                if (cardOpen) return;
                 EventSystem es = EventSystem.current;
                 if (es != null && es.currentSelectedGameObject == null && resumeButton != null && !PopupBase.AnyVisible)
                     es.SetSelectedGameObject(resumeButton.gameObject);
@@ -64,6 +71,9 @@ namespace GameGameplay
         private void OnPausePressed()
         {
             if (GameFlow.IsEnded) return;
+            // 조작법 패널이 열려 있으면 ESC/Start 는 패널만 닫고 일시정지 메뉴로 돌아간다 (재개하지 않는다)
+            if (controlsCard != null && controlsCard.IsVisible) { CloseControls(); return; }
+            if (PeepholeCameraController.IsActive || Time.unscaledTime - PeepholeCameraController.LastExitTime < 0.2f) return;
 
             if (PopupBase.HandleCancel()) return; // 설정 팝업 등이 열려 있으면 그것만 닫는다
             if (isOpen) Resume(); else Open();
@@ -86,6 +96,23 @@ namespace GameGameplay
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
         }
 
+        private void OpenControls()
+        {
+            if (controlsCard != null) controlsCard.Show();
+        }
+
+        private void OnBackPressed()
+        {
+            if (isOpen && controlsCard != null && controlsCard.IsVisible) CloseControls();   // 패드 B / 마우스 우클릭
+        }
+
+        private void CloseControls()
+        {
+            controlsCard.Hide();
+            if (panel != null) panel.interactable = !PopupBase.AnyVisible;
+            if (EventSystem.current != null && controlsButton != null) EventSystem.current.SetSelectedGameObject(controlsButton.gameObject);
+        }
+
         private void OpenSettings()
         {
             if (settingsPopup != null) settingsPopup.Open();
@@ -99,7 +126,7 @@ namespace GameGameplay
 
         private void GoToMainMenu()
         {
-            GameFlow.Reset();
+            GameRunContext.Cleanup("main-menu");
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
             SceneManager.LoadScene(mainMenuSceneName);

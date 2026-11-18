@@ -566,6 +566,12 @@ namespace GameUI.EditorTools
                     root.transform.position = Pt(op.center, 0f, line + op.inward * (t * 0.5f + 0.03f));
                     Box(root.transform, "Visual", Pt(0f, op.top * 0.5f, 0f), Sz(op.width, op.top, 0.06f), op.mat != null ? op.mat : FireDoorMat());
                     if (op.id == Ids.Elevator) Box(root.transform, "Seam", Pt(0f, op.top * 0.5f, 0.035f * op.inward), Sz(0.03f, op.top, 0.02f), Metal(), false);
+                    if (op.id == Ids.Elevator)
+                    {
+                        // 막는 메시지 대신 항상 상호작용 가능: 호출 → (평상시 정상 / 화재 중 확률적 위험) — ElevatorHazardSystem
+                        BuildElevatorParts(root, Pt(0f, op.top * 0.5f, 0.055f * op.inward), Sz(op.width - 0.12f, op.top - 0.06f, 0.04f));
+                        break;
+                    }
                     AddTrigger(root, op.id, op.prompt, op.message);
                     break;
                 }
@@ -601,6 +607,37 @@ namespace GameUI.EditorTools
             so.FindProperty("message").stringValue = message;
             so.ApplyModifiedPropertiesWithoutUndo();
             return t;
+        }
+
+        /// <summary>
+        /// 엘리베이터 문(elevator_door): 닫힌 문짝(Visual)과 열렸을 때 나타나는 탑승 칸(elevator_cabin, 기본 비활성)을 구성한다.
+        /// 탑승 칸의 콜라이더는 열린 문 위치를 막되 상호작용(탑승) 레이캐스트는 받는다.
+        /// </summary>
+        private static void BuildElevatorParts(GameObject root, Vector3 interiorCenter, Vector3 interiorSize)
+        {
+            Transform visual = root.transform.Find("Visual");
+            Transform seam = root.transform.Find("Seam");
+            if (visual != null && seam != null) seam.SetParent(visual, true);   // 문이 열리면 이음선도 함께 사라진다
+
+            var cabin = new GameObject("elevator_cabin");
+            cabin.transform.SetParent(root.transform, false);
+            Box(cabin.transform, "Interior", interiorCenter, interiorSize, Furn("ElevatorInterior", "2B2A28"));
+            var cabinItem = cabin.AddComponent<ElevatorInteractable>();
+            var cso = SO(cabinItem);
+            cso.FindProperty("id").stringValue = "elevator_cabin";
+            cso.FindProperty("prompt").stringValue = "엘리베이터 탑승";
+            cso.FindProperty("role").enumValueIndex = (int)ElevatorInteractable.PartRole.Cabin;
+            cso.ApplyModifiedPropertiesWithoutUndo();
+            cabin.SetActive(false);
+
+            var door = root.AddComponent<ElevatorInteractable>();
+            var dso = SO(door);
+            dso.FindProperty("id").stringValue = Ids.Elevator;
+            dso.FindProperty("prompt").stringValue = "엘리베이터 호출";
+            dso.FindProperty("role").enumValueIndex = (int)ElevatorInteractable.PartRole.Door;
+            dso.FindProperty("closedVisual").objectReferenceValue = visual != null ? visual.gameObject : null;
+            dso.FindProperty("cabinObject").objectReferenceValue = cabin;
+            dso.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>자리표시용 상호작용 오브젝트 (동작 없음): 루트 + Visual</summary>

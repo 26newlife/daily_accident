@@ -6,6 +6,14 @@ using UnityEngine.Audio;
 namespace GameCore
 {
     /// <summary>화면 모드 (설정 드롭다운 순서와 동일)</summary>
+    /// <summary>힌트 난이도. Easy: 모든 힌트 + 목표 화살표 / Normal: 조작·시스템 힌트만 / Hard: 힌트 없음(조작 카드만)</summary>
+    public enum HintLevel
+    {
+        Easy = 0,
+        Normal = 1,
+        Hard = 2,
+    }
+
     public enum DisplayMode
     {
         Fullscreen = 0,   // 전체화면 (독점)
@@ -61,6 +69,8 @@ namespace GameCore
         private const string KeyVSync = "settings.vsync";
         private const string KeyFrameLimit = "settings.frameLimit";
         private const string KeyBrightness = "settings.brightness";
+        private const string KeyHintLevel = "settings.hintLevel";
+        private const string KeyHighlight = "settings.highlight";
 
         // ───────── 현재 값 ─────────
         private static bool loaded;
@@ -73,6 +83,8 @@ namespace GameCore
         private static bool vSync;
         private static int frameLimit;
         private static float brightness;
+        private static int hintLevel;
+        private static bool highlightEnabled;
 
         private static AudioMixer mixer;
         private static bool mixerSearched;
@@ -164,6 +176,20 @@ namespace GameCore
             set { EnsureLoaded(); Set(ref brightness, Mathf.Clamp(value, BrightnessMin, BrightnessMax)); }
         }
 
+        /// <summary>힌트 난이도 (기본 Normal)</summary>
+        public static HintLevel HintLevel
+        {
+            get { EnsureLoaded(); return (HintLevel)hintLevel; }
+            set { EnsureLoaded(); Set(ref hintLevel, Mathf.Clamp((int)value, 0, 2)); }
+        }
+
+        /// <summary>가까운 상호작용 대상의 은은한 하이라이트 사용 여부</summary>
+        public static bool HighlightEnabled
+        {
+            get { EnsureLoaded(); return highlightEnabled; }
+            set { EnsureLoaded(); Set(ref highlightEnabled, value); }
+        }
+
         public static void SetResolution(int width, int height)
         {
             EnsureLoaded();
@@ -210,6 +236,8 @@ namespace GameCore
             PlayerPrefs.SetInt(KeyVSync, vSync ? 1 : 0);
             PlayerPrefs.SetInt(KeyFrameLimit, frameLimit);
             PlayerPrefs.SetFloat(KeyBrightness, brightness);
+            PlayerPrefs.SetInt(KeyHintLevel, hintLevel);
+            PlayerPrefs.SetInt(KeyHighlight, highlightEnabled ? 1 : 0);
             PlayerPrefs.Save();
         }
 
@@ -310,6 +338,8 @@ namespace GameCore
             vSync = PlayerPrefs.GetInt(KeyVSync, vSync ? 1 : 0) == 1;
             frameLimit = Mathf.Max(0, PlayerPrefs.GetInt(KeyFrameLimit, frameLimit));
             brightness = Mathf.Clamp(PlayerPrefs.GetFloat(KeyBrightness, brightness), BrightnessMin, BrightnessMax);
+            hintLevel = Mathf.Clamp(PlayerPrefs.GetInt(KeyHintLevel, hintLevel), 0, 2);
+            highlightEnabled = PlayerPrefs.GetInt(KeyHighlight, highlightEnabled ? 1 : 0) == 1;
 
             loaded = true;
         }
@@ -331,6 +361,8 @@ namespace GameCore
             vSync = true;
             frameLimit = FrameLimitDefault;
             brightness = BrightnessDefault;
+            hintLevel = (int)HintLevel.Normal;
+            highlightEnabled = true;
             loaded = true;
         }
 

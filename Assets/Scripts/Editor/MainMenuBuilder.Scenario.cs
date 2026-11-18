@@ -885,6 +885,8 @@ namespace GameUI.EditorTools
             var mouse = AddSlider(CreateSettingsRow(pageControls, 0, "마우스 감도", font), "MouseSensitivitySlider", res, font);
             var gamepad = AddSlider(CreateSettingsRow(pageControls, 1, "게임패드 감도", font), "GamepadSensitivitySlider", res, font);
             Toggle invertY = AddToggle(CreateSettingsRow(pageControls, 2, "Y축 반전", font), "InvertYToggle", res);
+            TMP_Dropdown hintDd = AddDropdown(CreateSettingsRow(pageControls, 3, "힌트 난이도", font), "HintLevelDropdown", res, font);
+            Toggle highlightTg = AddToggle(CreateSettingsRow(pageControls, 4, "상호작용 하이라이트", font), "HighlightToggle", res);
 
             // ② 소리
             var master = AddSlider(CreateSettingsRow(pageAudio, 0, "마스터 볼륨", font), "MasterSlider", res, font);
@@ -918,6 +920,8 @@ namespace GameUI.EditorTools
             setSo.FindProperty("gamepadSensitivitySlider").objectReferenceValue = gamepad.slider;
             setSo.FindProperty("gamepadSensitivityValue").objectReferenceValue = gamepad.value;
             setSo.FindProperty("invertYToggle").objectReferenceValue = invertY;
+            setSo.FindProperty("hintLevelDropdown").objectReferenceValue = hintDd;
+            setSo.FindProperty("highlightToggle").objectReferenceValue = highlightTg;
             setSo.FindProperty("masterSlider").objectReferenceValue = master.slider;
             setSo.FindProperty("masterValue").objectReferenceValue = master.value;
             setSo.FindProperty("musicSlider").objectReferenceValue = music.slider;

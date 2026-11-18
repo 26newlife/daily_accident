@@ -27,6 +27,9 @@ namespace GameCore
 
         public static void Clear() { numbers.Clear(); texts.Clear(); }
 
+        /// <summary>새 판 시작/재시작 시: 값과 변경 이벤트 구독을 모두 지운다 (GameRunContext)</summary>
+        public static void ResetRun() { numbers.Clear(); texts.Clear(); Changed = null; }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics() { numbers.Clear(); texts.Clear(); Changed = null; }
     }

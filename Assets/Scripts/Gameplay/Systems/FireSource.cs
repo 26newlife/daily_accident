@@ -63,6 +63,8 @@ namespace GameGameplay
         private float spreadTimer;
         private bool burnedOut;
         private bool electricalLive = true;
+        private bool uncontrollable;
+        private static bool uncontrollableAnnounced;
         private Collider hitCollider;
         private float flickerSeed;
 
@@ -73,6 +75,8 @@ namespace GameGameplay
         public HazardZone Zone => zone;
         public float HeatRadius => heatRadius;
         public bool BurnedOut => burnedOut;
+        /// <summary>한계 크기에 도달해 소화기/물로 진압할 수 없는 상태 (GameTimingConfig.uncontrollableIntensity)</summary>
+        public bool Uncontrollable => uncontrollable;
         /// <summary>전기가 흐르고 있는가 (멀티탭 플러그를 뽑으면 false)</summary>
         public bool ElectricalLive => electricalLive && (unplugSource == null || !unplugSource.IsRemoved);
 
@@ -86,6 +90,9 @@ namespace GameGameplay
             ApplyVisual();
         }
 
+        /// <summary>새 판 시작 시 static 상태 초기화 (GameRunContext)</summary>
+        public static void ResetRunState() { uncontrollableAnnounced = false; all.Clear(); }
+
         private void OnEnable() => all.Add(this);
         private void OnDisable() => all.Remove(this);
 
@@ -93,11 +100,17 @@ namespace GameGameplay
         {
             if (!IsLit || GameFlow.GameplayBlocked) return;
 
-            intensity = Mathf.Min(maxIntensity, intensity + growthPerSecond * Time.deltaTime);
+            GameTimingConfig timing = GameTimingConfig.Current;
+            intensity = Mathf.Min(maxIntensity, intensity + growthPerSecond * timing.fireGrowthMultiplier * Time.deltaTime);
+            if (!uncontrollable && countsForApartment && intensity >= timing.uncontrollableIntensity)
+            {
+                uncontrollable = true;   // 한 번 번지면 되돌릴 수 없다 → 수건 농성(2-B)으로 자연스럽게 유도
+                if (!uncontrollableAnnounced) { uncontrollableAnnounced = true; EventBus.ShowMessage(timing.uncontrollableMessage); }
+            }
 
             if (intensity >= spreadThreshold && spreadTargets != null && spreadTargets.Length > 0)
             {
-                spreadTimer += Time.deltaTime;
+                spreadTimer += Time.deltaTime * timing.fireSpreadMultiplier;
                 if (spreadTimer >= spreadDelay)
                 {
                     spreadTimer = 0f;
@@ -113,6 +126,7 @@ namespace GameGameplay
             if (burnedOut || IsLit) return;
             intensity = start > 0f ? start : startIntensity;
             spreadTimer = 0f;
+            uncontrollable = false;
             ApplyVisual();
             Ignited?.Invoke(this);
             EventBus.Raise(ScenarioEventType.Custom, Id + "_ignited", true);
@@ -122,6 +136,7 @@ namespace GameGameplay
         public void Suppress(float amount)
         {
             if (!IsLit) return;
+            if (uncontrollable) amount *= GameTimingConfig.Current.uncontrollableSuppressMultiplier;
             intensity -= amount;
             if (intensity <= 0.01f) Extinguish();
             else ApplyVisual();
@@ -209,6 +224,6 @@ namespace GameGameplay
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetStatics() => all.Clear();
+        private static void ResetStatics() { all.Clear(); uncontrollableAnnounced = false; }
     }
 }

@@ -27,6 +27,8 @@ namespace GameUI
         [SerializeField] private Slider gamepadSensitivitySlider;
         [SerializeField] private TMP_Text gamepadSensitivityValue;
         [SerializeField] private Toggle invertYToggle;
+        [SerializeField] private TMP_Dropdown hintLevelDropdown;
+        [SerializeField] private Toggle highlightToggle;
 
         [Header("② 소리")]
         [SerializeField] private Slider masterSlider;
@@ -55,6 +57,7 @@ namespace GameUI
         [Header("문구")]
         [SerializeField] private string[] displayModeLabels = { "전체화면", "창 모드", "테두리 없는 창" };
         [SerializeField] private string unlimitedFrameLabel = "무제한";
+        [SerializeField] private string[] hintLevelLabels = { "쉬움 (힌트+화살표)", "보통 (기본)", "어려움 (힌트 없음)" };
 
         private readonly List<Action> refreshers = new List<Action>();
         private List<Vector2Int> resolutions;
@@ -103,6 +106,7 @@ namespace GameUI
         private bool IsAnyDropdownExpanded()
             => (resolutionDropdown != null && resolutionDropdown.IsExpanded)
                || (displayModeDropdown != null && displayModeDropdown.IsExpanded)
+               || (hintLevelDropdown != null && hintLevelDropdown.IsExpanded)
                || (qualityDropdown != null && qualityDropdown.IsExpanded)
                || (frameLimitDropdown != null && frameLimitDropdown.IsExpanded);
 
@@ -150,6 +154,7 @@ namespace GameUI
             }
 
             FillDropdown(displayModeDropdown, new List<string>(displayModeLabels));
+            FillDropdown(hintLevelDropdown, new List<string>(hintLevelLabels));
             FillDropdown(qualityDropdown, new List<string>(QualitySettings.names));
 
             var frameOptions = new List<string>();
@@ -173,6 +178,8 @@ namespace GameUI
             BindSlider(gamepadSensitivitySlider, gamepadSensitivityValue,
                 () => GameSettings.GamepadSensitivity, v => GameSettings.GamepadSensitivity = v, v => v.ToString("0.0"));
             BindToggle(invertYToggle, () => GameSettings.InvertY, v => GameSettings.InvertY = v);
+            BindDropdown(hintLevelDropdown, () => (int)GameSettings.HintLevel, i => GameSettings.HintLevel = (HintLevel)i);
+            BindToggle(highlightToggle, () => GameSettings.HighlightEnabled, v => GameSettings.HighlightEnabled = v);
 
             BindSlider(masterSlider, masterValue, () => GameSettings.MasterVolume, v => GameSettings.MasterVolume = v, Percent);
             BindSlider(musicSlider, musicValue, () => GameSettings.MusicVolume, v => GameSettings.MusicVolume = v, Percent);

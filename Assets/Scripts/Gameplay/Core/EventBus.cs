@@ -17,6 +17,10 @@ namespace GameCore
         OilFireExplosion = 8, // 기름불에 물을 부어 불기둥 폭발
         ElectricShock = 9,  // 전기가 흐르는 멀티탭 화재에 물을 부어 감전
         DoorBackdraft = 10, // 뜨거운 현관문을 확인 없이 열어 복도 화염 유입
+        ElevatorFireball = 11, // 화재 중 엘리베이터가 도착해 문이 열리는 순간 화염이 덮침
+        ElevatorSmoke = 12,    // 엘리베이터 문이 열리며 유독가스 / 탑승 후 승강로 연기로 질식
+        BurnInjury = 13,       // 화상 수치(Burn)가 한도를 넘음 (뜨거운 버튼, 불길 근접 등)
+        FallFromHeight = 14,   // 베란다/창밖으로 뛰어내려 추락
     }
 
     /// <summary>ScenarioEvent 의 종류</summary>
@@ -77,6 +81,7 @@ namespace GameCore
         public static event Action<string> MessageRequested;    // HUD 안내 문구
         public static event Action<string> ScentRequested;      // 냄새 등 감각 묘사 (옅은 노란 글씨)
         public static event Action<string, float> SubtitleRequested; // 자막 (문구, 표시 시간)
+        public static event Action Explosion;                   // 아래층 가스 폭발 발생 (창밖 연출/가이드 구독)
 
         public static void Raise(ScenarioEvent e)
         {
@@ -96,6 +101,7 @@ namespace GameCore
         }
 
         public static void Raise(ScenarioEventType type, string sourceId, bool state = false) => Raise(new ScenarioEvent(type, sourceId, state));
+        public static void RaiseExplosion() => Explosion?.Invoke();
         public static void RaisePlayerDied(DeathReason reason) => PlayerDied?.Invoke(reason);
         public static void RaiseObjectiveAdded(string id) => ObjectiveAdded?.Invoke(id);
         public static void RaiseObjectiveCompleted(string id) => ObjectiveCompleted?.Invoke(id);
@@ -106,12 +112,24 @@ namespace GameCore
         public static void ShowScent(string text) { if (!string.IsNullOrEmpty(text)) ScentRequested?.Invoke(text); }
         public static void ShowSubtitle(string text, float seconds) { if (!string.IsNullOrEmpty(text)) SubtitleRequested?.Invoke(text, seconds); }
 
+        /// <summary>현재 EventBus 에 걸린 구독 수 (재시작 후 값이 처음과 같은지 확인하는 디버그용)</summary>
+        public static int SubscriptionCount()
+        {
+            int n = 0;
+            n += Count(ScenarioEventRaised); n += Count(Interacted); n += Count(ItemAcquired); n += Count(PlayerDied);
+            n += Count(ObjectiveAdded); n += Count(ObjectiveCompleted); n += Count(ObjectiveFailed); n += Count(EndingReached);
+            n += Count(ActChanged); n += Count(MessageRequested); n += Count(ScentRequested); n += Count(SubtitleRequested); n += Count(Explosion);
+            return n;
+        }
+
+        private static int Count(Delegate d) => d == null ? 0 : d.GetInvocationList().Length;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
             ScenarioEventRaised = null; Interacted = null; ItemAcquired = null; PlayerDied = null;
             ObjectiveAdded = null; ObjectiveCompleted = null; ObjectiveFailed = null;
-            EndingReached = null; ActChanged = null; MessageRequested = null; ScentRequested = null; SubtitleRequested = null;
+            EndingReached = null; ActChanged = null; MessageRequested = null; ScentRequested = null; SubtitleRequested = null; Explosion = null;
         }
     }
 }

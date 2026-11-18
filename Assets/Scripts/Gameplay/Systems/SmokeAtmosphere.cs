@@ -36,7 +36,7 @@ namespace GameGameplay
         {
             float smoke = HazardManager.Instance != null ? HazardManager.Instance.PlayerSmoke : 0f;
             float posture = player != null && player.IsCrouching ? crouchFactor : 1f;
-            density = Mathf.Lerp(density, smoke * posture * maxDensity, Time.unscaledDeltaTime * smoothing);
+            density = Mathf.Lerp(density, smoke * posture * maxDensity, Time.deltaTime * smoothing);
 
             bool on = density > 0.003f;
             RenderSettings.fog = on;

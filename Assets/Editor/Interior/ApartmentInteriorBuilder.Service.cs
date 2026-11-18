@@ -1,4 +1,7 @@
+using GameGameplay;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using M = GameUI.EditorTools.Interior.InteriorMaterialFactory;
 
 namespace GameUI.EditorTools.Interior
@@ -62,6 +65,40 @@ namespace GameUI.EditorTools.Interior
             Furn("Soap", r, 1.5f, 2.2f, 0f, 0.8f);
         }
 
+        /// <summary>
+        /// 현관문 도어 스코프(문구멍): 문 가운데 높이 1.5m 의 렌즈. 문과 함께 움직이도록 Hinge 의 자식으로 둔다.
+        /// 오브젝트 forward 가 문밖(복도) 방향이며, ViewPoint 는 문짝 바깥면보다 약간 바깥쪽에 있는 시점이다.
+        /// </summary>
+        private static void BuildPeephole(Transform hinge)
+        {
+            Transform existing = hinge.Find("door_peephole");
+            if (existing != null) Object.DestroyImmediate(existing.gameObject);
+
+            var go = new GameObject("door_peephole");
+            go.transform.SetParent(hinge, false);
+            go.transform.localPosition = new Vector3(0.475f, 1.5f, 0.055f);        // 문폭 0.95 의 한가운데, 안쪽 면
+            go.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);           // forward = 문밖(-z)
+
+            Prim.Cyl(go.transform, "Ring", Vector3.zero, 0.022f, 0.012f, M.Chrome, new Vector3(90f, 0f, 0f));
+            Prim.Cyl(go.transform, "Lens", new Vector3(0f, 0f, -0.004f), 0.012f, 0.008f, M.Glass, new Vector3(90f, 0f, 0f));
+            var col = go.AddComponent<BoxCollider>();
+            col.size = new Vector3(0.09f, 0.09f, 0.04f);                           // 조준하기 쉽도록 렌즈보다 크게
+            col.center = new Vector3(0f, 0f, -0.01f);
+
+            var view = new GameObject("ViewPoint").transform;
+            view.SetParent(go.transform, false);
+            view.localPosition = new Vector3(0f, 0f, 0.12f);                        // 문밖으로 0.12m (문짝 두께 바깥)
+
+            var ph = go.AddComponent<DoorPeephole>();
+            var so = new SerializedObject(ph);
+            so.FindProperty("id").stringValue = "door_peephole";
+            so.FindProperty("prompt").stringValue = "문구멍으로 보기";
+            so.FindProperty("viewPoint").objectReferenceValue = view;
+            so.FindProperty("outsideOffset").floatValue = 0f;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            MakeDynamic(go);
+        }
+
         // ═════════════════════════ 현관 (x 1.975~4.025, z 0.125~2.4) ═════════════════════════
         // 고정된 상호작용: 현관문(경첩 2.525,0 — 실내로 열림, 반경 0.95 안은 비워 둔다) / 소화기(3.92,0.32,1.9) / door_handle_check
         private static void BuildEntry()
@@ -96,6 +133,8 @@ namespace GameUI.EditorTools.Interior
                 lockGo.transform.localRotation = Quaternion.identity;
                 lockGo.name = "DoorLock";
                 MakeDynamic(lockGo);
+
+                BuildPeephole(hinge);
             }
         }
     }

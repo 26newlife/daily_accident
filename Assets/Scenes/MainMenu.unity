@@ -2898,6 +2898,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294108891
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_VerticalAlignment
       value: 512
       objectReference: {fileID: 0}
@@ -3915,6 +3923,8 @@ MonoBehaviour:
   gamepadSensitivitySlider: {fileID: 1117957429}
   gamepadSensitivityValue: {fileID: 1793131806}
   invertYToggle: {fileID: 153205694}
+  hintLevelDropdown: {fileID: 0}
+  highlightToggle: {fileID: 0}
   masterSlider: {fileID: 851446659}
   masterValue: {fileID: 630688873}
   musicSlider: {fileID: 717125100}
@@ -3938,6 +3948,10 @@ MonoBehaviour:
   - "\uCC3D \uBAA8\uB4DC"
   - "\uD14C\uB450\uB9AC \uC5C6\uB294 \uCC3D"
   unlimitedFrameLabel: "\uBB34\uC81C\uD55C"
+  hintLevelLabels:
+  - "\uC26C\uC6C0 (\uD78C\uD2B8+\uD654\uC0B4\uD45C)"
+  - "\uBCF4\uD1B5 (\uAE30\uBCF8)"
+  - "\uC5B4\uB824\uC6C0 (\uD78C\uD2B8 \uC5C6\uC74C)"
 --- !u!225 &463871851
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9790,7 +9804,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4294438374
   m_fontColor: {r: 0.9, g: 0.93, b: 0.97, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -9803,7 +9817,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -9988,6 +10002,30 @@ PrefabInstance:
       propertyPath: audioSource
       value: 
       objectReference: {fileID: 964848603}
+    - target: {fileID: 6710913708677969490, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294108891
+      objectReference: {fileID: 0}
+    - target: {fileID: 6710913708677969490, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449412796476174340, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294438374
+      objectReference: {fileID: 0}
+    - target: {fileID: 7449412796476174340, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7539081583724013897, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294108891
+      objectReference: {fileID: 0}
+    - target: {fileID: 7539081583724013897, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 9032049567181956897, guid: fdac01fda910b2e4889bba9736919e47, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -13612,6 +13650,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294108891
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_VerticalAlignment
       value: 512
       objectReference: {fileID: 0}
@@ -16872,6 +16918,14 @@ PrefabInstance:
     - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_characterSpacing
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294108891
+      objectReference: {fileID: 0}
+    - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 6066614961180668484, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_VerticalAlignment

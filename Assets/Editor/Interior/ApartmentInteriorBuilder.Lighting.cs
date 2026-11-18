@@ -146,6 +146,29 @@ namespace GameUI.EditorTools.Interior
                     ? new Vector3(BarrierThickness, b.size.y + 0.6f, along + 0.4f)
                     : new Vector3(along + 0.4f, b.size.y + 0.6f, BarrierThickness);
             }
+
+            // 베란다: 폭발로 고정 유리(balcony_glass)가 깨지면 개구부가 열린다. 외벽 바깥(z>9.125)에 전폭 투명 벽을 세워 추락/탈출을 막는다
+            var balcony = new GameObject("WindowBarrier_balcony");
+            balcony.transform.SetParent(safety, false);
+            balcony.transform.position = new Vector3(2.7f, 1.5f, 9.125f + BarrierGap + BarrierThickness * 0.5f);
+            balcony.AddComponent<BoxCollider>().size = new Vector3(5.8f, 3.4f, BarrierThickness);
+
+            // 통유리 위치의 보이지 않는 안전 콜라이더: 유리가 깨져 콜라이더가 꺼져도 베란다 끝(난간 높이 이상)에서 막는다.
+            // 베란다 안쪽 상호작용 대상(화분/칸막이/방화문)은 모두 유리보다 안쪽이라 레이캐스트를 가리지 않는다
+            var inner = new GameObject("WindowBarrier_balcony_glass");
+            inner.transform.SetParent(safety, false);
+            inner.transform.position = new Vector3((GlassX0 + GlassX1) * 0.5f, 1.5f, GlassPlaneZ + 0.03f);
+            inner.AddComponent<BoxCollider>().size = new Vector3(GlassX1 - GlassX0 + 0.2f, 3.4f, BarrierThickness * 0.6f);
+
+            // 추락 위험 구역: 유리가 깨진 뒤 베란다 끝(위 안전 콜라이더 바로 안쪽)에서 바깥으로 계속 밀거나 점프하면 추락 사고.
+            // 안전 콜라이더는 그대로라 월드 밖으로 나가지는 못하고, 이 트리거가 게임 오버만 처리한다 (FallHazard: 깨지기 전에는 비활성)
+            var fall = new GameObject("FallHazard_balcony");
+            fall.transform.SetParent(safety, false);
+            fall.transform.position = new Vector3((GlassX0 + GlassX1) * 0.5f, 1.2f, GlassPlaneZ - 0.2f);
+            var fbc = fall.AddComponent<BoxCollider>();
+            fbc.isTrigger = true;
+            fbc.size = new Vector3(GlassX1 - GlassX0, 2.0f, 0.5f);
+            fall.AddComponent<FallHazard>();
         }
     }
 }

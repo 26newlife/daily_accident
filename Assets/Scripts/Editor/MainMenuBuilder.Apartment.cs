@@ -34,7 +34,7 @@ namespace GameUI.EditorTools
         private const string ApartmentScenarioPath = "Assets/Data/Scenarios/Scenario_03.asset";
 
         // 플레이어 치수 (Scale 은 항상 1). 실제 성인 기준: 키 1.75 / 눈높이 1.6 / 반지름 0.28
-        private const float PlayerHeight = 1.75f, PlayerRadius = 0.28f, PlayerEyeBelowTop = 0.15f, PlayerFov = 78f;
+        private const float PlayerHeight = 1.75f, PlayerRadius = 0.28f, PlayerEyeBelowTop = 0.15f, PlayerFov = 78f, PlayerCameraHeightOffset = -0.06f;
         private const float PlayerWalk = 1.8f, PlayerSprint = 3.8f, PlayerCrouchSpeed = 1.0f, PlayerJump = 0.6f, PlayerInteractDistance = 2.0f;
 
         private static readonly Vector3 PlayerStart = new Vector3(1.7f, 0.02f, 4.0f);
@@ -93,6 +93,9 @@ namespace GameUI.EditorTools
 
             var gameplay = new GameObject("Gameplay").transform;
             level.SetParent(gameplay, true);
+
+            // 창밖 풍경 (배산임수 아파트 단지). 단독 재생성은 Tools > GameUI > Build Outdoor World
+            GameUI.EditorTools.Outdoor.OutdoorWorldBuilder.Build(gameplay);
 
             var player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
             player.transform.SetParent(gameplay, false);
@@ -232,6 +235,18 @@ namespace GameUI.EditorTools
                 EnsureDeath("Death_DoorBackdraft", DeathReason.DoorBackdraft, "복도 화염 유입",
                     "뜨거워진 현관문을 확인 없이 열자 산소가 유입되며 복도의 불길과 열기가 한꺼번에 밀려들었습니다.",
                     "문을 열기 전에 문손잡이와 문틈을 손등으로 확인하세요. 뜨겁다면 열지 말고 문틈을 막아 연기를 차단한 뒤 대피공간이나 다른 경로를 이용합니다."),
+                EnsureDeath("Death_ElevatorFireball", DeathReason.ElevatorFireball, "엘리베이터 화염",
+                    "화재 중 엘리베이터는 정전·고장으로 멈추거나, 열기와 불길이 승강로를 타고 이동합니다. 문이 열리는 순간 화염이 덮쳤습니다.",
+                    "화재 시 엘리베이터는 절대 사용하지 마세요. 반드시 비상계단(방화문)으로 대피하고, 계단이 막혔다면 대피공간이나 구조를 기다릴 수 있는 곳을 찾습니다."),
+                EnsureDeath("Death_ElevatorSmoke", DeathReason.ElevatorSmoke, "엘리베이터 질식",
+                    "화재 중 엘리베이터는 정전으로 갇히기 쉽고, 승강로는 굴뚝처럼 연기와 유독가스를 끌어올립니다. 좁은 칸 안에서 연기를 들이마셔 질식했습니다.",
+                    "화재 시 엘리베이터는 타지 말고 계단으로 대피하세요. 이미 갇혔다면 비상호출 버튼으로 알리고 몸을 낮춰 젖은 수건으로 코와 입을 막습니다."),
+                EnsureDeath("Death_BurnInjury", DeathReason.BurnInjury, "심한 화상",
+                    "뜨거워진 버튼이나 불길에 반복해서 닿아 치명적인 화상을 입었습니다. 화재 현장에서는 금속·문·버튼도 매우 뜨거울 수 있습니다.",
+                    "불길과 뜨거운 물체에는 접근하지 마세요. 손등으로 먼저 온도를 확인하고, 뜨겁다면 다른 경로를 선택합니다."),
+                EnsureDeath("Death_FallFromHeight", DeathReason.FallFromHeight, "추락 사고",
+                    "높은 층에서의 뛰어내림은 매우 위험합니다. 구조대를 기다리거나 안전한 대피 경로를 이용하세요.",
+                    "창밖이나 난간 밖으로 나가지 말고 옥상·경량칸막이·대피공간 등 정해진 경로를 이용하세요. 구조를 기다릴 때는 창가에서 위치를 알립니다."),
             };
 
             d.endings = new[]
@@ -296,14 +311,14 @@ namespace GameUI.EditorTools
 
             var camRoot = new GameObject("CameraRoot").transform;
             camRoot.SetParent(root.transform, false);
-            camRoot.localPosition = new Vector3(0f, PlayerHeight - PlayerEyeBelowTop, 0f);   // 눈높이 1.6
+            camRoot.localPosition = new Vector3(0f, PlayerHeight - PlayerEyeBelowTop + PlayerCameraHeightOffset, 0f);   // 눈높이 1.6 에서 6cm 낮춤
 
             var camGo = new GameObject("PlayerCamera", typeof(Camera), typeof(AudioListener));
             camGo.tag = "MainCamera";
             camGo.transform.SetParent(camRoot, false);
             var cam = camGo.GetComponent<Camera>();
-            cam.fieldOfView = PlayerFov; cam.nearClipPlane = 0.05f; cam.farClipPlane = 200f;
-            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.fieldOfView = PlayerFov; cam.nearClipPlane = 0.05f; cam.farClipPlane = 1800f;   // 창밖 산/하천/먼 동까지
+            cam.clearFlags = CameraClearFlags.Skybox;
             cam.backgroundColor = Hex("8FB4D9");
 
             // 손전등 (스마트폰 UI 에서 켜고 끈다)
@@ -332,6 +347,7 @@ namespace GameUI.EditorTools
             so.FindProperty("standHeight").floatValue = PlayerHeight;
             so.FindProperty("crouchHeight").floatValue = 1.05f;
             so.FindProperty("eyeBelowTop").floatValue = PlayerEyeBelowTop;
+            so.FindProperty("cameraHeightOffset").floatValue = PlayerCameraHeightOffset;
             so.FindProperty("walkSpeed").floatValue = PlayerWalk;
             so.FindProperty("sprintSpeed").floatValue = PlayerSprint;
             so.FindProperty("crouchSpeed").floatValue = PlayerCrouchSpeed;
@@ -408,6 +424,8 @@ namespace GameUI.EditorTools
                 deathAndEnding = root.AddComponent<DeathAndEnding>(),
                 hazard = root.AddComponent<HazardManager>(),
             };
+            WireTiming(root, s.clock);   // 전체 템포 설정 + F9 타이밍 오버레이
+            WireElevator(root);          // 엘리베이터 위험 확률 설정
             var machine = root.AddComponent<ScenarioStateMachine>();
             var fireManager = root.AddComponent<FireManager>();
             var atmosphere = root.AddComponent<SmokeAtmosphere>();
@@ -832,14 +850,17 @@ namespace GameUI.EditorTools
             // ── 3) 스마트폰 ──
             BuildPhone(ct, g, font, buttonPrefab, input, sys.clock, flashlight);
 
+            // ── 3.5) 가이드(힌트/조작 카드/목표 상세/목표 화살표) + 도어 스코프 ──
+            ControlsGuideCard controlsCard = BuildGuideAndPeephole(gameplay, ct, g, font, player, sys);
+
             // ── 4) 일시정지 메뉴 + 설정 팝업 ──
             PopupParts pause = BuildPopupFrame("PauseMenu", ct, g, font, "PAUSED", "일시정지", new Vector2(640, 600), false, 0.7f);
-            string[] pauseLabels = { "계속하기", "설정", "메인 메뉴로" };
-            var pauseButtons = new Button[3];
-            for (int i = 0; i < 3; i++)
+            string[] pauseLabels = { "계속하기", "조작법", "설정", "메인 메뉴로" };
+            var pauseButtons = new Button[4];
+            for (int i = 0; i < 4; i++)
             {
-                GameObject b = InstantiateButtonRaw(buttonPrefab, pause.window, $"Btn_Pause_{i + 1}", pauseLabels[i], new Vector2(480, 84), 32);
-                Anchor((RectTransform)b.transform, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -190 - i * 118));
+                GameObject b = InstantiateButtonRaw(buttonPrefab, pause.window, $"Btn_Pause_{i + 1}", pauseLabels[i], new Vector2(480, 80), 32);
+                Anchor((RectTransform)b.transform, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -170 - i * 96));
                 pauseButtons[i] = b.GetComponent<Button>();
             }
             SettingsPanel settings = BuildSettingsPopup(ct, g, font, buttonPrefab);
@@ -849,8 +870,10 @@ namespace GameUI.EditorTools
             pso.FindProperty("input").objectReferenceValue = input;
             pso.FindProperty("panel").objectReferenceValue = pause.root;
             pso.FindProperty("resumeButton").objectReferenceValue = pauseButtons[0];
-            pso.FindProperty("settingsButton").objectReferenceValue = pauseButtons[1];
-            pso.FindProperty("mainMenuButton").objectReferenceValue = pauseButtons[2];
+            pso.FindProperty("controlsButton").objectReferenceValue = pauseButtons[1];
+            pso.FindProperty("controlsCard").objectReferenceValue = controlsCard;
+            pso.FindProperty("settingsButton").objectReferenceValue = pauseButtons[2];
+            pso.FindProperty("mainMenuButton").objectReferenceValue = pauseButtons[3];
             pso.FindProperty("settingsPopup").objectReferenceValue = settings;
             pso.ApplyModifiedPropertiesWithoutUndo();
 

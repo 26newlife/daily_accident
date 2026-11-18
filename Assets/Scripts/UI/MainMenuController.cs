@@ -46,6 +46,7 @@ namespace GameUI
 
         private void Awake()
         {
+            GameRunContext.Cleanup("main-menu-enter");   // 게임에서 돌아온 경우 timeScale/오디오/static 상태 복구
             if (startButton != null) startButton.onClick.AddListener(OnStartGame);
             if (scenarioButton != null) scenarioButton.onClick.AddListener(OnScenarioSelect);
             if (settingsButton != null) settingsButton.onClick.AddListener(OnSettings);

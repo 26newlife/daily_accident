@@ -22,7 +22,7 @@ namespace GameGameplay
         public bool Interactable { get => interactable; set => interactable = value; }
 
         /// <summary>길게 눌러야 하는 시간(초). 0 이면 즉시 동작</summary>
-        public virtual float HoldSeconds => holdSeconds;
+        public virtual float HoldSeconds => GameTimingConfig.ResolveHold(id, holdSeconds);   // GameTimingConfig.holdOverrides 가 우선
 
         /// <summary>현재 상태에 맞는 프롬프트 문구</summary>
         public virtual string GetPrompt() => prompt;

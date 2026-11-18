@@ -16,8 +16,11 @@ namespace GameCore
         [Tooltip("시작 시각(게임 초). 0 = 00:00")]
         [SerializeField, Min(0f)] private float startGameSeconds;
         [SerializeField] private bool running = true;
+        [SerializeField, Tooltip("전체 템포/시간 설정 (Assets/Data/GameTimingConfig.asset). 비워도 기본값으로 동작")] private GameTimingConfig timing;
 
-        private readonly List<(float time, Action action)> schedule = new List<(float, Action)>();
+        private struct Timer { public float time; public Action action; public int runId; public string label; }
+        private readonly List<Timer> schedule = new List<Timer>();
+        private readonly List<Timer> due = new List<Timer>();
         private int lastMinute = -1;
 
         public static GameClock Instance { get; private set; }
@@ -28,7 +31,10 @@ namespace GameCore
         public float RealSeconds { get; private set; }
         public float Ratio => gameSecondsPerRealSecond;
         public bool Running => running;
-        public string FormattedTime => Format(GameSeconds);
+        /// <summary>예약돼 있는(아직 실행 전인) 타이머 수 — 재시작 후에도 처음과 같아야 한다</summary>
+        public int ActiveTimerCount => schedule.Count;
+        /// <summary>HUD/스마트폰에 보이는 시계. 진행은 1:1 이고 표시만 가상의 오전 시각으로 환산한다 (GameTimingConfig)</summary>
+        public string FormattedTime => GameTimingConfig.Current.FormatClock(GameSeconds);
 
         /// <summary>게임 분이 바뀔 때</summary>
         public event Action<int> MinuteChanged;
@@ -36,15 +42,22 @@ namespace GameCore
         private void Awake()
         {
             Instance = this;
+            if (timing != null) GameTimingConfig.SetActive(timing);
             GameSeconds = startGameSeconds;
         }
 
-        private void OnDestroy() { if (Instance == this) Instance = null; }
+        private void OnDestroy()
+        {
+            schedule.Clear();   // 씬이 사라지면 예약된 이벤트도 모두 취소
+            if (Instance == this) Instance = null;
+            GameTimingConfig.ClearActive(timing);
+        }
 
         private void Update()
         {
             float dt = Time.deltaTime; // timeScale 0이면 0
             if (dt <= 0f) return;
+            if (GameFlow.IsEnded) return;   // 사망/엔딩 후에는 시간도 예약 이벤트도 멈춘다
             RealSeconds += dt;
             if (!running) return;
 
@@ -53,12 +66,19 @@ namespace GameCore
             int minute = Mathf.FloorToInt(GameSeconds / 60f);
             if (minute != lastMinute) { lastMinute = minute; MinuteChanged?.Invoke(minute); }
 
+            // 실행 중 새 예약이 추가돼도 안전하도록 도래한 것을 먼저 모은 뒤 시각 순으로 실행
+            due.Clear();
             for (int i = schedule.Count - 1; i >= 0; i--)
             {
                 if (GameSeconds < schedule[i].time) continue;
-                Action a = schedule[i].action;
+                due.Add(schedule[i]);
                 schedule.RemoveAt(i);
-                a?.Invoke();
+            }
+            due.Sort((a, b) => a.time.CompareTo(b.time));
+            foreach (Timer t in due)
+            {
+                if (t.runId != GameRunContext.RunId) continue;   // 이전 판에서 예약된 타이머는 무시
+                t.action?.Invoke();
             }
         }
 
@@ -66,9 +86,9 @@ namespace GameCore
         public void SetRunning(bool value) => running = value;
 
         /// <summary>게임 시간 gameSeconds 가 되면 action 실행</summary>
-        public void ScheduleAt(float gameSeconds, Action action)
+        public void ScheduleAt(float gameSeconds, Action action, string label = null)
         {
-            if (action != null) schedule.Add((gameSeconds, action));
+            if (action != null) schedule.Add(new Timer { time = gameSeconds, action = action, runId = GameRunContext.RunId, label = label });
         }
 
         public void ClearSchedule() => schedule.Clear();

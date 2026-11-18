@@ -75,13 +75,13 @@ namespace GameGameplay
 
         private void Restart()
         {
-            GameFlow.Reset();
+            GameRunContext.Cleanup("restart");
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         private void GoToMainMenu()
         {
-            GameFlow.Reset();
+            GameRunContext.Cleanup("main-menu");
             SceneManager.LoadScene(mainMenuSceneName);
         }
     }

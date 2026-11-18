@@ -17,6 +17,8 @@ namespace GameGameplay
         [SerializeField, Min(0f), Tooltip("불 크기 1.0 당 불이 난 방의 연기 농도")] private float roomSmokePerIntensity = 0.9f;
         [SerializeField, Min(0.001f)] private float smokeRisePerSecond = 0.035f;
         [SerializeField, Min(0.001f)] private float smokeClearPerSecond = 0.05f;
+        [SerializeField, Tooltip("열어 두면 연기가 더 빨리 번지는 문/방화문 id")] private string[] leakDoorIds = { "door_front", "fire_door_stairs", "fire_door_shelter" };
+        [SerializeField, Min(0f), Tooltip("위 문이 하나 열려 있을 때마다 연기 상승 속도에 더해지는 비율")] private float openDoorSmokeBonus = 0.35f;
 
         [Header("열 / 화상")]
         [SerializeField] private float ambientTemperature = 24f;
@@ -29,7 +31,8 @@ namespace GameGameplay
 
         private readonly Dictionary<HazardZone, float> zoneSmoke = new Dictionary<HazardZone, float>();
         private float globalSmoke;
-        private float burnExposure;
+        private PlayerVitals vitals;
+        private ToggleInteractable[] leakDoors;
         private float warningTimer;
         private bool everLit, allOutRaised;
 
@@ -39,10 +42,28 @@ namespace GameGameplay
         public float SmokeFloor { get; set; }
         public float TotalIntensity { get; private set; }
         public int ActiveApartmentFires { get; private set; }
-        public float BurnExposure01 => Mathf.Clamp01(burnExposure / burnDeathSeconds);
+        public float BurnExposure01 => vitals != null ? vitals.Burn01 : 0f;
 
         private void Awake() { Instance = this; }
         private void OnDestroy() { if (Instance == this) Instance = null; }
+
+        private void Start()
+        {
+            vitals = FindFirstObjectByType<PlayerVitals>();
+            var found = new List<ToggleInteractable>();
+            foreach (ToggleInteractable t in FindObjectsByType<ToggleInteractable>(FindObjectsInactive.Include))
+                if (leakDoorIds != null && System.Array.IndexOf(leakDoorIds, t.Id) >= 0) found.Add(t);
+            leakDoors = found.ToArray();
+        }
+
+        /// <summary>방화문/현관문을 열어 둔 개수에 따른 연기 상승 배율 (사망까지는 아니지만 불리해진다)</summary>
+        private float OpenDoorSmokeFactor()
+        {
+            if (leakDoors == null) return 1f;
+            int open = 0;
+            foreach (ToggleInteractable t in leakDoors) if (t != null && t.IsOn) open++;
+            return 1f + openDoorSmokeBonus * open;
+        }
 
         private void Update()
         {
@@ -76,8 +97,9 @@ namespace GameGameplay
             HazardManager hazard = HazardManager.Instance;
             if (hazard == null) return;
 
+            float doorFactor = OpenDoorSmokeFactor();
             float target = Mathf.Clamp01(total * globalSmokePerIntensity + (everLit ? SmokeFloor : 0f));
-            globalSmoke = Mathf.MoveTowards(globalSmoke, target, (target > globalSmoke ? smokeRisePerSecond : smokeClearPerSecond) * dt);
+            globalSmoke = Mathf.MoveTowards(globalSmoke, target, (target > globalSmoke ? smokeRisePerSecond * GameTimingConfig.Current.smokeRiseMultiplier * doorFactor : smokeClearPerSecond * GameTimingConfig.Current.smokeClearMultiplier) * dt);
             if (!Mathf.Approximately(hazard.SmokeLevel, globalSmoke)) hazard.SetSmoke(globalSmoke);
 
             foreach (var kv in roomTarget) if (!zoneSmoke.ContainsKey(kv.Key)) zoneSmoke[kv.Key] = 0f;
@@ -87,7 +109,7 @@ namespace GameGameplay
                 roomTarget.TryGetValue(z, out float t);
                 t = Mathf.Clamp01(t);
                 float cur = zoneSmoke[z];
-                cur = Mathf.MoveTowards(cur, t, (t > cur ? smokeRisePerSecond * 1.5f : smokeClearPerSecond) * dt);
+                cur = Mathf.MoveTowards(cur, t, (t > cur ? smokeRisePerSecond * 1.5f * GameTimingConfig.Current.smokeRiseMultiplier * doorFactor : smokeClearPerSecond * GameTimingConfig.Current.smokeClearMultiplier) * dt);
                 zoneSmoke[z] = cur;
                 z.SetValues(z.GasLevel, cur, ambientTemperature + temperaturePerIntensity * Mathf.Clamp01(t));
             }
@@ -111,17 +133,12 @@ namespace GameGameplay
 
             if (closeness > 0f)
             {
-                burnExposure += dt * (0.4f + closeness);
+                // 불 근처에 머무르면 화상 수치(PlayerVitals.Burn)가 쌓이고, 한도에 닿으면 BurnInjury 사망 (기존 "burnDeathSeconds 머물면 사망"과 같은 속도)
+                if (vitals == null) vitals = FindFirstObjectByType<PlayerVitals>();
+                if (vitals != null) vitals.AddFireBurn(vitals.MaxBurn / burnDeathSeconds * (0.4f + closeness) * dt);
                 warningTimer -= dt;
                 if (BurnExposure01 > 0.3f && warningTimer <= 0f) { warningTimer = warningInterval; EventBus.ShowScent(heatWarning); }
-                if (burnExposure >= burnDeathSeconds)
-                {
-                    burnExposure = 0f;
-                    if (DeathAndEnding.Instance != null) DeathAndEnding.Instance.Die(DeathReason.Burn);
-                    else EventBus.RaisePlayerDied(DeathReason.Burn);
-                }
             }
-            else burnExposure = Mathf.Max(0f, burnExposure - dt * burnRecoveryMultiplier);
         }
 
         private void CheckAllOut(int active)

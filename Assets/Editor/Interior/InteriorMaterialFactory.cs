@@ -76,6 +76,8 @@ namespace GameUI.EditorTools.Interior
         public static Material Screen => Solid("Screen", "0C1015", 0.92f);
         public static Material Mirror => Solid("Mirror", "C8D6DE", 0.98f, 1f);
         public static Material Glass => Create("Glass", new Color(0.7f, 0.85f, 1f, 0.2f), 0.95f, 0f, null, Vector2.one, true, null);
+        public static Material BalconyGlass => Create("BalconyGlass", new Color(0.82f, 0.92f, 1f, 0.1f), 0.8f, 0f, null, Vector2.one, true, null);   // 풍경이 가려지지 않게 알파 0.1
+        public static Material BalconyFrame => Solid("BalconyFrame", "C4C8CD", 0.45f, 0.5f);
         public static Material Paper => Solid("Paper", "F5F1E6", 0.05f);
         public static Material PostIt => Solid("PostIt", "FFE35B", 0.05f);
         public static Material Cardboard => Solid("Cardboard", "B28B5E", 0.05f);

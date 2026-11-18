@@ -100,6 +100,7 @@ namespace GameUI.EditorTools.Interior
             root = new GameObject(RootName).transform;
             root.SetParent(level, false);
 
+            BuildBalconyFullGlass();  // 베란다 외벽 개구부를 바닥~천장 통유리로 (SkinStructure 보다 먼저: 걸레받이/재질 계산에 반영)
             SkinStructure();          // 벽/천장 재질, 걸레받이, 문틀/창틀, 바닥 마감
             BuildBedroom();
             BuildLiving();
@@ -248,6 +249,7 @@ namespace GameUI.EditorTools.Interior
                 bool corridor = c.name.StartsWith("Wall_Corridor") || c.name.StartsWith("Wall_Stair");
                 foreach (Renderer r in c.GetComponentsInChildren<Renderer>())
                 {
+                    if (r.name == BalconyGlassName) continue;   // 통유리는 벽 재질로 덮지 않는다
                     r.sharedMaterial = corridor ? M.CorridorWall : M.Wall;
                     Bounds b = r.bounds;
                     // 바닥에서 시작하는 벽 조각에만 걸레받이 (문/창문 개구부는 조각이 끊겨 있어 자동으로 비워진다)
