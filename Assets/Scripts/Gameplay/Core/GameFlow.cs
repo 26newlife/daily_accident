@@ -10,11 +10,13 @@ namespace GameCore
         public static bool IsPaused { get; private set; }
         public static bool IsEnded { get; private set; }
         public static bool IsPhoneOpen { get; private set; }
+        /// <summary>대화/선택지(ChoicePanel) 같은 모달 UI 가 열려 있는가 — 커서를 풀고 이동·시점을 멈춘다 (시간은 계속 흐른다)</summary>
+        public static bool IsModalOpen { get; private set; }
 
         /// <summary>이동/시점/상호작용을 막아야 하는가</summary>
         public static bool GameplayBlocked => IsPaused || IsEnded;
         /// <summary>마우스 커서를 풀어줘야 하는가 (메뉴·폰·결과 화면)</summary>
-        public static bool CursorFree => IsPaused || IsEnded || IsPhoneOpen;
+        public static bool CursorFree => IsPaused || IsEnded || IsPhoneOpen || IsModalOpen;
 
         public static void SetPaused(bool paused)
         {
@@ -25,16 +27,17 @@ namespace GameCore
 
         public static void SetEnded() { IsEnded = true; }
         public static void SetPhoneOpen(bool open) { IsPhoneOpen = open; }
+        public static void SetModalOpen(bool open) { IsModalOpen = open; }
 
         /// <summary>씬 시작 시 호출: 상태 초기화 + 시간 정상화</summary>
         public static void Reset()
         {
-            IsPaused = false; IsEnded = false; IsPhoneOpen = false;
+            IsPaused = false; IsEnded = false; IsPhoneOpen = false; IsModalOpen = false;
             Time.timeScale = 1f;
             AudioListener.pause = false;
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetStatics() { IsPaused = false; IsEnded = false; IsPhoneOpen = false; }
+        private static void ResetStatics() { IsPaused = false; IsEnded = false; IsPhoneOpen = false; IsModalOpen = false; }
     }
 }

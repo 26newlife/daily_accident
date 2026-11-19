@@ -70,6 +70,8 @@ namespace GameGameplay
         public bool IsGrounded => grounded;
         /// <summary>이동 속도 외부 배율 (화상 등 PlayerVitals 가 설정). 1 = 정상</summary>
         public float ExternalSpeedMultiplier { get; set; } = 1f;
+        /// <summary>시나리오가 거는 이동 속도 배율 (예: 루트 D 벽 짚고 하강). 화상 배율(ExternalSpeedMultiplier)과 별개로 곱해진다</summary>
+        public float ScenarioSpeedMultiplier { get; set; } = 1f;
         /// <summary>true 이면 이동/시점/자세 입력을 무시한다 (문구멍 등 다른 곳이 카메라를 제어할 때). 호흡기·시간 등 다른 시스템은 계속 동작한다.</summary>
         public bool ControlSuspended { get; set; }
         /// <summary>점프가 실행된 순간 (호흡기 체력 소모 등에서 구독)</summary>
@@ -114,7 +116,7 @@ namespace GameGameplay
         private void Update()
         {
             UpdateCursor();
-            if (GameFlow.GameplayBlocked || ControlSuspended) return;
+            if (GameFlow.GameplayBlocked || ControlSuspended || GameFlow.IsModalOpen) return;
 
             if (!GameFlow.CursorFree) UpdateLook();
             ApplyCameraRotation();
@@ -200,7 +202,7 @@ namespace GameGameplay
             Vector2 move = input.Move;
             IsSprinting = input.SprintHeld && !IsCrouching && move.y > 0.1f;
 
-            float speed = (IsCrouching ? crouchSpeed : (IsSprinting ? sprintSpeed : walkSpeed)) * ExternalSpeedMultiplier;
+            float speed = (IsCrouching ? crouchSpeed : (IsSprinting ? sprintSpeed : walkSpeed)) * ExternalSpeedMultiplier * ScenarioSpeedMultiplier;
             Vector3 wish = (transform.right * move.x + transform.forward * move.y);
             if (wish.sqrMagnitude > 1f) wish.Normalize();
             planarVelocity = Vector3.Lerp(planarVelocity, wish * speed, 1f - Mathf.Exp(-acceleration * Time.deltaTime));

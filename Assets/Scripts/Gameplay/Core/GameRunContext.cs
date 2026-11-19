@@ -33,6 +33,7 @@ namespace GameCore
             FireSource.ResetRunState();
             PeepholeCameraController.ResetRunState();
             ElevatorHazardSystem.ResetRunState();
+            RunCleanup.Run();                // Act 3~4 / NPC / 디버그 등 새 기능이 등록한 static 정리 루틴
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

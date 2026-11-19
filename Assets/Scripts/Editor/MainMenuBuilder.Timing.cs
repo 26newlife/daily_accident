@@ -52,6 +52,29 @@ namespace GameUI.EditorTools
             var so = SO(sys);
             so.FindProperty("config").objectReferenceValue = cfg;
             so.ApplyModifiedPropertiesWithoutUndo();
+
+            // 상태 머신 (ElevatorController) — 소리 슬롯은 비워 둔다
+            var ctl = systemsRoot.GetComponent<GameGameplay.ElevatorController>();
+            if (ctl == null) ctl = systemsRoot.AddComponent<GameGameplay.ElevatorController>();
+            UnityEngine.AudioSource Slot(string n) => AddAudioUnder(systemsRoot.transform, n);
+            var cso = SO(ctl);
+            cso.FindProperty("config").objectReferenceValue = cfg;
+            cso.FindProperty("cabin").objectReferenceValue = elev.cabin;
+            cso.FindProperty("exteriorDoor").objectReferenceValue = Obj<GameGameplay.ElevatorInteractable>("elevator_door");
+            cso.FindProperty("outsideStand").objectReferenceValue = elev.outsideStand;
+            cso.FindProperty("fireball").objectReferenceValue = elev.fireball;
+            cso.FindProperty("leakSmoke").objectReferenceValue = elev.leakSmoke;
+            cso.FindProperty("blastFire").objectReferenceValue = elev.blastFire;
+            cso.FindProperty("cabinZone").objectReferenceValue = elev.zone;
+            cso.FindProperty("dingAudio").objectReferenceValue = Slot("ElevatorDing");
+            cso.FindProperty("motorAudio").objectReferenceValue = Slot("ElevatorMotor");
+            cso.FindProperty("popAudio").objectReferenceValue = Slot("ElevatorPop");
+            cso.FindProperty("smokeAudio").objectReferenceValue = Slot("ElevatorSmoke");
+            cso.FindProperty("alarmAudio").objectReferenceValue = Slot("ElevatorAlarm");
+            cso.FindProperty("buttonAudio").objectReferenceValue = Slot("ElevatorButton");
+            cso.FindProperty("denyAudio").objectReferenceValue = Slot("ElevatorDeny");
+            cso.FindProperty("coughAudio").objectReferenceValue = Slot("ElevatorCough");
+            cso.ApplyModifiedPropertiesWithoutUndo();
         }
 
         [MenuItem("Tools/GameUI/Reset Game Timing Config (7-minute defaults)")]

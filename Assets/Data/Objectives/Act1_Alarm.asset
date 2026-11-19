@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 582122d204862114b951888909a2ff97, type: 3}
   m_Name: Act1_Alarm
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:ObjectiveData
-  id: objective_id
-  title: "\uBAA9\uD45C"
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.ObjectiveData
+  id: act1_alarm
+  title: "\uC54C\uB78C \uB044\uAE30"
   description: 
-  isMain: 1
+  isMain: 0

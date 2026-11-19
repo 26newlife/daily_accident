@@ -9,10 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 3f5f1b9b1ccc1454383c7556ecd32251, type: 3}
   m_Name: Ending_Rooftop
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:EndingData
-  id: ending_id
-  endingName: "\uC5D4\uB529"
-  description: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.EndingData
+  id: ending_rooftop
+  endingName: "\uC625\uC0C1 \uB300\uD53C"
+  description: "\uC544\uB798\uCE35 \uC5F0\uAE30\uAC00 \uC62C\uB77C\uC624\uB294 \uAC83\uC744 \uD655\uC778\uD558\uACE0 \uC704\uCABD\uC73C\uB85C \uD5A5\uD588\uB2E4. 14\uCE35\uACFC 17\uCE35\uC758 \uBC29\uD654\uBB38\uC744 \uB2EB\uC544 \uC5F0\uAE30\uB97C \uB2A6\uCD94\uACE0, 20\uCE35 \uBE44\uC0C1 \uC5F4\uC1E0\uD568\uC758 \uC720\uB9AC\uB97C \uAE68 \uC625\uC0C1 \uC5F4\uC1E0\uB97C \uC5BB\uC5B4 \uC625\uC0C1\uC73C\uB85C \uB098\uC654\uB2E4. \uB450 \uD314\uC744 \uD754\uB4E4\uC5B4 \uBCF4\uB0B8 \uC2E0\uD638\uB97C \uBCF8 \uD5EC\uAE30\uC640 \uACE0\uAC00\uC0AC\uB2E4\uB9AC\uCC28\uAC00 \uB3C4\uCC29\uD574 \uAD6C\uC870\uB418\uC5C8\uB2E4."
   isSurvival: 1
+  isHidden: 0
+  routeLabel: "\uB8E8\uD2B8 A \xB7 \uC625\uC0C1"

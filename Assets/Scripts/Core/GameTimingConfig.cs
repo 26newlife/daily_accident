@@ -107,17 +107,74 @@ namespace GameCore
         [Min(0.05f), Tooltip("호흡기 게이지 감소 배율. 0.5 면 서서 짙은 연기(0.6) 속을 걸을 때 약 28초")] public float vitalsDrainMultiplier = 0.5f;
 
         // ───────── Act 3 / Act 4 (구현 시 이 값을 따른다) ─────────
-        [Header("Act 3 — 복도·이웃 (아직 미구현: 구현 시 이 값을 사용)")]
+        [Header("Act 3 — 복도·이웃")]
         [Min(1f)] public float act3DurationTarget = 90f;
-        [Min(1f), Tooltip("복도 NPC 구조 상호작용 소요 (약 20~30초)")] public Vector2 act3NpcRescueSeconds = new Vector2(20f, 30f);
-        [Min(1f)] public float act3HardTimeoutSeconds = 90f;
+        [Min(1f), Tooltip("복도 NPC 구조 상호작용 소요 (약 20~30초) — 목표 시간 안내용")] public Vector2 act3NpcRescueSeconds = new Vector2(20f, 30f);
+        [Min(1f), Tooltip("Act 3 시작 후 이 시간이 지나면 어떤 상태든 Act 4 로 넘어간다")] public float act3HardTimeoutSeconds = 90f;
+        [Min(0f), Tooltip("현관 손잡이가 뜨거워 복도로 못 나가는 경우 Act 3(상황 판단) 길이")] public float act3BlockedSeconds = 25f;
+        [Min(0f), Tooltip("계단 방화문을 확인한 뒤 Act 4 로 넘어가기까지 (실시간 초)")] public float act3ClearDelay = 2f;
 
-        [Header("Act 4 — 최종 탈출 (아직 미구현: 구현 시 이 값을 사용)")]
+        [Header("Act 3 — 복도 / 계단실 연기")]
+        [Min(0f), Tooltip("Act 3 시작 후 복도 연기가 오르기 시작하는 시각(초)")] public float corridorSmokeStartDelay = 5f;
+        [Min(1f), Tooltip("복도 연기가 최대치까지 차는 시간(초)")] public float corridorSmokeRiseSeconds = 70f;
+        [Range(0f, 1f)] public float corridorSmokeMax = 0.55f;
+        [Min(1f), Tooltip("현관문을 열어 두었을 때 복도 연기 상승 배율")] public float corridorOpenDoorSmokeMultiplier = 1.5f;
+        [Min(0f), Tooltip("폭발 후 이 시간(초)이 지나면 8~9층 연기가 비상계단으로 올라오기 시작한다 (이전에 지나가면 '초기 방화문 관리 성공')")] public float stairSmokeArrivalSeconds = 95f;
+        [Min(1f), Tooltip("계단 연기가 최대치까지 차는 시간(초)")] public float stairSmokeRiseSeconds = 40f;
+        [Range(0f, 1f), Tooltip("방화문을 열었을 때 계단 연기가 이 값 이상이면 하강 불가(stairwellDownBlocked)")] public float stairBlockedThreshold = 0.45f;
+
+        [Header("Act 3 — NPC (할머니 / 청년)")]
+        [Min(0.5f)] public float grandmotherPressInterval = 6f;
+        [Min(1f), Tooltip("Act 3 복도 진입 후 이 시간(초) 동안 말을 걸지 않으면 할머니가 엘리베이터를 타려 한다(Panic)")] public float grandmotherPanicSeconds = 35f;
+        [Min(1f), Tooltip("Panic 후 엘리베이터에 탑승하기까지(초) — 이 안에 설득하면 막을 수 있다")] public float grandmotherBoardSeconds = 9f;
+        [Min(0.1f), Tooltip("할머니 동행 이동 속도(m/s). 플레이어 걷기(1.8)보다 느리다")] public float grandmotherFollowSpeed = 1.0f;
+        [Min(1f), Tooltip("동행 NPC 가 이 거리(m) 이상 멀어지면 멈춰서 기다려 달라고 한다")] public float npcWaitDistance = 4.5f;
+        [Min(0.5f)] public float npcFollowDistance = 1.4f;
+        [Min(3f), Tooltip("동행 NPC 가 이 거리(m) 이상 뒤처지면 플레이어 뒤로 순간이동")] public float npcWarpDistance = 9f;
+        [Min(0f), Tooltip("연기 1.0 에서 NPC 호흡 게이지(0~1)가 초당 줄어드는 양 (수건 없을 때)")] public float npcSmokeDrainPerSecond = 0.035f;
+        [Range(0f, 1f), Tooltip("젖은 수건을 받은 NPC 의 감소 배율")] public float npcTowelDrainMultiplier = 0.3f;
+        [Min(0f), Tooltip("설득(대화 선택) 처리 시간 — 길게 누르기가 아니라 대사 표시 시간")] public float npcPersuadeSeconds = 2.5f;
+        [Min(0f), Tooltip("쓰러진 NPC 를 부축해 일으키는 길게 누르기 시간")] public float npcLiftHoldSeconds = 3f;
+        [Min(1f), Tooltip("1003호에 쓰러진 할머니가 구출되지 않으면 의식을 잃기까지(초)")] public float grandmotherFallenSeconds = 55f;
+        [Min(0f), Tooltip("플레이어가 복도에 나온 뒤 청년이 수건 없이 계단으로 달려가기까지(초)")] public float youngManRunDelay = 10f;
+        [Min(0.5f)] public float youngManRunSpeed = 3.4f;
+        [Min(0f), Tooltip("청년이 계단에 들어간 뒤 쓰러지는 소리가 들리기까지(초)")] public float youngManFallSeconds = 6f;
+
+        [Header("Act 4 — 최종 탈출")]
         [Min(1f), Tooltip("루트별 완료 목표 (약 2분 20초 이내)")] public float act4RouteTargetSeconds = 140f;
-        [Min(1f)] public float act4HardTimeoutSeconds = 140f;
-        [Min(1f), Tooltip("계단 이동 전체 소요 — 층수는 압축 연출")] public float stairsTotalSeconds = 35f;
+        [Min(1f), Tooltip("Act 4 시작 후 이 시간 안에 어떤 루트로도 출발하지 못하면 연기에 갇힌다(ExitTimeout)")] public float act4HardTimeoutSeconds = 140f;
+        [Min(1f), Tooltip("계단 이동 전체 소요 — 층수는 압축 연출 (루트 D 의 벽 짚고 걷는 3구간 합계)")] public float stairsTotalSeconds = 35f;
         [Min(0.1f), Tooltip("중간층 통과 시 짧은 페이드/이동 연출 길이")] public float stairsMidFloorFadeSeconds = 0.7f;
         [Min(1f), Tooltip("대피공간 농성 루트 구조 대기 시간 (약 40~50초)")] public float shelterRescueWaitSeconds = 45f;
+
+        [Header("Act 4 — 루트 A (옥상)")]
+        [Min(0f), Tooltip("14·17층 방화문이 열려 있을 때 연기가 따라오기 시작하기까지(초)")] public float fireDoorChaseSeconds = 10f;
+        [Min(0f), Tooltip("연기가 따라오기 시작한 뒤 계단참 연기 상승 속도(1/초)")] public float landingSmokeRisePerSecond = 0.045f;
+        [Min(0.1f), Tooltip("비상 열쇠함 유리 깨기 길게 누르기(초)")] public float roofKeyBoxHoldSeconds = 2.5f;
+        [Min(0.1f), Tooltip("옥상 구조 신호(손 흔들기) 길게 누르기(초)")] public float roofSignalHoldSeconds = 6f;
+        [Min(0f), Tooltip("구조 신호 후 헬기/고가사다리차 도착 연출 길이(초)")] public float rooftopArrivalSeconds = 7f;
+
+        [Header("Act 4 — 루트 B (경량칸막이)")]
+        [Min(1)] public int partitionHitsHammer = 3;
+        [Min(1)] public int partitionHitsKick = 6;
+        [Min(0.05f), Tooltip("타격 사이 최소 간격(초)")] public float partitionHitCooldown = 0.35f;
+        [Min(0f), Tooltip("1003호 현관을 통해 복도를 지나 계단까지 가는 압축 이동 연출(초)")] public float routeBCorridorRunSeconds = 4f;
+
+        [Header("Act 4 — 루트 C (대피공간 농성)")]
+        [Range(0f, 1f), Tooltip("젖은 수건으로 한 면을 막았을 때의 밀봉률")] public float sealTowelRatio = 0.55f;
+        [Range(0f, 1f), Tooltip("청테이프로 한 면을 막았을 때의 밀봉률")] public float sealTapeRatio = 1.0f;
+        [Min(0.1f), Tooltip("문틈 한 면을 막는 길게 누르기(초)")] public float sealHoldSeconds = 1.6f;
+        [Range(0f, 1f), Tooltip("밀봉 0% 일 때 닫힌 대피공간으로 새어드는 연기 비율")] public float shelterUnsealedLeak = 0.7f;
+        [Range(0f, 1f), Tooltip("밀봉 100% 일 때 새어드는 연기 비율")] public float shelterSealedLeak = 0.05f;
+        [Range(0f, 1f), Tooltip("대피공간 창문을 열면 체감 연기가 이 비율로 줄어든다(신선한 공기)")] public float shelterWindowFactor = 0.55f;
+        [Min(0f), Tooltip("119 에 위치를 잘못 말했을 때 구조 도착 지연(초)")] public float rescueDelayWrong119 = 25f;
+        [Min(0f), Tooltip("119 에 신고하지 않았을 때 구조 도착 지연(초)")] public float rescueDelayNo119 = 35f;
+        [Min(0f), Tooltip("고가사다리차가 창문 앞에 도착하는 연출 길이(초)")] public float ladderArrivalSeconds = 6f;
+
+        [Header("Act 4 — 루트 D (계단 하강)")]
+        [Range(0.2f, 1f), Tooltip("벽을 짚고 내려가는 구간의 이동 속도 배율")] public float descentSpeedMultiplier = 0.55f;
+        [Range(0f, 0.1f), Tooltip("하강 중 카메라 미세 흔들림 세기")] public float descentShakeAmplitude = 0.012f;
+        [Min(0f), Tooltip("1층 도착 후 외부 집결지 연출 → 클리어까지(초)")] public float assemblyEndingDelay = 7f;
 
         // ───────── 시계 표시 / 개발용 로그 ─────────
         [Header("시계 표시 (진행은 1:1, 표시만 가상의 오전 시각)")]

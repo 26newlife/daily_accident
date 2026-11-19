@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: e52c8f487675b994ab90352a70ee62d1, type: 3}
   m_Name: Death_DoorBackdraft
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:DeathReasonData
-  reason: 0
-  title: "\uC0AC\uB9DD"
-  whyYouDied: 
-  correctAction: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.DeathReasonData
+  reason: 10
+  title: "\uBCF5\uB3C4 \uD654\uC5FC \uC720\uC785"
+  whyYouDied: "\uB728\uAC70\uC6CC\uC9C4 \uD604\uAD00\uBB38\uC744 \uD655\uC778 \uC5C6\uC774 \uC5F4\uC790 \uC0B0\uC18C\uAC00 \uC720\uC785\uB418\uBA70 \uBCF5\uB3C4\uC758 \uBD88\uAE38\uACFC \uC5F4\uAE30\uAC00 \uD55C\uAEBC\uBC88\uC5D0 \uBC00\uB824\uB4E4\uC5C8\uC2B5\uB2C8\uB2E4."
+  correctAction: "\uBB38\uC744 \uC5F4\uAE30 \uC804\uC5D0 \uBB38\uC190\uC7A1\uC774\uC640 \uBB38\uD2C8\uC744 \uC190\uB4F1\uC73C\uB85C \uD655\uC778\uD558\uC138\uC694. \uB728\uAC81\uB2E4\uBA74 \uC5F4\uC9C0 \uB9D0\uACE0 \uBB38\uD2C8\uC744 \uB9C9\uC544 \uC5F0\uAE30\uB97C \uCC28\uB2E8\uD55C \uB4A4 \uB300\uD53C\uACF5\uAC04\uC774\uB098 \uB2E4\uB978 \uACBD\uB85C\uB97C \uC774\uC6A9\uD569\uB2C8\uB2E4."

@@ -154,6 +154,16 @@ namespace GameGameplay
 
         public void SetLive(bool live) => electricalLive = live;
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        /// <summary>개발용: 불 크기를 직접 지정 (DebugPanel 슬라이더)</summary>
+        public void DebugSetIntensity(float value)
+        {
+            if (!IsLit) return;
+            intensity = Mathf.Clamp(value, 0.05f, 1f);
+            ApplyVisual();
+        }
+#endif
+
         private void ApplyVisual()
         {
             bool lit = IsLit;

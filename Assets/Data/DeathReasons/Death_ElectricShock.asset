@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: e52c8f487675b994ab90352a70ee62d1, type: 3}
   m_Name: Death_ElectricShock
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:DeathReasonData
-  reason: 0
-  title: "\uC0AC\uB9DD"
-  whyYouDied: 
-  correctAction: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.DeathReasonData
+  reason: 9
+  title: "\uAC10\uC804 \uC0AC\uB9DD"
+  whyYouDied: "\uC804\uAE30\uAC00 \uD750\uB974\uB294 \uBA40\uD2F0\uD0ED\uC758 \uBD88\uC5D0 \uBB3C\uC744 \uBD93\uC790 \uBB3C\uC744 \uD0C0\uACE0 \uC804\uB958\uAC00 \uD758\uB7EC \uAC10\uC804\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+  correctAction: "\uC804\uAE30 \uD654\uC7AC\uC5D0\uB294 \uBB3C\uC744 \uC4F0\uC9C0 \uB9C8\uC138\uC694. \uAC00\uB2A5\uD558\uBA74 \uD50C\uB7EC\uADF8\uB97C \uBA3C\uC800 \uBF51\uACE0, \uBD84\uB9D0 \uC18C\uD654\uAE30\uB85C \uC9C4\uC555\uD558\uAC70\uB098 \uAC70\uB9AC\uB97C \uB450\uACE0 \uB300\uD53C\uD569\uB2C8\uB2E4."

@@ -45,7 +45,7 @@ namespace GameGameplay
         [SerializeField] private string call119ActionId = "call_119";
         [SerializeField, Tooltip("폰을 열 때 발행하는 PhoneAction id")] private string phoneOpenActionId = "phone_open";
         [SerializeField, Tooltip("손전등 토글 시 발행하는 PhoneAction id (State = 켜짐)")] private string flashlightActionId = "flashlight";
-        [SerializeField] private string callPlaceholderText = "통화 기능 준비 중";
+        [SerializeField] private string callPlaceholderText = "119 연결 중...";
 
         [Header("열기/닫기")]
         [SerializeField] private float fadeSpeed = 8f;

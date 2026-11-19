@@ -17,6 +17,7 @@ namespace GameGameplay
 
         private ItemData[] slots;
         private readonly HashSet<ItemData> equipped = new HashSet<ItemData>();
+        private readonly Dictionary<ItemData, int> usesSpent = new Dictionary<ItemData, int>();
 
         public static InventorySystem Instance { get; private set; }
 
@@ -77,6 +78,33 @@ namespace GameGameplay
             Changed?.Invoke();
             if (!silent) EventBus.Raise(ScenarioEventType.ItemAcquired, item.Id);
             return true;
+        }
+
+        /// <summary>소모성 아이템 1회 사용. 남은 횟수가 0 이 되면 인벤토리에서 제거한다. 가지고 있지 않으면 false</summary>
+        public bool ConsumeUse(string itemId)
+        {
+            ItemData item = Find(itemId);
+            if (item == null) return false;
+            usesSpent.TryGetValue(item, out int spent);
+            spent++;
+            if (spent >= item.MaxUses) { usesSpent.Remove(item); Remove(item); }
+            else { usesSpent[item] = spent; Changed?.Invoke(); }
+            return true;
+        }
+
+        public ItemData Find(string itemId)
+        {
+            foreach (ItemData s in slots) if (s != null && s.Id == itemId) return s;
+            return null;
+        }
+
+        /// <summary>아이템 id 의 남은 사용 횟수 (없으면 0)</summary>
+        public int UsesLeft(string itemId)
+        {
+            ItemData item = Find(itemId);
+            if (item == null) return 0;
+            usesSpent.TryGetValue(item, out int spent);
+            return item.MaxUses - spent;
         }
 
         public bool Remove(ItemData item)

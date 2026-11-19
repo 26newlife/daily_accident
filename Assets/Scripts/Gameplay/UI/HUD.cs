@@ -20,7 +20,6 @@ namespace GameGameplay
         [SerializeField] private PlayerVitals vitals;
         [SerializeField] private InventorySystem inventory;
         [SerializeField] private ObjectiveSystem objectives;
-        [SerializeField] private GameClock clock;
 
         [Header("크로스헤어 / 프롬프트")]
         [SerializeField] private Image crosshair;
@@ -59,8 +58,6 @@ namespace GameGameplay
         [SerializeField] private Color objectivePulseColor = new Color(0.6f, 0.85f, 1f);
 
         [Header("시계")]
-        [SerializeField] private TMP_Text clockText;
-        [SerializeField] private string clockFormat = "{0}";
 
         [Header("호흡기 게이지")]
         [SerializeField] private CanvasGroup vitalsGroup;
@@ -125,7 +122,6 @@ namespace GameGameplay
         private void Update()
         {
             UpdatePrompt();
-            UpdateClock();
             UpdateVitalsVisibility();
         }
 
@@ -151,11 +147,6 @@ namespace GameGameplay
             float hold = interactor != null ? interactor.HoldProgress : 0f;
             if (holdFill != null) holdFill.fillAmount = hold;
             if (holdGroup != null) holdGroup.alpha = hold > 0f ? 1f : 0f;
-        }
-
-        private void UpdateClock()
-        {
-            if (clockText != null && clock != null) clockText.text = string.Format(clockFormat, clock.FormattedTime);
         }
 
         // ───────── 호흡기 게이지 ─────────

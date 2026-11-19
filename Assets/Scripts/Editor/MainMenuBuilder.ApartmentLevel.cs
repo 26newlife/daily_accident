@@ -843,7 +843,9 @@ namespace GameUI.EditorTools
 
             // 동쪽 외벽 + 주방 창문
             BuildWall("Wall_East", false, AptW, 0f, BalconyD, WallTExt,
-                Op(OpenKind.Window, 3.5f, 1.4f, 1.0f, 2.1f, Ids.WindowKitchen, "창문 닫기", "창문 열기", inward: -1, lockable: true));
+                Op(OpenKind.Window, 3.5f, 1.4f, 1.0f, 2.1f, Ids.WindowKitchen, "창문 닫기", "창문 열기", inward: -1, lockable: true),
+                // 대피공간 창문 (루트 C: 신선한 공기 / 고가사다리차 구조). 잠금 없이 바로 열린다
+                Op(OpenKind.Window, 8.2f, 0.8f, 1.1f, 2.1f, "window_shelter", "창문 닫기", "창문 열기", inward: -1));
 
             // 북쪽 벽: 안방 창 / 거실 창 / 베란다 문
             BuildWall("Wall_North", true, AptD, 0f, AptW, WallTExt,

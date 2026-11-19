@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: e52c8f487675b994ab90352a70ee62d1, type: 3}
   m_Name: Death_BurnInjury
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:DeathReasonData
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.DeathReasonData
   reason: 13
   title: "\uC2EC\uD55C \uD654\uC0C1"
   whyYouDied: "\uB728\uAC70\uC6CC\uC9C4 \uBC84\uD2BC\uC774\uB098 \uBD88\uAE38\uC5D0 \uBC18\uBCF5\uD574\uC11C \uB2FF\uC544 \uCE58\uBA85\uC801\uC778 \uD654\uC0C1\uC744 \uC785\uC5C8\uC2B5\uB2C8\uB2E4. \uD654\uC7AC \uD604\uC7A5\uC5D0\uC11C\uB294 \uAE08\uC18D\xB7\uBB38\xB7\uBC84\uD2BC\uB3C4 \uB9E4\uC6B0 \uB728\uAC70\uC6B8 \uC218 \uC788\uC2B5\uB2C8\uB2E4."

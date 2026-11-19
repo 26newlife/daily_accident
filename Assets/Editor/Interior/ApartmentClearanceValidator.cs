@@ -502,6 +502,10 @@ namespace GameUI.EditorTools.Interior
             foreach (InteractableObject io in all)
             {
                 if (io is FireSource) continue;                       // 불은 점화 전에는 상호작용 대상이 아니다
+                if (io is NpcBase) continue;                          // 이동하는 NPC(할머니/청년)는 가구 접근성 검증 대상이 아니다
+                Vector3 ip = io.transform.position;
+                if (ip.x < MinX - 0.5f || ip.x > MaxX + 0.5f || ip.z < MinZ - 0.5f || ip.z > MaxZ + 0.5f) continue;   // 계단참·옥상·하강 구간·집결지는 압축 이동(페이드+순간이동)으로 가는 별도 구역
+                if (io.Id == "door_1003_inside") continue;            // 1003호 안쪽 현관은 경량칸막이를 부순 뒤에만 들어갈 수 있다
                 Collider[] cols = io.GetComponentsInChildren<Collider>(false);
                 Bounds b = default; bool has = false;
                 foreach (Collider c in cols) { if (c.isTrigger) continue; if (!has) { b = c.bounds; has = true; } else b.Encapsulate(c.bounds); }

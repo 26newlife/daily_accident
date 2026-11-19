@@ -17,6 +17,7 @@ namespace GameGameplay
         [SerializeField] private TMP_Text titleText;
         [SerializeField] private TMP_Text whyText;
         [SerializeField] private TMP_Text correctActionText;
+        [SerializeField, Tooltip("사망 엔딩 모음 (발견한 사망 엔딩 n / N). 비워두면 표시하지 않는다")] private TMP_Text collectionText;
         [SerializeField] private Button restartButton;
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -30,8 +31,9 @@ namespace GameGameplay
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(GoToMainMenu);
         }
 
-        public void Show(DeathReasonData data)
+        public void Show(DeathReasonData data, string collection = null)
         {
+            if (collectionText != null) collectionText.text = collection ?? string.Empty;
             if (titleText != null) titleText.text = data != null ? data.Title : missingDataTitle;
             if (whyText != null) whyText.text = data != null ? data.WhyYouDied : string.Empty;
             if (correctActionText != null) correctActionText.text = data != null ? data.CorrectAction : string.Empty;

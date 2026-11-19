@@ -9,10 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 3f5f1b9b1ccc1454383c7556ecd32251, type: 3}
   m_Name: Ending_Partition
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:EndingData
-  id: ending_id
-  endingName: "\uC5D4\uB529"
-  description: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.EndingData
+  id: ending_partition
+  endingName: "\uACBD\uB7C9\uCE78\uB9C9\uC774 \uB300\uD53C"
+  description: "\uD604\uAD00\uC774 \uBD88\uAE38\uC5D0 \uB9C9\uD78C \uAC83\uC744 \uC190\uB4F1\uC73C\uB85C \uD655\uC778\uD558\uACE0 \uBCA0\uB780\uB2E4\uB85C \uD5A5\uD588\uB2E4. \uC587\uC740 \uC11D\uACE0\uBCF4\uB4DC \uCE78\uB9C9\uC774\uB97C \uBD80\uC218\uACE0 \uC606\uC9D1\uC73C\uB85C \uB118\uC5B4\uAC00 \uC5F0\uAE30 \uC18D\uC5D0 \uC4F0\uB7EC\uC9C4 \uC774\uC6C3\uC744 \uBD80\uCD95\uD574, \uC606\uC9D1 \uD604\uAD00\uC744 \uD1B5\uD574 \uACC4\uB2E8\uC73C\uB85C \uD0C8\uCD9C\uD588\uB2E4."
   isSurvival: 1
+  isHidden: 0
+  routeLabel: "\uB8E8\uD2B8 B \xB7 \uACBD\uB7C9\uCE78\uB9C9\uC774"

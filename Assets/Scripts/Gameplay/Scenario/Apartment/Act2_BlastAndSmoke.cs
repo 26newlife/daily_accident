@@ -204,6 +204,8 @@ namespace GameGameplay
         private void IgniteCorridor()
         {
             if (corridorFire == null || corridorFire.IsLit) return;
+            // handle cool and the player already left via Act 3 corridor route: do not ignite the fire at the door
+            if (cleared && !handleHot) return;
             corridorFire.Ignite();
             TimingLog.Mark("Act2 corridor fire");
             ScenarioFlags.Set(flagCorridorHot, true);

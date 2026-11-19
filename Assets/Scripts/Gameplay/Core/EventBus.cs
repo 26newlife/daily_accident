@@ -21,6 +21,10 @@ namespace GameCore
         ElevatorSmoke = 12,    // 엘리베이터 문이 열리며 유독가스 / 탑승 후 승강로 연기로 질식
         BurnInjury = 13,       // 화상 수치(Burn)가 한도를 넘음 (뜨거운 버튼, 불길 근접 등)
         FallFromHeight = 14,   // 베란다/창밖으로 뛰어내려 추락
+        StairwellSmoke = 15,   // 연기가 올라오는 비상계단으로 내려가다 질식 (계단은 굴뚝)
+        ShelterSmoke = 16,     // 밀봉하지 않은 대피공간에서 연기 유입으로 질식
+        ElevatorStallSmoke = 18, // 엘리베이터가 이동 중 급정지한 뒤 유입된 연기로 질식
+        ExitTimeout = 17,      // 대피 판단 시간 초과 — 연기와 열기에 갇힘
     }
 
     /// <summary>ScenarioEvent 의 종류</summary>

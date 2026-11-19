@@ -16,6 +16,8 @@ namespace GameGameplay
         [SerializeField] private TMP_Text descriptionText;
         [SerializeField] private TMP_Text scoreText;
         [SerializeField] private TMP_Text timeText;
+        [SerializeField, Tooltip("잘한 점 / 아쉬운 점 요약 (교육 피드백). 비워두면 표시하지 않는다")] private TMP_Text feedbackText;
+        [SerializeField, Tooltip("엔딩 모음 (사망 엔딩 / 생존 엔딩 발견 수). 비워두면 표시하지 않는다")] private TMP_Text collectionText;
         [SerializeField] private Button restartButton;
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private string mainMenuSceneName = "MainMenu";
@@ -35,11 +37,13 @@ namespace GameGameplay
             if (mainMenuButton != null) mainMenuButton.onClick.AddListener(GoToMainMenu);
         }
 
-        public void Show(EndingData ending, ScoreSystem score, float realSeconds)
+        public void Show(EndingData ending, ScoreSystem score, float realSeconds, string collection = null)
         {
+            if (feedbackText != null) feedbackText.text = BuildFeedbackText(score);
+            if (collectionText != null) collectionText.text = collection ?? string.Empty;
             if (endingNameText != null)
             {
-                endingNameText.text = ending.EndingName;
+                endingNameText.text = string.IsNullOrEmpty(ending.RouteLabel) ? ending.EndingName : ending.EndingName + "  <size=60%>" + ending.RouteLabel + "</size>";
                 endingNameText.color = ending.IsSurvival ? survivalColor : failureColor;
             }
             if (descriptionText != null) descriptionText.text = ending.Description;
@@ -48,11 +52,29 @@ namespace GameGameplay
             StartCoroutine(FadeIn());
         }
 
+        private string BuildFeedbackText(ScoreSystem score)
+        {
+            if (score == null || !score.HasRules) return string.Empty;
+            var sb = new StringBuilder();
+            sb.AppendLine("<color=#66E680><b>잘한 점</b></color>");
+            if (score.GoodPoints.Count == 0) sb.AppendLine("· (없음)");
+            for (int i = 0; i < score.GoodPoints.Count && i < 4; i++) sb.AppendLine("· " + score.GoodPoints[i]);
+            sb.AppendLine();
+            sb.AppendLine("<color=#FF9A6B><b>아쉬운 점</b></color>");
+            if (score.BadPoints.Count == 0) sb.AppendLine("· (없음)");
+            for (int i = 0; i < score.BadPoints.Count && i < 4; i++) sb.AppendLine("· " + score.BadPoints[i]);
+            return sb.ToString();
+        }
+
         private string BuildScoreText(ScoreSystem score)
         {
             if (score == null) return string.Empty;
             var sb = new StringBuilder();
-            if (score.Categories != null)
+            if (score.HasRules)
+            {
+                foreach (ScoreSystem.Line l in score.Breakdown) sb.AppendLine(string.Format(scoreLineFormat, l.label, l.earned, l.max));
+            }
+            else if (score.Categories != null)
                 foreach (ScoreCategoryData c in score.Categories)
                     if (c != null) sb.AppendLine(string.Format(scoreLineFormat, c.Label, score.GetEarned(c.Id), c.MaxPoints));
             sb.AppendLine();

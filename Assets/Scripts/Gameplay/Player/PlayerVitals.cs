@@ -194,11 +194,29 @@ namespace GameGameplay
             }
         }
 
-        private void Die() => DieWith(deathReason);
+        private void Die()
+        {
+            DeathReason? zoneReason = HazardManager.Instance != null ? HazardManager.Instance.PlayerSuffocationReason : null;
+            DieWith(zoneReason ?? deathReason);   // 계단/대피공간 등 구역별 교육 피드백
+        }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        /// <summary>개발용: 화상 수치 초기화 (DebugPanel)</summary>
+        public void DebugClearBurn() { burn = 0f; Changed?.Invoke(); }
+#endif
 
         private void DieWith(DeathReason reason)
         {
             if (IsDead) return;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (DebugFlags.Invulnerable)   // 무적(테스트용): 사망 대신 게이지를 절반으로 되돌린다
+            {
+                value = Mathf.Max(value, maxValue * 0.5f);
+                burn = Mathf.Min(burn, burnMax * 0.5f);
+                Changed?.Invoke();
+                return;
+            }
+#endif
             IsDead = true;
             EventBus.RaisePlayerDied(reason);
         }

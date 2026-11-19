@@ -19,6 +19,30 @@ namespace GameGameplay
 
         public PartRole Role => role;
 
+        private static readonly System.Collections.Generic.List<ElevatorInteractable> all = new System.Collections.Generic.List<ElevatorInteractable>();
+        private MaterialPropertyBlock block;
+        private void OnEnable() { if (!all.Contains(this)) all.Add(this); }
+        private void OnDisable() { all.Remove(this); }
+
+        /// <summary>호출 버튼(CallButton 역할)에 불을 켜고 끈다 — 호출 후 도착까지 점등</summary>
+        public static void SetCallButtonsLit(bool on)
+        {
+            foreach (ElevatorInteractable e in all)
+            {
+                if (e == null || e.role != PartRole.CallButton) continue;
+                if (e.block == null) e.block = new MaterialPropertyBlock();
+                Color c = on ? new Color(1f, 0.8f, 0.3f) : new Color(0.7f, 0.7f, 0.72f);
+                foreach (Renderer r in e.GetComponentsInChildren<Renderer>())
+                {
+                    r.GetPropertyBlock(e.block);
+                    e.block.SetColor("_BaseColor", c);
+                    e.block.SetColor("_Color", c);
+                    e.block.SetColor("_EmissionColor", on ? c * 1.5f : Color.black);
+                    r.SetPropertyBlock(e.block);
+                }
+            }
+        }
+
         /// <summary>Door 전용: 문 열림/닫힘 외형 전환</summary>
         public void SetOpen(bool open)
         {

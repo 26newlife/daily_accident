@@ -53,7 +53,7 @@ namespace GameUI.EditorTools.Interior
             SetDoorOpenYaw("fire_door_shelter", -90f);
             // 비상용품 선반: 북쪽 벽에 폭 0.775 x 깊이 0.25 로 붙인다 (방화문 입구 0.78m 와 안쪽 서 있을 공간 확보)
             Furn("ShelterShelf", r, new Vector3(6.0875f, 0f, 8.75f), 180f, new Vector3(0.775f, 1f, 0.714f));
-            OnWall("VentWindow", r, new Vector3(6.452f, 1.85f, 8.2f), 270f, "VentWindow");   // 환기창(루버)
+            // (환기창 루버 장식은 실제 열리는 대피공간 창문 window_shelter 로 대체되어 만들지 않는다)
 
             // 바닥 비상 표지
             Prim.Box(r, "ShelterFloorMark", new Vector3(5.95f, 0.014f, 8.2f), new Vector3(0.5f, 0.004f, 0.5f), M.GreenSign);

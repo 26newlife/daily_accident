@@ -89,6 +89,8 @@ namespace GameUI.EditorTools
             // 월드
             lvData = data;
             Transform level = BuildApartmentLevel(data.towel, data.extinguisher, data.key, data.tape, data.water);
+            BuildElevatorWorld(level);   // 엘리베이터 내부 세트 + 복도 쪽 폭발/징조 연출
+            BuildEvacWorld(level);   // Act 3~4 월드: 복도 NPC, 계단참/옥상, 계단 하강, 집결지, 1003호, 대피공간 밀봉, 망치
             GameObject playerPrefab = BuildPlayerPrefab(data.towel);
 
             var gameplay = new GameObject("Gameplay").transform;
@@ -120,7 +122,10 @@ namespace GameUI.EditorTools
         // ═════════════════════════ 데이터 에셋 ═════════════════════════
         private struct GameplayAssets
         {
-            public ItemData towel, extinguisher, key, tape, water, towelDry, waterPot;
+            public ItemData towel, extinguisher, key, tape, water, towelDry, waterPot, hammer, roofKey;
+            public ObjectiveData[] evacObjectives;
+            public ScoreRules scoreRules;
+            public EndingData hiddenEnding;
             public DeathReasonData[] deaths;
             public DeathReasonData fallback;
             public EndingData[] endings;
@@ -134,6 +139,14 @@ namespace GameUI.EditorTools
         {
             var existing = AssetDatabase.LoadAssetAtPath<T>(path);
             if (existing != null) return existing;
+
+            // 파일은 있는데 읽히지 않는 에셋(예전 빌더가 남긴 깨진 자리표시)은 CreateAsset 이 덮어쓰지 못해 씬 참조가 {fileID: 0} 으로 끊어진다.
+            // 지우고 새로 만든다 (사용자가 직접 쓴 내용은 읽히는 에셋이므로 이 경로를 타지 않는다)
+            if (File.Exists(path))
+            {
+                Debug.LogWarning($"[ApartmentBuilder] 읽을 수 없는 에셋을 지우고 다시 만듭니다: {path}");
+                AssetDatabase.DeleteAsset(path);
+            }
 
             EnsureFolder(Path.GetDirectoryName(path).Replace('\\', '/'));
             var asset = ScriptableObject.CreateInstance<T>();
@@ -156,13 +169,35 @@ namespace GameUI.EditorTools
             });
 
         private static DeathReasonData EnsureDeath(string file, DeathReason reason, string title, string why, string correct)
-            => Ensure<DeathReasonData>($"{DeathDir}/{file}.asset", so =>
+        {
+            int index = Array.IndexOf(Enum.GetValues(typeof(DeathReason)), reason);
+            var asset = Ensure<DeathReasonData>($"{DeathDir}/{file}.asset", so =>
             {
-                so.FindProperty("reason").enumValueIndex = Array.IndexOf(Enum.GetValues(typeof(DeathReason)), reason);
+                so.FindProperty("reason").enumValueIndex = index;
                 so.FindProperty("title").stringValue = title;
                 so.FindProperty("whyYouDied").stringValue = why;
                 so.FindProperty("correctAction").stringValue = correct;
             });
+
+            // 복구: 예전 빌더 실행이 남긴 "빈 자리표시 에셋"(reason=Unknown, 교육 문구 없음)은 사망 화면이 일반 문구로만 나오는 원인이다.
+            // 문구가 둘 다 비어 있을 때만 채운다 — 사용자가 직접 고친 문구는 건드리지 않는다.
+            if (reason != DeathReason.Unknown)
+            {
+                var fix = new SerializedObject(asset);
+                bool blank = string.IsNullOrEmpty(fix.FindProperty("whyYouDied").stringValue) && string.IsNullOrEmpty(fix.FindProperty("correctAction").stringValue);
+                if (blank)
+                {
+                    fix.FindProperty("reason").enumValueIndex = index;
+                    fix.FindProperty("title").stringValue = title;
+                    fix.FindProperty("whyYouDied").stringValue = why;
+                    fix.FindProperty("correctAction").stringValue = correct;
+                    fix.ApplyModifiedPropertiesWithoutUndo();
+                    EditorUtility.SetDirty(asset);
+                    Debug.Log($"[ApartmentBuilder] 비어 있던 사망 사유 에셋 복구: {file} → {reason}");
+                }
+            }
+            return asset;
+        }
 
         private static EndingData EnsureEnding(string file, string id, string name, string desc, bool survival)
             => Ensure<EndingData>($"{EndingDir}/{file}.asset", so =>
@@ -290,6 +325,7 @@ namespace GameUI.EditorTools
                 ["bottle"] = EnsureObjective("Act2_Bottle", "act2_bottle", "생수병 챙기기", false),
                 ["handle"] = EnsureObjective("Act2_Handle", "act2_handle", "현관문 손잡이 온도 확인하기", false),
             };
+            EnsureEvacData(ref d);   // Act 3~4: 망치/옥상 열쇠, 새 사망 사유, 엔딩 문구·히든 엔딩, 목표, ScoreRules
             return d;
         }
 
@@ -435,7 +471,7 @@ namespace GameUI.EditorTools
             var gas = root.AddComponent<GasLeakController>();
             ConfigureGas(gas);
 
-            // Act 4개 (빈 껍데기)
+            // Act 4개 (Act 1~2: 본 구현 / Act 3~4: 복도·이웃, 루트 A~D — MainMenuBuilder.Evac.*.cs 에서 연결)
             var actsRoot = new GameObject("Acts").transform;
             actsRoot.SetParent(root.transform, false);
             var act1 = AddAct<Act1_MorningSigns>(actsRoot, "Act1_MorningSigns", "아침의 징후", "평범한 아침, 가스 냄새 등 이상 징후를 발견한다.");
@@ -446,6 +482,7 @@ namespace GameUI.EditorTools
             ActBase a4 = AddAct<Act4_Evacuation>(actsRoot, "Act4_Evacuation", "대피", "옥상 / 경량칸막이 / 대피공간 / 1층 하강 중 탈출 루트를 선택한다.");
             ConfigureAct1(act1, gas, d, root.transform);
             ConfigureAct2(act2, gas, fireManager, d, root.transform, player);
+            ConfigureEvacSystems(root.transform, (Act3_FireSpreads)a3, (Act4_Evacuation)a4, d, player, s.score);
             var mso = SO(machine);
             SetObjectArray(mso.FindProperty("acts"), new[] { a1, a2, a3, a4 });
             mso.FindProperty("autoStart").boolValue = true;
@@ -758,8 +795,7 @@ namespace GameUI.EditorTools
             bannerText.fontStyle = FontStyles.Bold;
             Stretch(bannerText.rectTransform, 8);
 
-            TMP_Text clockText = GameText("ClockText", hud, "00:00", font, 40, TextAlignmentOptions.Right, TextMain);
-            Place(clockText.rectTransform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-48, -44), new Vector2(300, 56));
+            // (화면 상단 게임 시계는 삭제됨 — GameClock 로직과 폰 안의 시계는 그대로 유지)
 
             // 호흡기 게이지
             var vitalsGo = new GameObject("VitalsGauge", typeof(RectTransform), typeof(CanvasGroup));
@@ -828,14 +864,12 @@ namespace GameUI.EditorTools
             hudSo.FindProperty("vitals").objectReferenceValue = vitals;
             hudSo.FindProperty("inventory").objectReferenceValue = inventory;
             hudSo.FindProperty("objectives").objectReferenceValue = sys.objectives;
-            hudSo.FindProperty("clock").objectReferenceValue = sys.clock;
             hudSo.FindProperty("crosshair").objectReferenceValue = crosshair;
             hudSo.FindProperty("promptGroup").objectReferenceValue = promptGroup;
             hudSo.FindProperty("promptText").objectReferenceValue = promptText;
             hudSo.FindProperty("objectiveText").objectReferenceValue = objectiveText;
             hudSo.FindProperty("bannerGroup").objectReferenceValue = banner;
             hudSo.FindProperty("bannerText").objectReferenceValue = bannerText;
-            hudSo.FindProperty("clockText").objectReferenceValue = clockText;
             hudSo.FindProperty("vitalsGroup").objectReferenceValue = vitalsGo.GetComponent<CanvasGroup>();
             hudSo.FindProperty("vitalsFill").objectReferenceValue = vFill;
             SetObjectArray(hudSo.FindProperty("slotViews"), slotViews);
@@ -889,6 +923,8 @@ namespace GameUI.EditorTools
 
             DeathScreen deathScreen = BuildDeathScreen(ct, g, font, buttonPrefab);
             EndingScreen endingScreen = BuildEndingScreen(ct, g, font, buttonPrefab);
+            AddEndingScreenExtras(deathScreen, endingScreen, font);
+            BuildChoicePanel(ct, g, font, buttonPrefab);   // NPC 대화 / 119 위치 선택 (사망·엔딩 화면보다 아래)
 
             var deSo = SO(sys.deathAndEnding);
             SetObjectArray(deSo.FindProperty("deathReasons"), data.deaths);
@@ -1051,16 +1087,17 @@ namespace GameUI.EditorTools
             PopupParts p = BuildPopupFrame("EndingScreen", ct, g, font, "ENDING", "엔딩", new Vector2(1400, 860), false, 0.9f);
             TMP_Text name = p.window.Find("Title").GetComponent<TMP_Text>();
 
-            TMP_Text desc = GameText("Description", p.window, string.Empty, font, 30, TextAlignmentOptions.TopLeft, TextMain, true);
-            Place(desc.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(56, -170), new Vector2(1288, 150));
+            TMP_Text desc = GameText("Description", p.window, string.Empty, font, 26, TextAlignmentOptions.TopLeft, TextMain, true);
+            Place(desc.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(56, -150), new Vector2(1288, 120));
 
-            TMP_Text h = GameText("Header_Score", p.window, "구조 점수", font, 30, TextAlignmentOptions.MidlineLeft, Accent);
-            Place(h.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(56, -340), new Vector2(600, 44));
-            TMP_Text score = GameText("ScoreText", p.window, string.Empty, font, 30, TextAlignmentOptions.TopLeft, TextMain, true);
-            Place(score.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(56, -392), new Vector2(820, 340));
+            TMP_Text h = GameText("Header_Score", p.window, "구조 점수", font, 28, TextAlignmentOptions.MidlineLeft, Accent);
+            Place(h.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(56, -280), new Vector2(600, 40));
+            TMP_Text score = GameText("ScoreText", p.window, string.Empty, font, 22, TextAlignmentOptions.TopLeft, TextMain, true);
+            score.enableAutoSizing = true; score.fontSizeMin = 14; score.fontSizeMax = 22;
+            Place(score.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(56, -326), new Vector2(820, 420));
 
-            TMP_Text time = GameText("TimeText", p.window, string.Empty, font, 34, TextAlignmentOptions.TopRight, TextMain);
-            Place(time.rectTransform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-56, -392), new Vector2(460, 60));
+            TMP_Text time = GameText("TimeText", p.window, string.Empty, font, 30, TextAlignmentOptions.TopRight, TextMain);
+            Place(time.rectTransform, new Vector2(1, 1), new Vector2(1, 1), new Vector2(-56, -326), new Vector2(460, 50));
 
             GameObject restart = InstantiateButtonRaw(buttonPrefab, p.window, "Btn_Restart", "다시 시작", new Vector2(320, 76), 30);
             GameObject menu = InstantiateButtonRaw(buttonPrefab, p.window, "Btn_MainMenu", "메인 메뉴", new Vector2(320, 76), 30);

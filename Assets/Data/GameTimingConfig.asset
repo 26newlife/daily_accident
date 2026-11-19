@@ -89,11 +89,56 @@ MonoBehaviour:
   act3DurationTarget: 90
   act3NpcRescueSeconds: {x: 20, y: 30}
   act3HardTimeoutSeconds: 90
+  act3BlockedSeconds: 25
+  act3ClearDelay: 2
+  corridorSmokeStartDelay: 5
+  corridorSmokeRiseSeconds: 70
+  corridorSmokeMax: 0.55
+  corridorOpenDoorSmokeMultiplier: 1.5
+  stairSmokeArrivalSeconds: 95
+  stairSmokeRiseSeconds: 40
+  stairBlockedThreshold: 0.45
+  grandmotherPressInterval: 6
+  grandmotherPanicSeconds: 35
+  grandmotherBoardSeconds: 9
+  grandmotherFollowSpeed: 1
+  npcWaitDistance: 4.5
+  npcFollowDistance: 1.4
+  npcWarpDistance: 9
+  npcSmokeDrainPerSecond: 0.035
+  npcTowelDrainMultiplier: 0.3
+  npcPersuadeSeconds: 2.5
+  npcLiftHoldSeconds: 3
+  grandmotherFallenSeconds: 55
+  youngManRunDelay: 10
+  youngManRunSpeed: 3.4
+  youngManFallSeconds: 6
   act4RouteTargetSeconds: 140
   act4HardTimeoutSeconds: 140
   stairsTotalSeconds: 35
   stairsMidFloorFadeSeconds: 0.7
   shelterRescueWaitSeconds: 45
+  fireDoorChaseSeconds: 10
+  landingSmokeRisePerSecond: 0.045
+  roofKeyBoxHoldSeconds: 2.5
+  roofSignalHoldSeconds: 6
+  rooftopArrivalSeconds: 7
+  partitionHitsHammer: 3
+  partitionHitsKick: 6
+  partitionHitCooldown: 0.35
+  routeBCorridorRunSeconds: 4
+  sealTowelRatio: 0.55
+  sealTapeRatio: 1
+  sealHoldSeconds: 1.6
+  shelterUnsealedLeak: 0.7
+  shelterSealedLeak: 0.05
+  shelterWindowFactor: 0.55
+  rescueDelayWrong119: 25
+  rescueDelayNo119: 35
+  ladderArrivalSeconds: 6
+  descentSpeedMultiplier: 0.55
+  descentShakeAmplitude: 0.012
+  assemblyEndingDelay: 7
   useVirtualClock: 1
   virtualClockStartSeconds: 25920
   virtualClockShowSeconds: 1

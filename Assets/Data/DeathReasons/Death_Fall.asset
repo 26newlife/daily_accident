@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: e52c8f487675b994ab90352a70ee62d1, type: 3}
   m_Name: Death_Fall
-  m_EditorClassIdentifier: Assembly-CSharp:GameGameplay:DeathReasonData
-  reason: 0
-  title: "\uC0AC\uB9DD"
-  whyYouDied: 
-  correctAction: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.DeathReasonData
+  reason: 4
+  title: "\uCD94\uB77D"
+  whyYouDied: "\uBB34\uB9AC\uD558\uAC8C \uCC3D\uBC16\uC73C\uB85C \uD0C8\uCD9C\uD558\uB824\uB2E4 \uCD94\uB77D\uD588\uC2B5\uB2C8\uB2E4."
+  correctAction: "\uAC74\uBB3C \uBC16\uC73C\uB85C \uB6F0\uC5B4\uB0B4\uB9AC\uC9C0 \uB9D0\uACE0 \uC625\uC0C1\xB7\uACBD\uB7C9\uCE78\uB9C9\uC774\xB7\uB300\uD53C\uACF5\uAC04 \uB4F1 \uC815\uD574\uC9C4 \uACBD\uB85C\uB97C \uC774\uC6A9\uD558\uC138\uC694. \uAD6C\uC870\uB97C \uAE30\uB2E4\uB9B4 \uB54C\uB294 \uCC3D\uAC00\uC5D0\uC11C \uC704\uCE58\uB97C \uC54C\uB9BD\uB2C8\uB2E4."
