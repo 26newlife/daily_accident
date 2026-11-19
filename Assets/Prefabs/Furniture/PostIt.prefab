@@ -134,7 +134,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea7c3166dd9022b4db07a7fdf4ab2281, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.Flammable
-  linkedFire: {fileID: 0}
+  m_EditorClassIdentifier: Game.House::GameGameplay.Flammable
+  linkedFireId: 
   ignitability: 0.5
   burnSeconds: 20

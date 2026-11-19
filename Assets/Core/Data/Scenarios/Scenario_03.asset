@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21a3bb1c491279242a80902e9af14bf7, type: 3}
+  m_Name: Scenario_03
+  m_EditorClassIdentifier: Assembly-CSharp::GameData.ScenarioData
+  id: apartment_fire
+  displayName: "\uC544\uD30C\uD2B8 \uD654\uC7AC"
+  description: "\uACE0\uCE35 \uC544\uD30C\uD2B8 \uD654\uC7AC\uC5D0\uC11C \uD0C8\uCD9C\uD558\uB77C"
+  isUnlocked: 1
+  backgroundSprite: {fileID: 21300000, guid: c5d340e753d67df4cba2922910fb5520, type: 3}
+  thumbnail: {fileID: 0}
+  definition: {fileID: 11400000, guid: 236f02569f7a9fc43a7b2a2752dfa5ee, type: 2}

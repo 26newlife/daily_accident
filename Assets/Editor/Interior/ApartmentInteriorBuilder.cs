@@ -171,7 +171,7 @@ namespace GameUI.EditorTools.Interior
             var fs = fire.GetComponent<FireSource>();
             if (fs == null) return;
             var so = new SerializedObject(fl);
-            so.FindProperty("linkedFire").objectReferenceValue = fs;
+            so.FindProperty("linkedFireId").stringValue = fs.Id;   // 집은 시나리오 오브젝트를 직접 참조하지 않는다 (id 로만 연결)
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 

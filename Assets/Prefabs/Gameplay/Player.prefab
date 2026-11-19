@@ -2986,7 +2986,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8427397c89bc6f34c834418cd5743812, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.GameInput
+  m_EditorClassIdentifier: Game.Core::GameGameplay.GameInput
 --- !u!114 &4635063740210589524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2998,7 +2998,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5144a0c490e21bc4da7ae686431c744c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.PlayerController
+  m_EditorClassIdentifier: Game.Core::GameGameplay.PlayerController
   input: {fileID: 6309300408645157402}
   cameraRoot: {fileID: 6981309223068486535}
   walkSpeed: 1.8
@@ -3040,7 +3040,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51ac0eb1c31e68244aadcc2630f08e46, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.PlayerInteractor
+  m_EditorClassIdentifier: Game.Core::GameGameplay.PlayerInteractor
   input: {fileID: 6309300408645157402}
   viewCamera: {fileID: 8060157389494850683}
   interactDistance: 2
@@ -3058,7 +3058,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25d9b2d8ec2fe9e48a7c009c88b8472d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.PlayerVitals
+  m_EditorClassIdentifier: Game.Core::GameGameplay.PlayerVitals
   player: {fileID: 4635063740210589524}
   inventory: {fileID: 1113026735937956133}
   wetTowelItem: {fileID: 11400000, guid: dc92d03846f56494da070b5225fcd91d, type: 2}
@@ -3098,7 +3098,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 09049e234878a4845bd9b0e68f7d84e1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.InventorySystem
+  m_EditorClassIdentifier: Game.Core::GameGameplay.InventorySystem
   maxSlots: 8
   startingItems: []
   input: {fileID: 6309300408645157402}
@@ -3113,7 +3113,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f8dd6dfb059e85443b495e5836ef6b39, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.ExtinguisherController
+  m_EditorClassIdentifier: Game.Core::GameGameplay.ExtinguisherController
   input: {fileID: 6309300408645157402}
   inventory: {fileID: 1113026735937956133}
   viewCamera: {fileID: 8060157389494850683}

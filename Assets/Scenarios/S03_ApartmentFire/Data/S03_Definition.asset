@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 118c67db9df1d5e4f93d28b309762f93, type: 3}
+  m_Name: S03_Definition
+  m_EditorClassIdentifier: Game.Core::GameData.ScenarioDefinition
+  id: S03
+  displayName: "\uC544\uD30C\uD2B8 \uD654\uC7AC"
+  description: "\uACE0\uCE35 \uC544\uD30C\uD2B8 \uD654\uC7AC\uC5D0\uC11C \uD0C8\uCD9C\uD558\uB77C"
+  backgroundSprite: {fileID: 0}
+  thumbnail: {fileID: 0}
+  isPlayable: 1
+  targetPlayMinutes: 7
+  scenarioSceneName: S03_ApartmentFire
+  startSpawnId: spawn_bedroom_bed
+  environmentPreset: {fileID: 11400000, guid: 6c6b9fb24bb08104c9eb59125e6ca682, type: 2}
+  actTypeNames:
+  - Act1_MorningSigns
+  - Act2_BlastAndSmoke
+  - Act3_FireSpreads
+  - Act4_Evacuation
+  requiredItems:
+  - {fileID: 11400000, guid: dc92d03846f56494da070b5225fcd91d, type: 2}
+  - {fileID: 11400000, guid: bcf2795895b65a4408dea5443a5e2f71, type: 2}
+  - {fileID: 11400000, guid: 2d1e472b9cfb9214ba2158cd88d1672d, type: 2}
+  - {fileID: 11400000, guid: b127514e448e9ab47a735c6235c52b6d, type: 2}
+  - {fileID: 11400000, guid: 5304aeb81c5392941bbb6b32bcef0a7e, type: 2}
+  - {fileID: 11400000, guid: 3868f06be27589746a7fa437e918e49f, type: 2}
+  - {fileID: 11400000, guid: 89870318334cb4e48b03eeb2bca17ba8, type: 2}
+  deathReasons:
+  - {fileID: 11400000, guid: 5fc70dee6b3f6f14dbbc320b7a2f92d6, type: 2}
+  - {fileID: 11400000, guid: 7dcf5a821c1ee8b449cffe62a482aef1, type: 2}
+  - {fileID: 11400000, guid: 8716eda2bdc29ca49a10ff045af70caf, type: 2}
+  - {fileID: 11400000, guid: ca60e6f216371184abd33cf8fb62a8f6, type: 2}
+  - {fileID: 11400000, guid: 6f27832676d8b8841a24d23ca8bb4f4d, type: 2}
+  - {fileID: 11400000, guid: 0b2187b58b0513248bfad1b1eccc89fd, type: 2}
+  - {fileID: 11400000, guid: 7d9531b260c1f3e4982e2789a1c510ad, type: 2}
+  - {fileID: 11400000, guid: 4b19f0501a3bbbd4697c4ad291facb6a, type: 2}
+  - {fileID: 11400000, guid: 27d617c9581f0874a9c7e8095e2835d2, type: 2}
+  - {fileID: 11400000, guid: c2065439ee77c5f4bacee8a8b2a313e9, type: 2}
+  - {fileID: 11400000, guid: f5e2b6b6c99ce984490df64aa37e0410, type: 2}
+  - {fileID: 11400000, guid: a109c0ec60cf5344799105adb9ecf067, type: 2}
+  - {fileID: 11400000, guid: e0480f96484f50349b460c620aef0eb7, type: 2}
+  - {fileID: 11400000, guid: 6a95d6e036facdd429a9c8f319eda044, type: 2}
+  - {fileID: 11400000, guid: b05e5528701241447ad4fcb67f3259ac, type: 2}
+  - {fileID: 11400000, guid: ad8e9a6c75a85ca4fb2781c92dd97b2e, type: 2}
+  - {fileID: 11400000, guid: 20b064509d1053c47b6f3774fa6edef4, type: 2}
+  - {fileID: 11400000, guid: ff48e69b0494fdf4db670e3f17b260f6, type: 2}
+  fallbackDeath: {fileID: 11400000, guid: 42fa8cd5a61b0f543a8f1e0b2cd3f30a, type: 2}
+  endings:
+  - {fileID: 11400000, guid: e029f8e616c672642904fc2070043c31, type: 2}
+  - {fileID: 11400000, guid: 572964528a2d5c2419a0eec998df4aa1, type: 2}
+  - {fileID: 11400000, guid: 6280396168179a04faddee9bc53dc512, type: 2}
+  - {fileID: 11400000, guid: 8005cca4d55c61545b700e294d8c1bf2, type: 2}
+  - {fileID: 11400000, guid: 138de1c24f09bba4492f092002d1c9f4, type: 2}
+  hiddenEndingId: ending_hidden_grandmother
+  hiddenEndingFlag: evac_grandmother_with_player
+  scoreRules: {fileID: 11400000, guid: bc4af86a151161a4f81e2ab3ad1180d1, type: 2}
+  hints:
+  - {fileID: 11400000, guid: 9362dd137ca83a248afb50aa3391015a, type: 2}
+  - {fileID: 11400000, guid: ff17768642699be4da3542c79faa96bb, type: 2}
+  - {fileID: 11400000, guid: 6d422ec3455f7a24db8cb0ebd5156f82, type: 2}
+  - {fileID: 11400000, guid: b6fec5cf29857724aa86e27c417b75b3, type: 2}
+  - {fileID: 11400000, guid: fe915152f9e945f448f874e87380ae52, type: 2}

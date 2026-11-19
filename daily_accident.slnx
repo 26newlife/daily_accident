@@ -1,4 +1,6 @@
 ﻿<Solution>
-  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Game.Core.csproj" />
+  <Project Path="Game.Scenarios.S03.csproj" />
+  <Project Path="Game.House.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>
