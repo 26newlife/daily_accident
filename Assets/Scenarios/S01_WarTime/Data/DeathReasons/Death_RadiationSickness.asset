@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52c8f487675b994ab90352a70ee62d1, type: 3}
+  m_Name: Death_RadiationSickness
+  m_EditorClassIdentifier: Game.Core::GameGameplay.DeathReasonData
+  reason: 21
+  title: "\uAE09\uC131 \uBC29\uC0AC\uC120 \uD53C\uD3ED"
+  whyYouDied: "\uB099\uC9C4 \uC18D\uC5D0\uC11C \uD53C\uD3ED \uC218\uCE58\uAC00 \uD55C\uB3C4\uB97C \uB118\uC5C8\uB2E4. \uCC3D\uC774 \uAE68\uC9C0\uAC70\uB098 \uBC29\uB3C5\uBA74 \uC5C6\uC774 \uC624\uC5FC\uB41C \uACF5\uAE30\uB97C \uB9C8\uC168\uB2E4."
+  correctAction: "\uB099\uC9C4 \uC18D\uC5D0\uC11C\uB294 \uCC3D\uC744 \uBC00\uD3D0\uD558\uACE0, \uBC29\uB3C5\uBA74(\uB610\uB294 \uC816\uC740 \uC218\uAC74)\uC73C\uB85C \uD638\uD761\uC744 \uB9C9\uC73C\uBA70, \uB099\uC9C4 \uC804\uC5D0 \uC694\uC624\uB4DC\uD654 \uCE7C\uB968\uC744 \uBCF5\uC6A9\uD558\uC790. \uC624\uC5FC \uC9C0\uC5ED\uC5D0\uC11C \uBA39\uACE0 \uB9C8\uC2E0 \uAC83\uC740 \uC624\uC5FC\uB418\uC5C8\uC744 \uC218 \uC788\uB2E4."

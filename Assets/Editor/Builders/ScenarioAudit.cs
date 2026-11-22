@@ -196,13 +196,16 @@ namespace GameUI.EditorTools
             Check("C-4", "ScenarioDefinition.deathReasons (no null entries)", def != null && def.DeathReasons != null && def.DeathReasons.Length > 0 && !def.DeathReasons.Any(x => x == null), "사망 사유 목록");
             Check("A4-E2", "ScenarioDefinition.endings (no null entries)", def != null && def.Endings != null && def.Endings.Length > 0 && !def.Endings.Any(x => x == null), "엔딩 목록");
             foreach (DeathReason r in Enum.GetValues(typeof(DeathReason)))
-                Check("C-4", "DeathReason." + r, r == DeathReason.Unknown || (def != null && def.DeathReasons != null && def.DeathReasons.Any(x => x != null && x.Reason == r && !string.IsNullOrEmpty(x.WhyYouDied) && !string.IsNullOrEmpty(x.CorrectAction))), "교육 피드백 연결");
+                Check("C-4", "DeathReason." + r, r == DeathReason.Unknown || IsWarOnlyReason(r) || (def != null && def.DeathReasons != null && def.DeathReasons.Any(x => x != null && x.Reason == r && !string.IsNullOrEmpty(x.WhyYouDied) && !string.IsNullOrEmpty(x.CorrectAction))), "교육 피드백 연결");
             Check("C-5", "GameRunContext/RunCleanup", FindObjectOfType_GameSceneEntry(roots), "씬 진입 시 GameRunContext.Begin");
             Check("C-5", "EvacDirector", Find<EvacDirector>() != null, "압축 이동 코루틴 (씬 소속 → 재시작 시 정리)");
 
             Debug.Log($"[Audit] ───── 완료: PASS {pass} / FAIL {fail} ─────");
             if (fail > 0) Debug.LogWarning($"[Audit] FAIL {fail}건 — Tools > GameUI > Build Apartment Scene 을 (백업 후) 다시 실행했는지 확인하세요.");
         }
+
+        /// <summary>시나리오 1(전시 상황) 전용 사망 사유 — S01 정의에서 검사한다 (시나리오 3 감사 대상 아님)</summary>
+        private static bool IsWarOnlyReason(DeathReason r) => r == DeathReason.NuclearFlash || r == DeathReason.ShockwaveDebris || r == DeathReason.RadiationSickness || r == DeathReason.Hypothermia || r == DeathReason.Starvation;
 
         // ═════════════════════ 검사 헬퍼 ═════════════════════
         private static InteractableObject Interact(string checkId, string id, Type type, Wire wire, string note)

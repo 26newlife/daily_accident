@@ -1001,7 +1001,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d4efebe714a8a3419e489eb17d03618, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameUI.MenuButtonFX
+  m_EditorClassIdentifier: Game.Core::GameUI.MenuButtonFX
   scaleTarget: {fileID: 7115128386922517462}
   fillImage: {fileID: 6089374813623314023}
   borderImage: {fileID: 7897917733386953862}
@@ -1051,7 +1051,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 60f22b4e67902a34d9792ed76fd16cb6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameUI.ScenarioSlot
+  m_EditorClassIdentifier: Game.Core::GameUI.ScenarioSlot
   button: {fileID: 835158522358321526}
   numberText: {fileID: 6234571917577611460}
   nameText: {fileID: 7822881258607934483}

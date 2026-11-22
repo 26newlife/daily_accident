@@ -25,6 +25,11 @@ namespace GameCore
         ShelterSmoke = 16,     // 밀봉하지 않은 대피공간에서 연기 유입으로 질식
         ElevatorStallSmoke = 18, // 엘리베이터가 이동 중 급정지한 뒤 유입된 연기로 질식
         ExitTimeout = 17,      // 대피 판단 시간 초과 — 연기와 열기에 갇힘
+        NuclearFlash = 19,     // 시나리오 1: 거짓 종전에 속아 밖에 있거나 차폐를 해체한 채 섬광·충격파에 노출
+        ShockwaveDebris = 20,  // 시나리오 1: 창문 방어도가 낮아 충격파에 유리·파편 피해
+        RadiationSickness = 21, // 시나리오 1: 낙진 피폭 수치가 한도를 넘음
+        Hypothermia = 22,      // 시나리오 1: 핵겨울 한파에 체온 저하
+        Starvation = 23,       // 시나리오 1: 식량·물 고갈
     }
 
     /// <summary>ScenarioEvent 의 종류</summary>

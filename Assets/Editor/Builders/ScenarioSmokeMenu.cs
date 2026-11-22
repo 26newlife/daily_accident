@@ -20,6 +20,21 @@ namespace GameUI.EditorTools
             RunBatch();
         }
 
+        [MenuItem("Tools/GameUI/Debug/Run S01 Smoke Test")]
+        public static void RunS01()
+        {
+            if (!EditorApplication.isPlaying && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            RunS01Batch();
+        }
+
+        public static void RunS01Batch()
+        {
+            EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
+            SessionState.SetBool("S01SmokeTest.Run", true);
+            Debug.Log("[S01Smoke] entering play mode...");
+            EditorApplication.EnterPlaymode();
+        }
+
         public static void RunBatch()
         {
             EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);

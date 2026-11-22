@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7c962c88ef28104cb497740a997270b, type: 3}
+  m_Name: Env_War_Night
+  m_EditorClassIdentifier: Game.Core::GameData.EnvironmentPreset
+  displayName: "\uC804\uC2DC \uBC24"
+  timeOfDay: 3
+  applySun: 1
+  sunEuler: {x: -25, y: -30, z: 0}
+  sunIntensity: 0.04
+  sunColor: {r: 0.4, g: 0.45, b: 0.7, a: 1}
+  applyAmbient: 1
+  ambientColor: {r: 0.04, g: 0.05, b: 0.08, a: 1}
+  applyFog: 0
+  fogColor: {r: 0.6, g: 0.65, b: 0.7, a: 1}
+  fogDensity: 0.002
+  windowView: 0
+  applyTraffic: 1
+  pedestrians: 0
+  vehicles: 0
+  trafficDensity: 0
+  ambientSound: {fileID: 0}
+  ambientVolume: 0.4

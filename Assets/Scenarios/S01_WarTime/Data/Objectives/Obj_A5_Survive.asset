@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 582122d204862114b951888909a2ff97, type: 3}
+  m_Name: Obj_A5_Survive
+  m_EditorClassIdentifier: Game.Core::GameGameplay.ObjectiveData
+  id: war_a5_survive
+  title: "\uC12C\uAD11\uACFC \uCDA9\uACA9\uD30C\uC5D0\uC11C \uC0B4\uC544\uB0A8\uB294\uB2E4"
+  description: "\uBC16\uC5D0 \uB098\uAC00\uC9C0 \uB9D0\uACE0, \uCC28\uD3D0\uB97C \uD574\uCCB4\uD558\uC9C0 \uB9D0 \uAC83."
+  isMain: 1

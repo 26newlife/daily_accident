@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 582122d204862114b951888909a2ff97, type: 3}
+  m_Name: Obj_A2_Radio
+  m_EditorClassIdentifier: Game.Core::GameGameplay.ObjectiveData
+  id: war_a2_radio
+  title: "\uB2E8\uD30C \uB77C\uB514\uC624\uB85C \uC9C4\uC9DC \uC18C\uC2DD\uC744 \uB4E3\uB294\uB2E4"
+  description: "\uACF5\uC2DD \uBC29\uC1A1\uB9CC \uBBFF\uC5B4\uB3C4 \uB420\uAE4C? \uB2E8\uD30C \uC8FC\uD30C\uC218\uB97C \uB3CC\uB824 \uBCF4\uC790."
+  isMain: 1

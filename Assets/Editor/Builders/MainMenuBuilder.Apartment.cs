@@ -120,6 +120,10 @@ namespace GameUI.EditorTools
             SetupBuildSettings();
             AssetDatabase.SaveAssets();
             Debug.Log("[ApartmentBuilder] 완료: GameScene(아파트 화재 1004호), Player 프리팹, 데이터 에셋이 생성되었습니다.");
+
+            // 시나리오 1(전시 상황)도 같은 집 위에 함께 만든다 (실패해도 시나리오 3 빌드는 유지된다)
+            try { BuildWarScenario(); }
+            catch (System.Exception e) { Debug.LogError("[ApartmentBuilder] 시나리오 1 빌드 중 오류: " + e); }
         }
 
         // ═════════════════════════ 데이터 에셋 ═════════════════════════

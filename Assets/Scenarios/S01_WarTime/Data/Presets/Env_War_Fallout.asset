@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7c962c88ef28104cb497740a997270b, type: 3}
+  m_Name: Env_War_Fallout
+  m_EditorClassIdentifier: Game.Core::GameData.EnvironmentPreset
+  displayName: "\uAC80\uC740 \uBE44\uC640 \uB099\uC9C4"
+  timeOfDay: 1
+  applySun: 1
+  sunEuler: {x: 35, y: -30, z: 0}
+  sunIntensity: 0.18
+  sunColor: {r: 0.55, g: 0.55, b: 0.6, a: 1}
+  applyAmbient: 1
+  ambientColor: {r: 0.1, g: 0.1, b: 0.12, a: 1}
+  applyFog: 1
+  fogColor: {r: 0.18, g: 0.18, b: 0.2, a: 1}
+  fogDensity: 0.01
+  windowView: 2
+  applyTraffic: 1
+  pedestrians: 0
+  vehicles: 0
+  trafficDensity: 0
+  ambientSound: {fileID: 0}
+  ambientVolume: 0.4

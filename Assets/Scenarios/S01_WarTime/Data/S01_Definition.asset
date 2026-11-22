@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 118c67db9df1d5e4f93d28b309762f93, type: 3}
+  m_Name: S01_Definition
+  m_EditorClassIdentifier: Game.Core::GameData.ScenarioDefinition
+  id: S01
+  displayName: "\uC804\uC2DC\uC0C1\uD669"
+  description: "\uAE30\uB9CC\uB41C \uD3C9\uD654\uC640 \uB099\uC9C4 \u2014 \uAC70\uC9D3 \uC885\uC804 \uC120\uC5B8\uC5D0 \uC18D\uC9C0 \uB9D0\uACE0 \uD575\uD3ED\uBC1C\uC5D0\uC11C \uC0B4\uC544\uB0A8\uC544\uB77C"
+  backgroundSprite: {fileID: 0}
+  thumbnail: {fileID: 0}
+  isPlayable: 1
+  targetPlayMinutes: 17
+  scenarioSceneName: S01_WarTime
+  startSpawnId: spawn_living_room
+  environmentPreset: {fileID: 11400000, guid: 092e1b1479f1bf5479c02bc68ddaa310, type: 2}
+  actTypeNames:
+  - Act1_CrackInDaily
+  - Act2_StormEve
+  - Act3_IsolatedArk
+  - Act4_FalsePeace
+  - Act5_FlashAndFallout
+  - Act6_TrueArmistice
+  requiredItems:
+  - {fileID: 11400000, guid: 98afc4b3a353fa7418e5e696ba9f6d71, type: 2}
+  - {fileID: 11400000, guid: d32c14da44275264da0b40d838cdc87e, type: 2}
+  deathReasons:
+  - {fileID: 11400000, guid: 51aab96093c5b7441933d62cff7e41ea, type: 2}
+  - {fileID: 11400000, guid: 6660662419250ab4a9f053ab2dcabe5c, type: 2}
+  - {fileID: 11400000, guid: 23267838d00d3594a924974bf080523e, type: 2}
+  - {fileID: 11400000, guid: 7a325e1c1fcd40d4ca8cca5c6180af37, type: 2}
+  - {fileID: 11400000, guid: 13c1d85f4622c51409297bbb00969a0b, type: 2}
+  fallbackDeath: {fileID: 11400000, guid: 51aab96093c5b7441933d62cff7e41ea, type: 2}
+  endings:
+  - {fileID: 11400000, guid: 1021a1dfafe9ba744ad9ff61719dfe04, type: 2}
+  - {fileID: 11400000, guid: 07e509e8d9dd2624dbc4d82ac4e2664f, type: 2}
+  - {fileID: 11400000, guid: 1b1fe0a6f1ec7334eb603caea85bc648, type: 2}
+  hiddenEndingId: 
+  hiddenEndingFlag: 
+  scoreRules: {fileID: 11400000, guid: d67ec8e5d4ffe6041a21499514a24cde, type: 2}
+  hints: []
