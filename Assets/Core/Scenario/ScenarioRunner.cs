@@ -92,6 +92,9 @@ namespace GameGameplay
             if (scoreSystem != null) scoreSystem.SetRules(Definition.ScoreRules);
             if (HintSystem.Instance != null) HintSystem.Instance.AddScenarioHints(Definition.Hints);
 
+            // 기능 플래그 (호흡기 게이지·가스·화재 소품·도어 스코프·창밖 교통)
+            ScenarioFeatures.Apply(Definition);
+
             // 환경 프리셋 / 시작 위치
             if (HouseServices.Environment != null && Definition.EnvironmentPreset != null) HouseServices.Environment.ApplyEnvironmentPreset(Definition.EnvironmentPreset);
             if (player == null) player = FindFirstObjectByType<PlayerController>();

@@ -1,4 +1,5 @@
 using GameCore;
+using GameData;
 using UnityEngine;
 
 namespace GameGameplay
@@ -20,6 +21,11 @@ namespace GameGameplay
             Configure(EvacKeys.ZoneStairwell, true, 1f, DeathReason.StairwellSmoke);
             Configure(EvacKeys.ZoneShelter, true, 1f, DeathReason.ShelterSmoke);
             Configure("zone_elevator_cabin", true, 1f, DeathReason.ElevatorStallSmoke);
+
+            // 기능 플래그: 엘리베이터 위험 (기본 켜짐 — 끄면 시스템만 멈춘다. 베이스의 엘리베이터는 그대로 동작)
+            ScenarioDefinition def = ScenarioRunner.Instance != null ? ScenarioRunner.Instance.Definition : null;
+            if (def != null && !def.UseElevatorHazard)
+                foreach (ElevatorHazardSystem e in FindObjectsByType<ElevatorHazardSystem>(FindObjectsInactive.Include)) e.enabled = false;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             DebugExt = new S03DebugExtension();
             DebugPanel.Register(DebugExt);

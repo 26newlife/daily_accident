@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7c962c88ef28104cb497740a997270b, type: 3}
+  m_Name: Env_RainyDay
+  m_EditorClassIdentifier: Game.Core::GameData.EnvironmentPreset
+  displayName: "\uBE44 \uC624\uB294 \uB0AE"
+  timeOfDay: 1
+  applySun: 1
+  sunEuler: {x: 60, y: -30, z: 0}
+  sunIntensity: 0.45
+  sunColor: {r: 0.7, g: 0.75, b: 0.8, a: 1}
+  applyAmbient: 1
+  ambientColor: {r: 0.22, g: 0.24, b: 0.28, a: 1}
+  applyFog: 0
+  fogColor: {r: 0.6, g: 0.65, b: 0.7, a: 1}
+  fogDensity: 0.002
+  windowView: 1
+  applyTraffic: 1
+  pedestrians: 0
+  vehicles: 1
+  trafficDensity: 0.4
+  ambientSound: {fileID: 0}
+  ambientVolume: 0.4

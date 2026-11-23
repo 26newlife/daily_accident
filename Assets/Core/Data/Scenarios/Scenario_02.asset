@@ -18,3 +18,4 @@ MonoBehaviour:
   isUnlocked: 1
   backgroundSprite: {fileID: 0}
   thumbnail: {fileID: 0}
+  definition: {fileID: 11400000, guid: b9e17166770c8b2419d6c4527fa375f9, type: 2}

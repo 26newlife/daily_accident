@@ -139,6 +139,13 @@ namespace GameGameplay
             Check("Act 6개", ScenarioRunner.Instance.Root.Acts.Length == 6);
             Check("WarState/HUD", W != null && WarHud.Instance != null);
 
+            // 공통 HUD: 생존 상태는 우측 상단 SurvivalStatsPanel 한 곳에만, 상시 목표 텍스트는 없다 (J 패널로 본다)
+            yield return null; yield return null;
+            SurvivalStatsPanel stats = SurvivalStatsPanel.Instance;
+            Check("HUD: 생존 상태 패널 등록 (보이는 행 ≥ 6)", stats != null && stats.VisibleCount >= 6, stats != null ? "visible=" + stats.VisibleCount : "패널 없음");
+            Check("HUD: 상시 목표 텍스트 제거", GameObject.Find("Gameplay/GameCanvas/HUD/ObjectiveText") == null);
+            Check("HUD: 구 S01 좌측 패널 제거", GameObject.Find("WarHudCanvas/StatsPanel") == null);
+
             // 격리: 시나리오 3(화재) 소품·시스템이 없어야 한다
             CheckIsolation();
 
@@ -225,10 +232,13 @@ namespace GameGameplay
             bool s03Loaded = SceneManager.GetSceneByName("S03_ApartmentFire").isLoaded;
             Check("격리: 시나리오 3 씬 미로드", !s03Loaded);
             Check("격리: FireSource/가스 누출/화재 관리자 없음", FindObjectsByType<FireSource>(FindObjectsInactive.Include).Length == 0 && FindObjectsByType<GasLeakController>(FindObjectsInactive.Include).Length == 0 && FindObjectsByType<FireManager>(FindObjectsInactive.Include).Length == 0);
-            int active = 0; string first = "";
-            foreach (InteractableObject o in FindObjectsByType<InteractableObject>(FindObjectsInactive.Exclude))
-                if (WarFireExclusion.IsFireId(o.Id)) { active++; if (first.Length == 0) first = o.Id; }
-            Check("격리: 화재 관련 상호작용 물품 활성 0개", active == 0, active > 0 ? "활성: " + first : "제외 " + WarFireExclusion.LastExcluded + "개");
+            int active = 0, total = 0; string first = "";
+            foreach (FireHazardProp p in FireHazardProp.FindAllIncludingInactive())
+            {
+                total++;
+                if (p.gameObject.activeInHierarchy) { active++; if (first.Length == 0) first = p.name; }
+            }
+            Check("격리: 화재 소품(FireHazardProp) 활성 0개", total > 0 && active == 0, total == 0 ? "태그된 소품이 없음 (베이스 태그 누락)" : active > 0 ? "활성: " + first : "숨김 " + total + "개");
             Check("격리: 요새화·물물교환 오브젝트 없음", FindObjectsByType<InteractableObject>(FindObjectsInactive.Include).Length > 0 && InteractableObject.FindById("war_barter") == null && InteractableObject.FindById("war_station_rain") == null && InteractableObject.FindById("war_station_toilet") == null && InteractableObject.FindById("war_door_barricade") == null);
         }
 

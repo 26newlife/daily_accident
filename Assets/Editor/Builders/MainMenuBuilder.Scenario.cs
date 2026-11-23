@@ -887,6 +887,7 @@ namespace GameUI.EditorTools
             Toggle invertY = AddToggle(CreateSettingsRow(pageControls, 2, "Y축 반전", font), "InvertYToggle", res);
             TMP_Dropdown hintDd = AddDropdown(CreateSettingsRow(pageControls, 3, "힌트 난이도", font), "HintLevelDropdown", res, font);
             Toggle highlightTg = AddToggle(CreateSettingsRow(pageControls, 4, "상호작용 하이라이트", font), "HighlightToggle", res);
+            Toggle objectiveNoticeTg = AddToggle(CreateSettingsRow(pageControls, 5, "새 목표 알림", font), "ObjectiveNoticeToggle", res);
 
             // ② 소리
             var master = AddSlider(CreateSettingsRow(pageAudio, 0, "마스터 볼륨", font), "MasterSlider", res, font);
@@ -922,6 +923,7 @@ namespace GameUI.EditorTools
             setSo.FindProperty("invertYToggle").objectReferenceValue = invertY;
             setSo.FindProperty("hintLevelDropdown").objectReferenceValue = hintDd;
             setSo.FindProperty("highlightToggle").objectReferenceValue = highlightTg;
+            setSo.FindProperty("objectiveNoticeToggle").objectReferenceValue = objectiveNoticeTg;
             setSo.FindProperty("masterSlider").objectReferenceValue = master.slider;
             setSo.FindProperty("masterValue").objectReferenceValue = master.value;
             setSo.FindProperty("musicSlider").objectReferenceValue = music.slider;

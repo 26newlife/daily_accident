@@ -268,6 +268,9 @@ namespace GameUI.EditorTools
             }
             RegisterScene(S03ScenePath);
 
+            // 4.5) 확정 보정 (화재 소품 태그 + B-02 통로 보정) — 빌더를 다시 돌려도 유지되도록 프리팹 저장 직전에 적용한다
+            GameUI.EditorTools.Interior.BaseHouseFixups.Apply(houseRoot);
+
             // 5) 집 프리팹 (시나리오 오브젝트가 빠진 뒤 저장 — 씬의 외부 참조는 유지된다)
             EnsureFolder("Assets/House/Prefabs");
             GameObject prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(houseRoot.gameObject, HousePrefabPath, InteractionMode.AutomatedAction);

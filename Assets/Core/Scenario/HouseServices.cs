@@ -8,6 +8,8 @@ namespace GameGameplay
     public interface IHouseEnvironment
     {
         void ApplyEnvironmentPreset(EnvironmentPreset preset);
+        /// <summary>시나리오 기능 플래그 중 집(베이스)이 처리하는 것 (화재 소품·도어 스코프·창밖 보행자/차량)</summary>
+        void ApplyScenarioFeatures(ScenarioDefinition definition);
     }
 
     public interface ISpawnProvider

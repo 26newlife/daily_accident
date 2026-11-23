@@ -364,8 +364,8 @@ RectTransform:
   - {fileID: 180707644662787561}
   - {fileID: 2226461319384774927}
   - {fileID: 4193170457804898818}
-  - {fileID: 2563483433733852366}
-  - {fileID: 2557397754627121762}
+  - {fileID: 2968640605161934822}
+  - {fileID: 1217809229373222938}
   m_Father: {fileID: 9032049567181956897}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -444,8 +444,8 @@ MonoBehaviour:
   closeDuration: 0.15
   hiddenScale: 0.95
   messageText: {fileID: 7449412796476174340}
-  yesButton: {fileID: 3541495861375889334}
-  noButton: {fileID: 2557397754627121763}
+  yesButton: {fileID: 4288556902052736158}
+  noButton: {fileID: 1217809229373222939}
 --- !u!1 &6582426804377596330
 GameObject:
   m_ObjectHideFlags: 0
@@ -596,7 +596,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1001 &2557397754627121761
+--- !u!1001 &1217809229373222937
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -691,11 +691,11 @@ PrefabInstance:
     - target: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Navigation.m_SelectOnLeft
       value: 
-      objectReference: {fileID: 3541495861375889334}
+      objectReference: {fileID: 4288556902052736158}
     - target: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Navigation.m_SelectOnRight
       value: 
-      objectReference: {fileID: 3541495861375889334}
+      objectReference: {fileID: 4288556902052736158}
     - target: {fileID: 1975344899822455339, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Name
       value: Btn_No
@@ -737,15 +737,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 25707c77150cee2478bc66805297041a, type: 3}
---- !u!224 &2557397754627121762 stripped
+--- !u!224 &1217809229373222938 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 742822718471417223, guid: 25707c77150cee2478bc66805297041a, type: 3}
-  m_PrefabInstance: {fileID: 2557397754627121761}
+  m_PrefabInstance: {fileID: 1217809229373222937}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2557397754627121763 stripped
+--- !u!114 &1217809229373222939 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
-  m_PrefabInstance: {fileID: 2557397754627121761}
+  m_PrefabInstance: {fileID: 1217809229373222937}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -753,7 +753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!1001 &3016386775566917961
+--- !u!1001 &2557397754627121761
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -848,11 +848,11 @@ PrefabInstance:
     - target: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Navigation.m_SelectOnLeft
       value: 
-      objectReference: {fileID: 2557397754627121763}
+      objectReference: {fileID: 1217809229373222939}
     - target: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Navigation.m_SelectOnRight
       value: 
-      objectReference: {fileID: 2557397754627121763}
+      objectReference: {fileID: 1217809229373222939}
     - target: {fileID: 1975344899822455339, guid: 25707c77150cee2478bc66805297041a, type: 3}
       propertyPath: m_Name
       value: Btn_Yes
@@ -894,15 +894,15 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 25707c77150cee2478bc66805297041a, type: 3}
---- !u!224 &2563483433733852366 stripped
+--- !u!224 &2968640605161934822 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 742822718471417223, guid: 25707c77150cee2478bc66805297041a, type: 3}
-  m_PrefabInstance: {fileID: 3016386775566917961}
+  m_PrefabInstance: {fileID: 2557397754627121761}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3541495861375889334 stripped
+--- !u!114 &4288556902052736158 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1799663532200513279, guid: 25707c77150cee2478bc66805297041a, type: 3}
-  m_PrefabInstance: {fileID: 3016386775566917961}
+  m_PrefabInstance: {fileID: 2557397754627121761}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1

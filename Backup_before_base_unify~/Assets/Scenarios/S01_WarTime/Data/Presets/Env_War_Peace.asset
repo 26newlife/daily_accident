@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7c962c88ef28104cb497740a997270b, type: 3}
+  m_Name: Env_War_Peace
+  m_EditorClassIdentifier: Game.Core::GameData.EnvironmentPreset
+  displayName: "\uD3C9\uD654\uB85C\uC6B4 \uC624\uD6C4"
+  timeOfDay: 1
+  applySun: 1
+  sunEuler: {x: 55, y: -30, z: 0}
+  sunIntensity: 1
+  sunColor: {r: 1, g: 0.96, b: 0.88, a: 1}
+  applyAmbient: 0
+  ambientColor: {r: 0.16, g: 0.16, b: 0.18, a: 1}
+  applyFog: 0
+  fogColor: {r: 0.6, g: 0.65, b: 0.7, a: 1}
+  fogDensity: 0.002
+  windowView: 0
+  applyTraffic: 1
+  pedestrians: 1
+  vehicles: 1
+  trafficDensity: 1
+  ambientSound: {fileID: 0}
+  ambientVolume: 0.4

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdb6a35a6d26a694fa4477cfa9d85b54, type: 3}
+  m_Name: ScenarioDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::GameData.ScenarioDatabase
+  scenarios:
+  - {fileID: 11400000, guid: cba7b5c73ab811c47a0a0c2e5ac6f8ba, type: 2}
+  - {fileID: 11400000, guid: 46745d76d5ff09448a504b2417fd9d6d, type: 2}
+  - {fileID: 11400000, guid: 790a1283d34d2944489c76f9199e7b95, type: 2}
+  - {fileID: 11400000, guid: 10c3674a3a4b8a941b32845adc8dddef, type: 2}
+  - {fileID: 11400000, guid: 9f0c8aa8aadd4d34da6a2def7b80a26e, type: 2}
+  - {fileID: 11400000, guid: 5c6056b604788604e96d21d4d6badd5c, type: 2}
+  - {fileID: 11400000, guid: ef25f51a6cfac734a98ee07b2163e6d0, type: 2}
+  - {fileID: 11400000, guid: 3183e77556b1568439d83ea126cf8414, type: 2}
+  - {fileID: 11400000, guid: 266de24c87176924294b8585fd82b06b, type: 2}
+  - {fileID: 11400000, guid: f1d18b8d41bcde4458192c4f904f6e52, type: 2}

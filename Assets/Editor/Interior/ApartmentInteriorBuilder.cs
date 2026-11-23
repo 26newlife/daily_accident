@@ -116,6 +116,11 @@ namespace GameUI.EditorTools.Interior
             BuildSafetyColliders();   // 점프로 창밖으로 나가지 못하게 막는 투명 콜라이더
             MarkStaticRecursive(root);
 
+            // 인테리어만 다시 만들면 가구(Interior)가 원래 값으로 재생성된다 → 확정 보정(B-02·화재 소품 태그·치우기 소품)을 다시 적용한다.
+            // 집 루트(Apartment_1004_Base)가 이미 있을 때만 (씬 전체 빌드 중에는 FinalizeFramework 가 적용한다)
+            Transform houseRoot = level.parent;
+            if (houseRoot != null && houseRoot.name == "Apartment_1004_Base") BaseHouseFixups.Apply(houseRoot);
+
             Debug.Log($"[Interior] 생성 완료: 프리팹 {FurnitureFactory.PrefabDir}, 머티리얼 {M.MaterialDir}");
         }
 
@@ -284,7 +289,7 @@ namespace GameUI.EditorTools.Interior
             Floor(parent, "Bedroom", 0f, 2.6f, 2.4f, 7.4f, M.FloorWood, M.WoodTexMeters);
             Floor(parent, "LivingHall", 2.6f, 6.6f, 4.6f, 7.4f, M.FloorWood, M.WoodTexMeters);
             Floor(parent, "Hall", 2.6f, 3.9f, 2.4f, 4.6f, M.FloorWood, M.WoodTexMeters);
-            Floor(parent, "Kitchen", 3.9f, 6.6f, 2.4f, 4.6f, M.FloorTileKitchen, M.TileTexMeters);
+            Floor(parent, "Kitchen", 3.9f, 6.6f, 2.4f, 4.6f, M.FloorWood, M.WoodTexMeters);   // 참고 이미지: 주방도 마루로 이어진다
             Floor(parent, "Entry", 1.9f, 4.1f, 0f, 2.4f, M.FloorTileEntry, M.TileTexMeters);
             Floor(parent, "Bathroom", 0f, 1.9f, 0f, 2.4f, M.FloorTileBath, M.BathTileTexMeters);
             Floor(parent, "Utility", 4.1f, 6.6f, 0f, 2.4f, M.FloorTileUtility, M.TileTexMeters);
@@ -300,7 +305,7 @@ namespace GameUI.EditorTools.Interior
         private static void BuildFrames(Transform parent)
         {
             // id → (문짝/유리 자식 경로, 벽 두께, 창틀 여부, 재질)
-            FrameFor(parent, "door_front", "Hinge/Visual", WallThickExterior, false, M.FireDoorFrame);
+            FrameFor(parent, "door_front", "Hinge/Visual", WallThickExterior, false, M.FrontDoorFrame);
             FrameFor(parent, "door_bedroom", "Hinge/Visual", WallThickInterior, false, M.DoorFrame);
             FrameFor(parent, "door_bathroom", "Hinge/Visual", WallThickInterior, false, M.DoorFrame);
             FrameFor(parent, "door_utility", "Hinge/Visual", WallThickInterior, false, M.DoorFrame);

@@ -1,0 +1,134 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e0a0b62a85feea43b4e0e2cf277a463, type: 3}
+  m_Name: ScoreRules
+  m_EditorClassIdentifier: Game.Core::GameGameplay.ScoreRules
+  rules:
+  - id: clues
+    label: "\uAE30\uB9CC \uB2E8\uC11C \uC218\uC9D1"
+    maxPoints: 15
+    kind: 0
+    key: war_clues_enough
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uB2E8\uD30C \uBC29\uC1A1\uACFC \uCC3D\uBC16 \uAD00\uCC30\uB85C \uC885\uC804 \uBC29\uC1A1\uC758 \uAC70\uC9D3\uC744 \uAC04\uD30C\uD588\uB2E4."
+    badText: "\uACF5\uC2DD \uBC29\uC1A1\uB9CC \uB4E3\uC9C0 \uB9D0\uACE0 \uC5EC\uB7EC \uCD9C\uCC98\uB97C \uBE44\uAD50\uD558\uC790. \uB2E8\uD30C \uB77C\uB514\uC624\uC640 \uCC3D\uBC16 \uAD00\uCC30\uC5D0\uC11C \uBAA8\uC21C\uC744 \uCC3E\uC744 \uC218 \uC788\uB2E4."
+  - id: radio
+    label: "\uB77C\uB514\uC624 \uD655\uBCF4"
+    maxPoints: 5
+    kind: 0
+    key: war_has_radio
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uBC30\uD130\uB9AC \uB77C\uB514\uC624\uB97C \uCC59\uACBC\uB2E4."
+    badText: "\uC815\uBCF4\uB97C \uC5BB\uB294 \uC218\uB2E8(\uBC30\uD130\uB9AC \uB77C\uB514\uC624)\uC744 \uAC00\uC7A5 \uBA3C\uC800 \uD655\uBCF4\uD558\uC790."
+  - id: stay_inside
+    label: "\uC123\uBD88\uB9AC \uB098\uAC00\uC9C0 \uC54A\uC558\uB2E4"
+    maxPoints: 15
+    kind: 4
+    key: war_outside
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uC885\uC804 \uBC29\uC1A1\uC5D0\uB3C4 \uC740\uC2E0\uCC98\uB97C \uB5A0\uB098\uC9C0 \uC54A\uC558\uB2E4."
+    badText: "\uBC29\uC1A1\uC774 \uD3C9\uD654\uB97C \uC120\uC5B8\uD574\uB3C4 \uD574\uC81C \uD655\uC778 \uC804\uC5D0\uB294 \uC740\uC2E0\uCC98\uB97C \uB5A0\uB098\uC9C0 \uC54A\uB294\uB2E4."
+  - id: blast
+    label: "\uCDA9\uACA9\uD30C \uBC29\uD638"
+    maxPoints: 15
+    kind: 0
+    key: war_survived_flash
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uCC3D\uC744 \uB367\uB300 \uD3ED\uD48D\uC744 \uACAC\uB3A0\uB2E4."
+    badText: "\uCC3D\uBB38\uC5D0 \uD569\uD310\uC744 \uB367\uB300\uACE0 \uCC28\uD3D0\uB97C \uC720\uC9C0\uD574\uC57C \uCDA9\uACA9\uD30C\uC640 \uD30C\uD3B8\uC744 \uB9C9\uB294\uB2E4."
+  - id: iodine
+    label: "\uC694\uC624\uB4DC\uD654 \uCE7C\uB968 \uC120\uBCF5\uC6A9"
+    maxPoints: 10
+    kind: 0
+    key: war_iodine_before_fallout
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uB099\uC9C4 \uC804\uC5D0 \uC694\uC624\uB4DC\uD654 \uCE7C\uB968\uC744 \uBCF5\uC6A9\uD588\uB2E4."
+    badText: "\uC694\uC624\uB4DC\uD654 \uCE7C\uB968\uC740 \uD53C\uD3ED \uC804\xB7\uC9C1\uD6C4\uC5D0 \uBCF5\uC6A9\uD574\uC57C \uD6A8\uACFC\uAC00 \uC788\uB2E4."
+  - id: mask
+    label: "\uBC29\uB3C5\uBA74 \uCC29\uC6A9"
+    maxPoints: 10
+    kind: 0
+    key: war_mask_worn
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uB099\uC9C4 \uC18D\uC5D0\uC11C \uBC29\uB3C5\uBA74\uC744 \uCC29\uC6A9\uD588\uB2E4."
+    badText: "\uB099\uC9C4 \uC18D\uC5D0\uC11C\uB294 \uBC29\uB3C5\uBA74(\uB610\uB294 \uC816\uC740 \uC218\uAC74)\uC73C\uB85C \uD638\uD761\uC744 \uB9C9\uC544\uC57C \uD55C\uB2E4."
+  - id: radiation
+    label: "\uB0AE\uC740 \uD53C\uD3ED"
+    maxPoints: 10
+    kind: 3
+    key: war_radiation
+    threshold: 30
+    partialPoints: 5
+    partialKey: 
+    partialThreshold: 60
+    goodText: "\uD53C\uD3ED\uC744 \uB0AE\uAC8C \uC720\uC9C0\uD588\uB2E4."
+    badText: "\uCC3D \uBC00\uD3D0\xB7\uBC29\uB3C5\uBA74\xB7\uC694\uC624\uB4DC\uD654 \uCE7C\uB968\uC744 \uBAA8\uB450 \uC4F0\uBA74 \uD53C\uD3ED\uC774 \uD06C\uAC8C \uC900\uB2E4."
+  - id: no_loss
+    label: "\uB3D9\uB8CC\uB97C \uC783\uC9C0 \uC54A\uC558\uB2E4"
+    maxPoints: 10
+    kind: 4
+    key: war_lost
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uD569\uB958\uD55C \uB3D9\uB8CC\uB97C \uC9C0\uCF1C \uB0C8\uB2E4."
+    badText: "\uB3D9\uB8CC\uAC00 \uBC29\uC1A1\uC5D0 \uC18D\uC544 \uB098\uAC00\uC9C0 \uC54A\uB3C4\uB85D \uADFC\uAC70\uB97C \uBAA8\uC544 \uC124\uB4DD\uD558\uC790."
+  - id: no_refuse
+    label: "\uBB38\uC744 \uB450\uB4DC\uB9B0 \uC0AC\uB78C\uC744 \uC678\uBA74\uD558\uC9C0 \uC54A\uC558\uB2E4"
+    maxPoints: 5
+    kind: 4
+    key: war_refused
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uBB38 \uC55E\uC758 \uC0AC\uB78C\uB4E4\uC744 \uBAA8\uB450 \uBC1B\uC544\uB4E4\uC600\uB2E4."
+    badText: "\uC790\uC6D0\uC774 \uD55C\uC815\uB418\uC5B4\uB3C4 \uB3C4\uC6C0\uC744 \uCCAD\uD558\uB294 \uC0AC\uB78C\uC740 \uC678\uBA74\uD558\uAE30 \uC5B4\uB835\uB2E4. \uADE0\uD615\uC744 \uCC3E\uC544 \uBCF4\uC790."
+  - id: persuade
+    label: "\uC124\uB4DD \uC131\uACF5"
+    maxPoints: 5
+    kind: 0
+    key: war_persuaded
+    threshold: 0
+    partialPoints: 0
+    partialKey: 
+    partialThreshold: 0
+    goodText: "\uB3D9\uB8CC\uB4E4\uC744 \uC124\uB4DD\uD574 \uBB38\uC744 \uC9C0\uCF30\uB2E4."
+    badText: "\uB2E8\uC11C\uAC00 \uCDA9\uBD84\uD574\uC57C \uC124\uB4DD\uD560 \uC218 \uC788\uB2E4."
+  grades:
+  - minRatio: 0
+    label: C
+  - minRatio: 0.55
+    label: B
+  - minRatio: 0.75
+    label: A
+  - minRatio: 0.9
+    label: S

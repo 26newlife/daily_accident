@@ -254,6 +254,13 @@ namespace GameUI.EditorTools
             d.FindProperty("fallbackDeath").objectReferenceValue = a.deaths[0];
             SetObjectArray(d.FindProperty("endings"), a.endings);
             d.FindProperty("scoreRules").objectReferenceValue = a.rules;
+            // 기능 플래그: 전시 상황은 가스·화재 소품·엘리베이터 위험을 쓰지 않는다 (집 오브젝트는 그대로, 상태만 꺼진다)
+            d.FindProperty("useRespiratoryGauge").boolValue = true;
+            d.FindProperty("useGasHazard").boolValue = false;
+            d.FindProperty("useFireProps").boolValue = false;
+            d.FindProperty("useElevatorHazard").boolValue = false;
+            d.FindProperty("useDoorPeephole").boolValue = true;
+            d.FindProperty("useOutdoorTraffic").boolValue = true;
             d.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(def);
             a.definition = def;
@@ -293,6 +300,54 @@ namespace GameUI.EditorTools
 
         private static bool InsideHome(Vector3 p) => p.x > 0.35f && p.x < 7.2f && p.z > 0.55f && p.z < 8.8f;
 
+        // ───────── 고정 배치 (S01-01) ─────────
+        // 소품·동행자 위치는 더 이상 빌드 때 빈 자리 탐색(FindSpot)에 맡기지 않는다 — 아래 표의 좌표가 정답이다.
+        // 각 위치는 시나리오 씬의 앵커 s01_* (ScenarioAnchor)로도 만들어져, 시나리오 코드와 HouseController.FindAnchor 가 id 로 찾을 수 있다.
+        // 좌표를 바꾸면 Tools > GameUI > Validate Apartment Clearance 와 S01 통로 점검으로 다시 검증할 것 (주 동선 0.9m 이상).
+        private static readonly System.Collections.Generic.Dictionary<string, Vector3> S01FixedSpots = new System.Collections.Generic.Dictionary<string, Vector3>
+        {
+            { "BatteryRadio", new Vector3(4.00f, 0.01f, 5.00f) },
+            { "RadioShelterSpot", new Vector3(6.00f, 0.01f, 7.60f) },
+            { "WaterAndCans", new Vector3(5.50f, 0.01f, 4.30f) },   // 주방 북동쪽 구석 (예전 자동 탐색 결과 x=7.05 는 건물 밖이었다)
+            { "PantryBox", new Vector3(5.50f, 0.01f, 2.20f) },
+            { "MedKit", new Vector3(1.30f, 0.58f, 5.80f) },
+            { "CivilDefenseBox", new Vector3(6.22f, 0.01f, 1.38f) },
+            { "Blanket", new Vector3(1.60f, 0.01f, 6.80f) },
+            { "WinterClothes", new Vector3(5.38f, 0.01f, 5.68f) },
+            { "SteelPipe", new Vector3(3.40f, 0.01f, 2.00f) },
+            { "Soldier", new Vector3(3.40f, 0.01f, 5.40f) },
+            { "Child", new Vector3(4.30f, 0.01f, 5.80f) },
+            { "Neighbor", new Vector3(4.90f, 0.01f, 4.80f) },
+        };
+
+        private static Transform s01Anchors;
+
+        private static string S01AnchorId(string goName)
+        {
+            var sb = new System.Text.StringBuilder("s01_");
+            for (int i = 0; i < goName.Length; i++)
+            {
+                char c = goName[i];
+                if (char.IsUpper(c) && i > 0) sb.Append('_');
+                sb.Append(char.ToLowerInvariant(c));
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>고정 좌표(없으면 FindSpot)를 돌려주고, 시나리오 앵커 s01_* 를 만든다</summary>
+        private static Vector3 ResolveSpot(string goName, Vector3 near, Vector3 size, bool preferSurface)
+        {
+            Vector3 foot = S01FixedSpots.TryGetValue(goName, out Vector3 fixedPos) ? fixedPos : FindSpot(near, size, preferSurface);
+            if (s01Anchors != null)
+            {
+                var a = new GameObject(S01AnchorId(goName)).AddComponent<ScenarioAnchor>();
+                a.transform.SetParent(s01Anchors, false);
+                a.transform.position = foot;
+                var aso = SO(a); aso.FindProperty("id").stringValue = S01AnchorId(goName); aso.FindProperty("description").stringValue = "시나리오 1 고정 배치: " + goName; aso.ApplyModifiedPropertiesWithoutUndo();
+            }
+            return foot;
+        }
+
         /// <summary>near 주변에서 소품이 놓일 빈 자리(가구 위 또는 바닥)를 찾는다. 집이 없으면 near 그대로 바닥</summary>
         private static Vector3 FindSpot(Vector3 near, Vector3 size, bool preferSurface)
         {
@@ -325,7 +380,7 @@ namespace GameUI.EditorTools
 
         private static T Prop<T>(Transform parent, string id, string goName, Vector3 anchorNear, Vector3 size, bool surface, Material mat, bool trigger = false) where T : InteractableObject
         {
-            Vector3 foot = FindSpot(anchorNear, size, surface);
+            Vector3 foot = ResolveSpot(goName, anchorNear, size, surface);
             var root = new GameObject(goName);
             root.transform.SetParent(parent, false);
             root.transform.position = foot;
@@ -377,6 +432,7 @@ namespace GameUI.EditorTools
             Transform sys = Group("ScenarioSystems", content);
             Transform props = Group("Props", content);
             Transform people = Group("Survivors", content);
+            s01Anchors = Group("Anchors", content);   // s01_* 앵커 (소품·동행자 고정 위치)
 
             // ── 시스템 ──
             var state = sys.gameObject.AddComponent<WarState>(); SetObj(state, "config", a.config);
@@ -395,7 +451,7 @@ namespace GameUI.EditorTools
             // Act 1/2 파밍
             var radio = Prop<WarRadio>(props, WarKeys.Radio, "BatteryRadio", livingCenter, new Vector3(0.3f, 0.18f, 0.12f), true, olive, true);
             Box(radio.transform, "Antenna", new Vector3(0.1f, 0.3f, 0f), new Vector3(0.012f, 0.24f, 0.012f), grey, false);
-            var shelterSpot = new GameObject("RadioShelterSpot").transform; shelterSpot.SetParent(props, false); shelterSpot.position = FindSpot(shelter, new Vector3(0.3f, 0.18f, 0.12f), true);
+            var shelterSpot = new GameObject("RadioShelterSpot").transform; shelterSpot.SetParent(props, false); shelterSpot.position = ResolveSpot("RadioShelterSpot", shelter, new Vector3(0.3f, 0.18f, 0.12f), true);
             SetObj(radio, "shelterSpot", shelterSpot);
             MakePickup(props, WarKeys.PickupSupplies, "WaterAndCans", kitchen, new Vector3(0.4f, 0.3f, 0.3f), true, blue, "생수·비상식량 챙기기", "생수와 통조림을 챙겼다.", null, 4, 4, 0, false, 0, 0.8f);
             MakePickup(props, WarKeys.PickupPantry, "PantryBox", kitchen + new Vector3(-0.8f, 0f, -0.8f), new Vector3(0.45f, 0.3f, 0.35f), true, tan, "주방 수납장 뒤지기", "수납장 구석에서 라면과 통조림, 생수를 찾았다.", null, 3, 2, 0, false, a.config.actionCostSearch, 1.5f);
@@ -580,7 +636,7 @@ namespace GameUI.EditorTools
 
         private static WarSurvivor MakeSurvivor(Transform parent, string id, string goName, string display, Vector3 near, Color color, float scale = 1f)
         {
-            Vector3 foot = FindSpot(near, new Vector3(0.6f, 1.7f * scale, 0.6f), false);
+            Vector3 foot = ResolveSpot(goName, near, new Vector3(0.6f, 1.7f * scale, 0.6f), false);
             var root = new GameObject(goName);
             root.transform.SetParent(parent, false);
             root.transform.position = foot;

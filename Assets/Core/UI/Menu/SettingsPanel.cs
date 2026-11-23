@@ -29,6 +29,7 @@ namespace GameUI
         [SerializeField] private Toggle invertYToggle;
         [SerializeField] private TMP_Dropdown hintLevelDropdown;
         [SerializeField] private Toggle highlightToggle;
+        [SerializeField] private Toggle objectiveNoticeToggle;
 
         [Header("② 소리")]
         [SerializeField] private Slider masterSlider;
@@ -180,6 +181,7 @@ namespace GameUI
             BindToggle(invertYToggle, () => GameSettings.InvertY, v => GameSettings.InvertY = v);
             BindDropdown(hintLevelDropdown, () => (int)GameSettings.HintLevel, i => GameSettings.HintLevel = (HintLevel)i);
             BindToggle(highlightToggle, () => GameSettings.HighlightEnabled, v => GameSettings.HighlightEnabled = v);
+            BindToggle(objectiveNoticeToggle, () => GameSettings.ObjectiveNotice, v => GameSettings.ObjectiveNotice = v);
 
             BindSlider(masterSlider, masterValue, () => GameSettings.MasterVolume, v => GameSettings.MasterVolume = v, Percent);
             BindSlider(musicSlider, musicValue, () => GameSettings.MusicVolume, v => GameSettings.MusicVolume = v, Percent);

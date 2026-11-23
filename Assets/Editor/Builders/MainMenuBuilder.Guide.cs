@@ -113,11 +113,10 @@ namespace GameUI.EditorTools
             var controller = player.GetComponent<PlayerController>();
             Camera cam = player.GetComponentInChildren<Camera>(true);
 
-            // ── 힌트 토스트 ──
-            CanvasGroup toast = GroupWithPanel("HintToast", ct, g, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 150), new Vector2(1000, 64), new Color(0.02f, 0.05f, 0.09f, 0.7f));
-            TMP_Text toastText = GameText("Text", toast.transform, string.Empty, font, 28, TextAlignmentOptions.Center, TextMain, true);
-            Stretch(toastText.rectTransform, 8);
-            toast.alpha = 0f; toast.blocksRaycasts = false; toast.interactable = false;
+            // ── 힌트 토스트 (공통 HUD 프리팹 안의 고정 슬롯 — 다른 하단 UI 와 겹치지 않는다) ──
+            Transform hudT = ct.Find("HUD");
+            CanvasGroup toast = hudT.Find("HintToast").GetComponent<CanvasGroup>();
+            TMP_Text toastText = hudT.Find("HintToast/Text").GetComponent<TMP_Text>();
 
             // ── 조작법 패널 (일시정지 메뉴의 "조작법" 버튼으로만 열림, X 로 닫기 전까지 유지) ──
             CanvasGroup cardGroup = GroupWithPanel("ControlsCard", ct, g, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, 0), new Vector2(980, 640), new Color(0.03f, 0.06f, 0.1f, 0.96f));
@@ -148,11 +147,11 @@ namespace GameUI.EditorTools
             cso.ApplyModifiedPropertiesWithoutUndo();
 
             // ── 목표 상세 패널 (J) ──
-            CanvasGroup detail = GroupWithPanel("ObjectiveDetail", ct, g, new Vector2(0, 0.5f), new Vector2(0, 0.5f), new Vector2(40, 0), new Vector2(640, 560), new Color(0.03f, 0.06f, 0.1f, 0.88f));
+            CanvasGroup detail = GroupWithPanel("ObjectiveDetail", ct, g, new Vector2(0, 1), new Vector2(0, 1), new Vector2(40, -40), new Vector2(460, 560), new Color(0.03f, 0.06f, 0.1f, 0.88f));
             TMP_Text detailTitle = GameText("Title", detail.transform, "현재 목표", font, 36, TextAlignmentOptions.TopLeft, Accent);
-            Place(detailTitle.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(28, -20), new Vector2(560, 50));
+            Place(detailTitle.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(28, -20), new Vector2(404, 50));
             TMP_Text detailBody = GameText("Body", detail.transform, string.Empty, font, 26, TextAlignmentOptions.TopLeft, TextMain, true);
-            Place(detailBody.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(28, -80), new Vector2(584, 460));
+            Place(detailBody.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(28, -80), new Vector2(404, 460));
             detail.alpha = 0f; detail.blocksRaycasts = false; detail.interactable = false;
             var detailPanel = detail.gameObject.AddComponent<ObjectiveDetailPanel>();
             var dso = SO(detailPanel);

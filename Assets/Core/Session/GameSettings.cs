@@ -71,6 +71,7 @@ namespace GameCore
         private const string KeyBrightness = "settings.brightness";
         private const string KeyHintLevel = "settings.hintLevel";
         private const string KeyHighlight = "settings.highlight";
+        private const string KeyObjectiveNotice = "settings.objectiveNotice";
 
         // ───────── 현재 값 ─────────
         private static bool loaded;
@@ -85,6 +86,7 @@ namespace GameCore
         private static float brightness;
         private static int hintLevel;
         private static bool highlightEnabled;
+        private static bool objectiveNotice;
 
         private static AudioMixer mixer;
         private static bool mixerSearched;
@@ -184,6 +186,13 @@ namespace GameCore
         }
 
         /// <summary>가까운 상호작용 대상의 은은한 하이라이트 사용 여부</summary>
+        /// <summary>새 목표 추가·완료 때 화면 상단 중앙에 알림을 띄울지 (J 패널은 이 설정과 무관)</summary>
+        public static bool ObjectiveNotice
+        {
+            get { EnsureLoaded(); return objectiveNotice; }
+            set { EnsureLoaded(); Set(ref objectiveNotice, value); }
+        }
+
         public static bool HighlightEnabled
         {
             get { EnsureLoaded(); return highlightEnabled; }
@@ -238,6 +247,7 @@ namespace GameCore
             PlayerPrefs.SetFloat(KeyBrightness, brightness);
             PlayerPrefs.SetInt(KeyHintLevel, hintLevel);
             PlayerPrefs.SetInt(KeyHighlight, highlightEnabled ? 1 : 0);
+            PlayerPrefs.SetInt(KeyObjectiveNotice, objectiveNotice ? 1 : 0);
             PlayerPrefs.Save();
         }
 
@@ -340,6 +350,7 @@ namespace GameCore
             brightness = Mathf.Clamp(PlayerPrefs.GetFloat(KeyBrightness, brightness), BrightnessMin, BrightnessMax);
             hintLevel = Mathf.Clamp(PlayerPrefs.GetInt(KeyHintLevel, hintLevel), 0, 2);
             highlightEnabled = PlayerPrefs.GetInt(KeyHighlight, highlightEnabled ? 1 : 0) == 1;
+            objectiveNotice = PlayerPrefs.GetInt(KeyObjectiveNotice, objectiveNotice ? 1 : 0) == 1;
 
             loaded = true;
         }
@@ -363,6 +374,7 @@ namespace GameCore
             brightness = BrightnessDefault;
             hintLevel = (int)HintLevel.Normal;
             highlightEnabled = true;
+            objectiveNotice = true;
             loaded = true;
         }
 

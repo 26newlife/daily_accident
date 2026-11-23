@@ -120,7 +120,7 @@ namespace GameUI.EditorTools
                     R("valve_order", "가스 차단 순서", 10, ScoreRules.Kind.RecordEquals, "act1_fuse_close_order", 1f, 5, "act1_main_close_order", 0f,
                       "주방 퓨즈콕부터 잠가 가스 유입을 먼저 막았다.", "가스는 주방 중간 밸브(퓨즈콕)를 먼저, 이어서 다용도실 메인 밸브를 잠그는 순서가 안전하다."),
                     R("ventilation", "환기 완료", 10, ScoreRules.Kind.RecordPresent, "act1_ventilation_done_time", 0f, 0, "", 0f,
-                      "창문 3개를 열어 맞통풍으로 가스를 빼냈다.", "가스 냄새가 나면 창문을 열어 환기해야 한다. 잠금장치를 풀고 거실·주방·안방 창문을 모두 열자."),
+                      "창문 3개를 열어 맞통풍으로 가스를 빼냈다.", "가스 냄새가 나면 창문을 열어 환기해야 한다. 거실·주방·안방 창문을 모두 열자."),
                     R("multitap", "멀티탭 처리", 10, ScoreRules.Kind.RecordPresent, "act1_multitap_handled_correctly", 0f, 0, "", 0f,
                       "주변 가연물을 치우고 코드 본체를 뽑아 과열된 멀티탭을 처리했다.", "과열된 멀티탭은 전원 스위치를 누르지 말고 주변 가연물을 치운 뒤 플러그 본체를 잡고 뽑아야 한다."),
                     R("no_danger", "방송 후 위험 행동 없음", 10, ScoreRules.Kind.RecordZero, "act1_danger_attempts_after_broadcast", 0f, 0, "", 0f,

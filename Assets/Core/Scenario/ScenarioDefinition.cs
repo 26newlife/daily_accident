@@ -29,6 +29,14 @@ namespace GameData
         [SerializeField, Tooltip("Act 구성 문서용 (실제 Act 목록은 시나리오 씬의 ScenarioSceneRoot.acts)")] private string[] actTypeNames;
         [SerializeField, Tooltip("이 시나리오가 사용하는 아이템 (검증용: 에셋이 존재하는지 확인)")] private ItemData[] requiredItems;
 
+        [Header("기능 플래그 (공통 베이스 위에서 이 시나리오가 쓰는 기능 — 기본값 켜짐)")]
+        [SerializeField, Tooltip("호흡기 게이지 HUD (연기 속에서 표시)")] private bool useRespiratoryGauge = true;
+        [SerializeField, Tooltip("가스 누출 시스템 (GasLeakController)")] private bool useGasHazard = true;
+        [SerializeField, Tooltip("화재 소품: 베이스에 있는 가스·멀티탭·소화기·수건 등 (FireHazardProp 태그) + 화재 확산 시스템")] private bool useFireProps = true;
+        [SerializeField, Tooltip("엘리베이터 위험 (ElevatorHazardSystem — 2종 랜덤 사망)")] private bool useElevatorHazard = true;
+        [SerializeField, Tooltip("도어 스코프 (door_peephole)")] private bool useDoorPeephole = true;
+        [SerializeField, Tooltip("창밖 보행자·차량")] private bool useOutdoorTraffic = true;
+
         [Header("시나리오 전용 데이터 (시나리오 폴더에서 관리)")]
         [SerializeField] private DeathReasonData[] deathReasons;
         [SerializeField] private DeathReasonData fallbackDeath;
@@ -57,5 +65,11 @@ namespace GameData
         public string HiddenEndingFlag => hiddenEndingFlag;
         public ScoreRules ScoreRules => scoreRules;
         public HintData[] Hints => hints;
+        public bool UseRespiratoryGauge => useRespiratoryGauge;
+        public bool UseGasHazard => useGasHazard;
+        public bool UseFireProps => useFireProps;
+        public bool UseElevatorHazard => useElevatorHazard;
+        public bool UseDoorPeephole => useDoorPeephole;
+        public bool UseOutdoorTraffic => useOutdoorTraffic;
     }
 }

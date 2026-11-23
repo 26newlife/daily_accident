@@ -3,13 +3,13 @@
 집(1004호)은 그대로 두고, 시나리오 3(아파트 화재)과 같은 프레임워크 위에 **Additive 씬 `S01_WarTime`** 으로 만든 시나리오입니다.
 
 ## 만드는 법 / 테스트
-1. Unity: `Tools > GameUI > Build Apartment Scene` — 집 + 시나리오 3 + 시나리오 1 을 함께 만듭니다. (시나리오 1만: `Tools > GameUI > Scenarios > Build S01 War Time`)
+1. Unity: `Tools > GameUI > Build Apartment Scene` — 집 + 시나리오 3 + 시나리오 1 을 함께 만듭니다. (소품 위치는 `S01FixedSpots` 고정 좌표 + `s01_*` 앵커) (시나리오 1만: `Tools > GameUI > Scenarios > Build S01 War Time`)
 2. 메인 메뉴 `SCENARIO SELECT` → **전시상황** → START.
 3. 자동 점검: `Tools > GameUI > Debug > Run S01 Smoke Test` (격리 검사, 전쟁 발발 연출, 6개 Act 진행, 사망·엔딩 분기, 재시작 누수. 결과 `smoke_results_s01.txt`)
 
 ## 시나리오 3(화재)과의 격리
 - 가스 누출·화재 확산·연기·FireSource·소화기·Act 로직은 **시나리오 3 씬(`S03_ApartmentFire`)에만** 있고, 시나리오 1 실행 시 로드되지 않습니다.
-- 집(공유 에셋)에는 가스 밸브·멀티탭·소화기·수건·프라이팬 같은 화재용 상호작용 오브젝트가 들어 있습니다. 집을 고치지 않고, 시나리오 1 이 시작될 때 `WarFireExclusion` 이 그 오브젝트(약 21개)와 소화기·소화전·화재경보 소품을 **비활성화**합니다. 시나리오 3 실행 시에는 이 코드가 돌지 않습니다.
+- 집(공유 에셋)에는 가스 밸브·멀티탭·소화기·수건·프라이팬 같은 화재용 상호작용 오브젝트가 들어 있다. 집을 고치지 않고, 이 오브젝트(20개)에는 `FireHazardProp` 태그가 붙어 있으며 `S01_Definition` 의 `useFireProps = false` 로 시나리오 시작 시 `ScenarioRunner → ScenarioFeatures → HouseController` 가 **비활성화**한다 (예전의 `WarFireExclusion` 문자열 매칭은 제거됨). 시나리오 3 은 `useFireProps = true` 라서 그대로 동작한다.
 - 시나리오 1 은 시나리오 3 의 데이터 에셋·프리팹을 읽거나 수정하지 않습니다 (`Scenario_01.asset` 과 자기 폴더만 씁니다).
 - 공용 `DeathReason` enum 에 시나리오 1 전용 값 5개가 있고, 감사 도구는 이 값을 시나리오 3 검사에서 제외합니다.
 
@@ -34,12 +34,12 @@
 ```
 Assets/Scenarios/S01_WarTime/
   Game.Scenarios.S01.asmdef · Scenes/ · Prefabs/(S01_Fighter, S01_Helicopter) · Data/(WarConfig, Definition, Items, Objectives, DeathReasons, Endings, ScoreRules, Presets)
-  Scripts/Systems  WarConfig · WarState · WarKeys · WarAudio · WarHud · WarWindows · WarFireExclusion · WarOutbreak · WarFlyovers · WarAircraft · WarRotorSpin · WarFx · WarTime
+  Scripts/Systems  WarConfig · WarState · WarKeys · WarAudio · WarHud · WarWindows · WarUtilities(정전·단수) · WarOutbreak · WarFlyovers · WarAircraft · WarRotorSpin · WarFx · WarTime
   Scripts/Interactables  WarPickup · WarRadio · WarSurvivor
   Scripts/Acts  WarActBase · Act1_CrackInDaily … Act6_TrueArmistice
 ```
 
 ## 알려진 한계
-- 소품 위치는 빌드 때 집의 빈 자리를 탐색해 정합니다. 어색하면 `Props` 아래 오브젝트를 옮기세요.
+- 소품 위치는 `MainMenuBuilder.S01.cs` 의 `S01FixedSpots` 고정 좌표입니다 (앵커 `s01_*`). 옮길 때는 건물 안쪽인지 확인하세요. 자세한 목록: `Docs/ScenarioAdditions_S01.md`.
 - 비행 기체는 `Time.deltaTime` 기반 연출입니다 (게임플레이 타이밍과 무관).
 - 밸런스는 스모크 테스트가 "충분히 준비하면 진 엔딩 가능, 준비 없이는 사망"까지만 검증합니다. 직접 플레이해 조정하세요.

@@ -70,6 +70,16 @@ namespace GameGameplay
             else RenderSettings.ambientLight = savedAmbient;
         }
 
+        public bool IsBlackout => blackout;
+
+        /// <summary>정전 중에 환경 프리셋이 주변광을 바꿨을 때 다시 어둡게 맞춘다 (해제 시 복원할 값은 프리셋의 주변광)</summary>
+        public void RefreshBlackout()
+        {
+            if (!blackout) return;
+            savedAmbient = RenderSettings.ambientLight;
+            RenderSettings.ambientLight = new Color(blackoutAmbient, blackoutAmbient, blackoutAmbient * 1.1f);
+        }
+
         /// <summary>비상구 유도등 ("exit" 조명 그룹)</summary>
         public void SetEmergencyLights(bool on) => SetLightGroup("exit", on);
 
@@ -176,7 +186,7 @@ namespace GameGameplay
         }
 
         // ═════════════════════ 앵커 · 스폰 ═════════════════════
-        public ScenarioAnchor FindAnchor(string id) => anchors.TryGetValue(id, out var a) ? a : null;
+        public ScenarioAnchor FindAnchor(string id) => anchors.TryGetValue(id, out var a) ? a : ScenarioAnchor.FindLive(id);   // 집 앵커 우선, 없으면 시나리오 씬 앵커(s01_* 등)
         public SpawnPoint FindSpawn(string id) => spawns.TryGetValue(id, out var s) ? s : null;
 
         public bool TryGetSpawn(string spawnId, out Vector3 position, out float yaw)
@@ -247,6 +257,30 @@ namespace GameGameplay
 
         private static void Warn(string kind, string id) => Debug.LogWarning($"[House] {kind} '{id}' 을(를) 찾지 못했습니다.");
 
+        // ═════════════════════ 시나리오 기능 플래그 ═════════════════════
+        /// <summary>
+        /// ScenarioDefinition 기능 플래그 중 집이 처리하는 것. 베이스 오브젝트는 지우지 않고 켜고 끄기만 한다.
+        ///   useFireProps=false  → FireHazardProp 태그가 붙은 오브젝트 숨김 (상호작용도 함께 꺼진다)
+        ///   useDoorPeephole=false → 도어 스코프 상호작용 비활성
+        ///   useOutdoorTraffic=false → 창밖 보행자·차량 끔
+        /// </summary>
+        public void ApplyScenarioFeatures(ScenarioDefinition def)
+        {
+            if (def == null) return;
+            int hidden = 0;
+            foreach (FireHazardProp p in FireHazardProp.FindAllIncludingInactive())
+            {
+                if (p.gameObject.activeSelf == def.UseFireProps) continue;
+                p.gameObject.SetActive(def.UseFireProps);
+                if (!def.UseFireProps) hidden++;
+            }
+            if (!def.UseDoorPeephole) SetInteractableEnabled(PeepholeId, false);
+            if (!def.UseOutdoorTraffic) ApplyTraffic(false, false, 0f);
+            Debug.Log($"[House] 시나리오 기능 적용: 화재 소품 {(def.UseFireProps ? "켜짐" : "숨김 " + hidden + "개")}, 도어 스코프 {(def.UseDoorPeephole ? "켜짐" : "꺼짐")}, 창밖 교통 {(def.UseOutdoorTraffic ? "켜짐" : "꺼짐")}");
+        }
+
+        private const string PeepholeId = "door_peephole";
+
         // ═════════════════════ 환경 프리셋 ═════════════════════
         public void ApplyEnvironmentPreset(EnvironmentPreset p)
         {
@@ -266,6 +300,7 @@ namespace GameGameplay
                 RenderSettings.fogColor = p.applyFog ? p.fogColor : (smoky ? new Color(0.12f, 0.1f, 0.09f) : new Color(0.45f, 0.5f, 0.55f));
                 RenderSettings.fogDensity = p.applyFog ? p.fogDensity : (smoky ? 0.012f : rain ? 0.008f : 0.002f);
             }
+            if (HouseVolumes.Instance != null) HouseVolumes.Instance.SetSmoke(p.windowView == WindowViewMode.DarkSmoky ? 1f : 0f);   // 후처리 분위기 (연기 → 채도·노출 낮춤)
             if (p.applyTraffic) ApplyTraffic(p.pedestrians, p.vehicles, p.trafficDensity);
             if (ambientSource != null && p.ambientSound != null)
             {

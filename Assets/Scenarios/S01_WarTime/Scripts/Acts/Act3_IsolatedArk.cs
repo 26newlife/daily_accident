@@ -46,6 +46,8 @@ namespace GameGameplay
             EventBus.ShowMessage("외출은 불가능하다. 식량과 물, 정신력을 아끼며 버텨야 한다.");
 
             for (int i = 0; i < c.visitorTimes.Length && i < 3; i++) { int idx = i; At(c.visitorTimes[i], () => Knock(idx)); }
+            At(c.waterCutTime, WarUtilities.CutWater, "war.act3.water");
+            At(c.blackoutTime, WarUtilities.PowerOut, "war.act3.blackout");
             At(c.nightTime, () => { ApplyPreset(nightPreset); EventBus.ShowSubtitle("해가 졌다. 어둠 속에서 포성이 더 가까워진다.", 5f); });
             At(c.raiderTime, () => Knock(3));
             At(40f, () => WarAudio.Instance?.Play(WarSound.Rumble, 0.5f));

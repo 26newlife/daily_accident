@@ -38,6 +38,7 @@ namespace GameUI.EditorTools.Interior
             Furn("FloorLamp", r, 5.375f, 6.95f);
             Furn("Plant", r, 2.93f, 6.42f);
             OnWall("FramePortrait", r, new Vector3(6.458f, 1.55f, 5.975f), 270f, "Frame_Living");
+            OnWall("AirConditioner", r, new Vector3(6.375f, 2.0f, 5.975f), 270f, "AirCon_Living");   // 참고 이미지: 벽걸이 에어컨
 
             // 커튼 — 화재 때 불붙는 대상이므로 따로 분리된 오브젝트. 거실 창(2.7~3.7) + 베란다 문(3.85~5.15) 양끝에 모음
             Transform curtain = Group("Curtain_Living", r);

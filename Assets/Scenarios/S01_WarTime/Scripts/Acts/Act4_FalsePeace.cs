@@ -28,6 +28,7 @@ namespace GameGameplay
             AddObjective(objectiveJudge);
             WarOutbreak.Instance?.Calm();   // 포성과 편대 비행이 멎는다 — 거짓 평화의 정적
             ApplyPreset(dawnPreset);
+            At(c.powerRestoreDelayAct4, WarUtilities.PowerRestore, "war.act4.power");   // 거짓 평화 — 전기가 돌아온다 (단수는 계속)
 
             HouseController house = HouseController.Instance;
             ScenarioAnchor door = house != null ? house.FindAnchor("anchor_entrance_door") : null;

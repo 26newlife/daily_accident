@@ -14,6 +14,15 @@ namespace GameGameplay
         public string Id => id;
         public string Description => description;
 
+        // 시나리오 씬(Additive)의 앵커 (예: s01_radio) 는 HouseController.Awake 이후에 로드되므로, 켜질 때 스스로 등록한다
+        private static readonly System.Collections.Generic.Dictionary<string, ScenarioAnchor> live = new System.Collections.Generic.Dictionary<string, ScenarioAnchor>();
+        public static ScenarioAnchor FindLive(string anchorId) => live.TryGetValue(anchorId, out var a) && a != null ? a : null;
+        private void OnEnable() { if (!string.IsNullOrEmpty(id)) live[id] = this; }
+        private void OnDisable() { if (live.TryGetValue(id, out var a) && a == this) live.Remove(id); }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics() => live.Clear();
+
         private void OnDrawGizmos() { Gizmos.color = new Color(0.2f, 0.8f, 1f, 0.8f); Gizmos.DrawWireSphere(transform.position, 0.15f); }
     }
 }

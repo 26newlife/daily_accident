@@ -41,6 +41,8 @@ namespace GameUI.EditorTools.Interior
             Furn("Monitor", r, 0.25f, 6.52f, 90f, 0.74f);
             Furn("Keyboard", r, 0.42f, 6.55f, 90f, 0.74f);
             Furn("BookStack", r, 0.3f, 6.12f, 15f, 0.74f);
+            Furn("DeskLamp", r, 0.22f, 6.72f, 90f, 0.74f);      // 참고 이미지: 책상 위 검은 스탠드
+            OnWall("AirConditioner", r, new Vector3(0.225f, 2.02f, 5.6f), 90f, "AirCon_Bedroom");   // 참고 이미지: 벽걸이 에어컨
             Furn("Cup", r, 0.58f, 6.7f, 0f, 0.74f);
             Furn("PostIt", r, 0.27f, 6.7f, 90f, 0.98f, "PostIt_Monitor");
             // 의자: 책상 밑으로 밀어 넣어 통로로 튀어나오지 않게

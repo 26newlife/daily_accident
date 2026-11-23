@@ -363,6 +363,8 @@ namespace GameUI.EditorTools
             cam.fieldOfView = PlayerFov; cam.nearClipPlane = 0.05f; cam.farClipPlane = 1800f;   // 창밖 산/하천/먼 동까지
             cam.clearFlags = CameraClearFlags.Skybox;
             cam.backgroundColor = Hex("8FB4D9");
+            // URP: 후처리(톤매핑·블룸·비네트·색보정)와 SMAA — 설정하지 않으면 후처리가 꺼진다
+            GameUI.EditorTools.Art.InteriorLookBuilder.ConfigureCamera(camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>());
 
             // 손전등 (스마트폰 UI 에서 켜고 끈다)
             var flashGo = new GameObject("Flashlight", typeof(Light));
@@ -746,8 +748,8 @@ namespace GameUI.EditorTools
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
+            // Expand: 캔버스가 항상 1920x1080 이상 — 울트라와이드에서 높이가 줄어 하단 슬롯이 좁아지는 일이 없고, 4:3·16:10 에서 폭이 줄지도 않는다
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             Transform ct = canvasGo.transform;
 
             var input = player.GetComponent<GameInput>();
@@ -788,113 +790,8 @@ namespace GameUI.EditorTools
             gasFxSo.FindProperty("yellowVignette").objectReferenceValue = gasVig;
             gasFxSo.ApplyModifiedPropertiesWithoutUndo();
 
-            // ── 2) HUD ──
-            var hudGo = new GameObject("HUD", typeof(RectTransform), typeof(HUD));
-            hudGo.transform.SetParent(ct, false);
-            Stretch((RectTransform)hudGo.transform, 0);
-            Transform hud = hudGo.transform;
-
-            Image crosshair = CreateImage("Crosshair", hud, g.radial, Image.Type.Simple, false);
-            Place(crosshair.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(12, 12));
-
-            CanvasGroup promptGroup = GroupWithPanel("Prompt", hud, g, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -80), new Vector2(620, 58), new Color(0, 0, 0, 0.55f));
-            TMP_Text promptText = GameText("Text", promptGroup.transform, "[E] 상호작용", font, 30, TextAlignmentOptions.Center, TextMain);
-            Stretch(promptText.rectTransform, 6);
-
-            TMP_Text objectiveText = GameText("ObjectiveText", hud, string.Empty, font, 28, TextAlignmentOptions.TopLeft, TextMain, true);
-            objectiveText.richText = true;
-            Place(objectiveText.rectTransform, new Vector2(0, 1), new Vector2(0, 1), new Vector2(48, -48), new Vector2(760, 340));
-
-            CanvasGroup banner = GroupWithPanel("ObjectiveBanner", hud, g, new Vector2(0.5f, 1), new Vector2(0.5f, 1), new Vector2(0, -120), new Vector2(820, 80), WithA(PanelDark, 0.85f));
-            TMP_Text bannerText = GameText("Text", banner.transform, string.Empty, font, 34, TextAlignmentOptions.Center, TextMain);
-            bannerText.fontStyle = FontStyles.Bold;
-            Stretch(bannerText.rectTransform, 8);
-
-            // (화면 상단 게임 시계는 삭제됨 — GameClock 로직과 폰 안의 시계는 그대로 유지)
-
-            // 호흡기 게이지
-            var vitalsGo = new GameObject("VitalsGauge", typeof(RectTransform), typeof(CanvasGroup));
-            vitalsGo.transform.SetParent(hud, false);
-            Place((RectTransform)vitalsGo.transform, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 168), new Vector2(520, 40));
-            TMP_Text vitalsLabel = GameText("Label", vitalsGo.transform, "호흡", font, 24, TextAlignmentOptions.MidlineLeft, TextDim);
-            Place(vitalsLabel.rectTransform, new Vector2(0, 0.5f), new Vector2(0, 0.5f), Vector2.zero, new Vector2(100, 40));
-            Image vBg = CreateImage("BarBg", vitalsGo.transform, g.white, Image.Type.Simple, false);
-            Place(vBg.rectTransform, new Vector2(1, 0.5f), new Vector2(1, 0.5f), Vector2.zero, new Vector2(400, 14));
-            vBg.color = new Color(0, 0, 0, 0.55f);
-            Image vFill = CreateImage("BarFill", vBg.transform, g.white, Image.Type.Filled, false);
-            Stretch(vFill.rectTransform, 0);
-            vFill.fillMethod = Image.FillMethod.Horizontal;
-            vFill.fillOrigin = 0;
-            vFill.fillAmount = 1f;
-
-            // 인벤토리 바 (8칸)
-            const int slotCount = 8;
-            const float slotSize = 72f, slotGap = 8f;
-            var invGo = new GameObject("InventoryBar", typeof(RectTransform));
-            invGo.transform.SetParent(hud, false);
-            Place((RectTransform)invGo.transform, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 40), new Vector2(slotCount * (slotSize + slotGap), slotSize));
-            var slotViews = new InventorySlotView[slotCount];
-            for (int i = 0; i < slotCount; i++)
-                slotViews[i] = BuildInventorySlot(invGo.transform, i, (i - (slotCount - 1) * 0.5f) * (slotSize + slotGap), slotSize, g, font);
-
-            // 안내 문구
-            CanvasGroup msgGroup = GroupWithPanel("Message", hud, g, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 240), new Vector2(900, 60), new Color(0, 0, 0, 0.6f));
-            TMP_Text msgText = GameText("Text", msgGroup.transform, string.Empty, font, 30, TextAlignmentOptions.Center, TextMain);
-            Stretch(msgText.rectTransform, 6);
-
-            // 길게 누르기 진행 바
-            var holdGo = new GameObject("HoldBar", typeof(RectTransform), typeof(CanvasGroup));
-            holdGo.transform.SetParent(hud, false);
-            Place((RectTransform)holdGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -130), new Vector2(260, 10));
-            Image holdBg = CreateImage("Bg", holdGo.transform, g.white, Image.Type.Simple, false);
-            Stretch(holdBg.rectTransform, 0);
-            holdBg.color = new Color(0, 0, 0, 0.6f);
-            Image holdFill = CreateImage("Fill", holdGo.transform, g.white, Image.Type.Filled, false);
-            Stretch(holdFill.rectTransform, 0);
-            holdFill.fillMethod = Image.FillMethod.Horizontal;
-            holdFill.fillOrigin = 0;
-            holdFill.fillAmount = 0f;
-            holdFill.color = Accent;
-
-            // 감각 묘사 (냄새 등, 옅은 노란 글씨)
-            var scentGo = new GameObject("Scent", typeof(RectTransform), typeof(CanvasGroup));
-            scentGo.transform.SetParent(hud, false);
-            Place((RectTransform)scentGo.transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0, -210), new Vector2(1100, 50));
-            TMP_Text scentText = GameText("Text", scentGo.transform, string.Empty, font, 30, TextAlignmentOptions.Center, new Color(0.96f, 0.88f, 0.42f));
-            scentText.fontStyle = FontStyles.Italic;
-            Stretch(scentText.rectTransform, 0);
-
-            // 자막
-            CanvasGroup subGroup = GroupWithPanel("Subtitle", hud, g, new Vector2(0.5f, 0), new Vector2(0.5f, 0), new Vector2(0, 320), new Vector2(1300, 96), new Color(0, 0, 0, 0.65f));
-            TMP_Text subText = GameText("Text", subGroup.transform, string.Empty, font, 30, TextAlignmentOptions.Center, TextMain, true);
-            Stretch(subText.rectTransform, 10);
-            var subDisplay = subGroup.gameObject.AddComponent<SubtitleDisplay>();
-            var subSo = SO(subDisplay);
-            subSo.FindProperty("group").objectReferenceValue = subGroup;
-            subSo.FindProperty("text").objectReferenceValue = subText;
-            subSo.ApplyModifiedPropertiesWithoutUndo();
-
-            var hudSo = SO(hudGo.GetComponent<HUD>());
-            hudSo.FindProperty("interactor").objectReferenceValue = interactor;
-            hudSo.FindProperty("vitals").objectReferenceValue = vitals;
-            hudSo.FindProperty("inventory").objectReferenceValue = inventory;
-            hudSo.FindProperty("objectives").objectReferenceValue = sys.objectives;
-            hudSo.FindProperty("crosshair").objectReferenceValue = crosshair;
-            hudSo.FindProperty("promptGroup").objectReferenceValue = promptGroup;
-            hudSo.FindProperty("promptText").objectReferenceValue = promptText;
-            hudSo.FindProperty("objectiveText").objectReferenceValue = objectiveText;
-            hudSo.FindProperty("bannerGroup").objectReferenceValue = banner;
-            hudSo.FindProperty("bannerText").objectReferenceValue = bannerText;
-            hudSo.FindProperty("vitalsGroup").objectReferenceValue = vitalsGo.GetComponent<CanvasGroup>();
-            hudSo.FindProperty("vitalsFill").objectReferenceValue = vFill;
-            SetObjectArray(hudSo.FindProperty("slotViews"), slotViews);
-            hudSo.FindProperty("messageGroup").objectReferenceValue = msgGroup;
-            hudSo.FindProperty("messageText").objectReferenceValue = msgText;
-            hudSo.FindProperty("holdGroup").objectReferenceValue = holdGo.GetComponent<CanvasGroup>();
-            hudSo.FindProperty("holdFill").objectReferenceValue = holdFill;
-            hudSo.FindProperty("scentGroup").objectReferenceValue = scentGo.GetComponent<CanvasGroup>();
-            hudSo.FindProperty("scentText").objectReferenceValue = scentText;
-            hudSo.ApplyModifiedPropertiesWithoutUndo();
+            // ── 2) HUD (공통 HUD 프리팹 GameHUD — 모든 시나리오가 같은 레이아웃 / MainMenuBuilder.Hud.cs) ──
+            CreateHudInstance(ct, g, font, interactor, vitals, inventory, sys.objectives);
 
             // ── 3) 스마트폰 ──
             BuildPhone(ct, g, font, buttonPrefab, input, sys.clock, flashlight);

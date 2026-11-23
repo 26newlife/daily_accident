@@ -1,7 +1,7 @@
 ﻿<Solution>
   <Project Path="Game.Core.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Game.Scenarios.S03.csproj" />
   <Project Path="Game.House.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Game.Scenarios.S01.csproj" />
 </Solution>

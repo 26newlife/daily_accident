@@ -130,6 +130,9 @@ namespace GameGameplay
         [Tooltip("약탈자 야간 방문 시각")] public float raiderTime = 150f;
         public float raiderAnswerSeconds = 25f;
         [Tooltip("야간 환경으로 바뀌는 시각")] public float nightTime = 135f;
+        [Min(0f), Tooltip("Act 3 시작 후 단수가 되는 시각 (초) — 싱크 상호작용이 막힌다")] public float waterCutTime = 30f;
+        [Min(0f), Tooltip("Act 3 시작 후 정전이 되는 시각 (초) — 모든 조명 소등 + 비상구 유도등만 켜짐")] public float blackoutTime = 60f;
+        [Min(0f), Tooltip("Act 4(거짓 평화) 시작 후 전기가 돌아오는 시각 (초)")] public float powerRestoreDelayAct4 = 2f;
         public int raiderFoodDemand = 2;
         public int soldierMedicine = 2;
         public float childSanityBonus = 12f;

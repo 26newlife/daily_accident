@@ -46,6 +46,7 @@ namespace GameGameplay
         {
             if (p != null && HouseServices.Environment != null) HouseServices.Environment.ApplyEnvironmentPreset(p);
             if (p != null && WarOutbreak.Instance != null) WarOutbreak.Instance.MatchSkyToPreset(p);   // 하늘 재질도 같은 분위기로
+            if (HouseController.Instance != null) HouseController.Instance.RefreshBlackout();           // 정전 중이면 프리셋이 밝혀 놓은 주변광을 다시 어둡게
         }
 
         protected static bool PlayerIsOutside(float outsideZ)

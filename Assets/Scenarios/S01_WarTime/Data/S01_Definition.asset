@@ -32,6 +32,12 @@ MonoBehaviour:
   requiredItems:
   - {fileID: 11400000, guid: 98afc4b3a353fa7418e5e696ba9f6d71, type: 2}
   - {fileID: 11400000, guid: d32c14da44275264da0b40d838cdc87e, type: 2}
+  useRespiratoryGauge: 1
+  useGasHazard: 0
+  useFireProps: 0
+  useElevatorHazard: 0
+  useDoorPeephole: 1
+  useOutdoorTraffic: 1
   deathReasons:
   - {fileID: 11400000, guid: 51aab96093c5b7441933d62cff7e41ea, type: 2}
   - {fileID: 11400000, guid: 6660662419250ab4a9f053ab2dcabe5c, type: 2}

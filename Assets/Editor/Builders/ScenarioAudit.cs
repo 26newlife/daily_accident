@@ -100,10 +100,7 @@ namespace GameUI.EditorTools
             Interact("A1-7", "fuse_cock", typeof(ValveInteractable), Wire.Self, "퓨즈콕");
             Interact("A1-7", "gas_valve_main", typeof(ValveInteractable), Wire.Self, "메인 밸브");
             foreach (string w in new[] { "window_living", "window_kitchen", "window_bedroom" })
-            {
                 Interact("A1-8", w, typeof(ToggleInteractable), Wire.Self, "창문 열기");
-                Interact("A1-8", w + "_lock", typeof(LockInteractable), Wire.Self, "잠금 해제");
-            }
             Interact("A1-9", "multitap_plug", typeof(RemovableInteractable), Wire.Referenced, "코드 뽑기");
             foreach (string id in new[] { "clutter_paper_1", "clutter_cloth_1", "clutter_paper_2" }) Interact("A1-9", id, typeof(RemovableInteractable), Wire.Referenced, "가연물 치우기");
             Check("A1-10", "Act1 → Act2 전환", act1 != null, "Act1_MorningSigns 존재");

@@ -5,7 +5,7 @@ namespace GameGameplay
 {
     /// <summary>
     /// 시나리오 1(전시 상황) 시작 훅. 집은 그대로 두고, 시나리오 시작 시에만:
-    ///   · 시나리오 3(화재) 소품을 제외한다 (WarFireExclusion)
+    ///   · (화재 소품 숨김은 ScenarioDefinition.useFireProps=false 로 ScenarioRunner 가 처리한다 — 여기서는 하지 않는다)
     ///   · 시나리오 전용 HUD 를 켠다 (WarHud)
     ///   · 아이템 사용 이벤트(요오드화 칼륨 복용 / 방독면 착용)를 구독한다
     /// </summary>
@@ -15,7 +15,7 @@ namespace GameGameplay
 
         public void OnScenarioLoaded()
         {
-            WarFireExclusion.Apply();   // 시나리오 3(화재) 소품·상호작용을 이 시나리오에서 제외
+            WarUtilities.Reset();       // 정전·단수 상태 초기화 (재시작 안전)
             if (hud != null) hud.gameObject.SetActive(true);
             EventBus.ScenarioEventRaised -= OnEvent;
             EventBus.ScenarioEventRaised += OnEvent;

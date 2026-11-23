@@ -195,14 +195,14 @@ namespace GameUI.EditorTools.Interior
             // 침대 1.5 x 2.0 (머리판은 -Z, 발치가 +Z). 매트리스 윗면 0.50, 이불 윗면 0.57
             R("Bed", false, false, f =>
             {
-                f.Box("Frame", 0, 0.11f, 0, 1.5f, 0.22f, 2.0f, M.WoodDark);
+                f.Box("Frame", 0, 0.11f, 0, 1.5f, 0.22f, 2.0f, M.Wood);
                 f.Box("Mattress", 0, 0.36f, 0, 1.44f, 0.28f, 1.92f, M.Bedding);
                 f.Box("Blanket", 0, 0.535f, 0.30f, 1.48f, 0.07f, 1.30f, M.Blanket);
                 f.Box("BlanketFold", 0, 0.575f, -0.36f, 1.48f, 0.05f, 0.14f, M.Pillow);
                 f.Box("Pillow_L", -0.37f, 0.56f, -0.78f, 0.56f, 0.12f, 0.34f, M.Pillow);
                 f.Box("Pillow_R", 0.37f, 0.56f, -0.78f, 0.56f, 0.12f, 0.34f, M.Pillow);
-                f.Box("Headboard", 0, 0.45f, -1.04f, 1.56f, 0.9f, 0.08f, M.WoodDark);
-                f.Box("Footboard", 0, 0.3f, 1.03f, 1.5f, 0.38f, 0.06f, M.WoodDark);
+                f.Box("Headboard", 0, 0.45f, -1.04f, 1.56f, 0.9f, 0.08f, M.Wood);
+                f.Box("Footboard", 0, 0.3f, 1.03f, 1.5f, 0.38f, 0.06f, M.Wood);
                 f.Col(0, 0.29f, 0, 1.5f, 0.58f, 2.0f);        // 매트리스 높이만 올라설 수 있게
                 f.Col(0, 0.45f, -1.04f, 1.56f, 0.9f, 0.08f);  // 머리판
             });
@@ -232,11 +232,25 @@ namespace GameUI.EditorTools.Interior
             R("Desk", true, false, f =>       // 폭 0.75 x 깊이 0.55 x 높이 0.74, 앞면 = 앉는 쪽
             {
                 f.Box("Top", 0, 0.72f, 0, 0.75f, 0.04f, 0.55f, M.WoodLight);
-                f.Box("Leg_FL", -0.35f, 0.35f, 0.24f, 0.04f, 0.7f, 0.04f, M.Metal);
-                f.Box("Leg_FR", 0.35f, 0.35f, 0.24f, 0.04f, 0.7f, 0.04f, M.Metal);
-                f.Box("Leg_BL", -0.35f, 0.35f, -0.24f, 0.04f, 0.7f, 0.04f, M.Metal);
-                f.Box("Leg_BR", 0.35f, 0.35f, -0.24f, 0.04f, 0.7f, 0.04f, M.Metal);
+                f.Box("Leg_FL", -0.35f, 0.35f, 0.24f, 0.04f, 0.7f, 0.04f, M.MetalDark);
+                f.Box("Leg_FR", 0.35f, 0.35f, 0.24f, 0.04f, 0.7f, 0.04f, M.MetalDark);
+                f.Box("Leg_BL", -0.35f, 0.35f, -0.24f, 0.04f, 0.7f, 0.04f, M.MetalDark);
+                f.Box("Leg_BR", 0.35f, 0.35f, -0.24f, 0.04f, 0.7f, 0.04f, M.MetalDark);
                 f.Box("Drawer", 0.2f, 0.58f, 0, 0.3f, 0.2f, 0.5f, M.Wood);
+            });
+            // 벽걸이 에어컨 (참고 이미지: 창/벽 위쪽). 폭 0.8 x 깊이 0.2 x 높이 0.28, 피벗 = 아랫면, 앞면 +Z, 콜라이더 없음
+            R("AirConditioner", false, false, f =>
+            {
+                f.Box("Body", 0, 0.14f, 0, 0.8f, 0.28f, 0.2f, M.White);
+                f.Box("Vent", 0, 0.03f, 0.08f, 0.7f, 0.04f, 0.06f, M.Plastic);
+                f.Box("Slit", 0, 0.1f, 0.101f, 0.6f, 0.006f, 0.002f, M.MetalDark);
+            });
+            // 검은 암 스탠드 (참고 이미지: 책상 위)
+            R("DeskLamp", false, false, f =>
+            {
+                f.Cyl("Base", 0, 0.01f, 0, 0.07f, 0.02f, M.PlasticBlack);
+                f.Box("Arm", 0, 0.2f, -0.02f, 0.015f, 0.38f, 0.015f, M.PlasticBlack, new Vector3(-12f, 0f, 0f));
+                f.Cyl("Head", 0, 0.4f, 0.04f, 0.06f, 0.1f, M.PlasticBlack, new Vector3(70f, 0f, 0f));
             });
             R("DeskChair", true, false, f =>
             {
@@ -377,11 +391,11 @@ namespace GameUI.EditorTools.Interior
             {
                 f.Box("Body", 0, 0.42f, -0.01f, 1.78f, 0.8f, 0.56f, M.White);
                 f.Box("Toe", 0, 0.04f, 0.0f, 1.74f, 0.08f, 0.5f, M.MetalDark);
-                f.Box("Top", 0, 0.88f, 0.0f, 1.8f, 0.04f, 0.62f, M.Stone);
+                f.Box("Top", 0, 0.88f, 0.0f, 1.8f, 0.04f, 0.62f, M.CounterDark);
                 for (int i = 0; i < 4; i++)
                 {
                     float x = -0.66f + i * 0.44f;
-                    f.Box("Door", x, 0.44f, 0.285f, 0.42f, 0.74f, 0.02f, M.WoodLight);
+                    f.Box("Door", x, 0.44f, 0.285f, 0.42f, 0.74f, 0.02f, M.White);
                     f.Box("Handle", x, 0.74f, 0.305f, 0.12f, 0.02f, 0.02f, M.Metal);
                 }
             });
@@ -390,14 +404,24 @@ namespace GameUI.EditorTools.Interior
             {
                 f.Box("Body", 0, 0.42f, 0, 0.88f, 0.8f, 0.53f, M.White);
                 f.Box("Toe", 0, 0.04f, 0, 0.84f, 0.08f, 0.48f, M.MetalDark);
-                f.Box("Top", 0, 0.88f, 0, 0.9f, 0.04f, 0.55f, M.Stone);
-                f.Box("Basin", -0.1f, 0.904f, 0.02f, 0.5f, 0.008f, 0.36f, M.Metal);
+                f.Box("Top", 0, 0.88f, 0, 0.9f, 0.04f, 0.55f, M.CounterDark);
+                f.Box("Basin", -0.1f, 0.904f, 0.02f, 0.5f, 0.008f, 0.36f, M.PlasticBlack);
                 f.Box("Drain", -0.1f, 0.909f, 0.02f, 0.06f, 0.004f, 0.06f, M.MetalDark);
                 f.Cyl("TapStem", 0.2f, 0.99f, -0.16f, 0.015f, 0.2f, M.Chrome);
                 f.Box("TapSpout", 0.2f, 1.09f, -0.06f, 0.025f, 0.025f, 0.22f, M.Chrome);
                 f.Box("TapHandle", 0.26f, 0.95f, -0.16f, 0.07f, 0.02f, 0.02f, M.Chrome);
                 for (int i = 0; i < 2; i++)
-                    f.Box("Door", -0.22f + i * 0.44f, 0.44f, 0.275f, 0.42f, 0.74f, 0.02f, M.WoodLight);
+                    f.Box("Door", -0.22f + i * 0.44f, 0.44f, 0.275f, 0.42f, 0.74f, 0.02f, M.White);
+            });
+            // 벽선반 + 식기건조대 (참고 이미지: 싱크대 위 진녹색 브래킷 선반). 폭 0.9 x 깊이 0.2, 피벗 = 선반 윗면, 콜라이더 없음
+            R("DishShelf", false, false, f =>
+            {
+                f.Box("Board", 0, -0.015f, 0, 0.9f, 0.03f, 0.2f, M.WoodLight);
+                f.Box("Bracket_L", -0.35f, -0.12f, -0.07f, 0.03f, 0.18f, 0.05f, M.FrontDoorFrame);
+                f.Box("Bracket_R", 0.35f, -0.12f, -0.07f, 0.03f, 0.18f, 0.05f, M.FrontDoorFrame);
+                f.Box("RackBase", -0.1f, 0.015f, 0, 0.5f, 0.02f, 0.17f, M.MetalDark);
+                for (int i = 0; i < 5; i++) f.Box("Plate", -0.3f + i * 0.1f, 0.12f, 0, 0.012f, 0.2f, 0.17f, M.Ceramic);
+                f.Cyl("Bowl", 0.28f, 0.06f, 0, 0.1f, 0.1f, M.Ceramic);
             });
             R("UpperCabinet", true, false, f =>   // 폭 0.95 x 깊이 0.35 x 높이 0.4, 피벗 = 아랫면
             {

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using GameCore;
 using TMPro;
 using UnityEngine;
@@ -9,13 +8,18 @@ using UnityEngine.UI;
 namespace GameGameplay
 {
     /// <summary>
-    /// 게임 HUD: 크로스헤어, 상호작용 프롬프트, 현재 목표 + 목표 알림 배너, 게임 내 시간,
-    /// 호흡기 게이지(연기 속에서만 표시), 인벤토리 바, 안내 문구(토스트).
-    /// 모든 문구 형식은 Inspector 에서 바꿀 수 있고, 데이터는 각 시스템의 이벤트를 구독해 갱신한다.
+    /// 게임 HUD (모든 시나리오 공통, 공통 HUD 프리팹 GameHUD 의 루트 컴포넌트).
+    /// 영역(기준 1920x1080, 세이프 에어리어 안쪽):
+    ///   · 우측 상단  : 생존 상태 (SurvivalStatsPanel — 호흡기·화상은 여기서 등록, 시나리오 1 은 WarHud 가 등록)
+    ///   · 상단 중앙  : 새 목표 알림 배너 (약 3초, 설정으로 끌 수 있음) / 시나리오 전용 큰 팝업(WarHud 재난문자)은 그 아래
+    ///   · 하단 중앙  : 인벤토리 → 상호작용 프롬프트 → 힌트 토스트 → 안내 문구 → 자막 (고정 슬롯 — 서로 겹치지 않는다)
+    ///   · 중앙       : 크로스헤어, 길게 누르기 진행 바, 감각 묘사
+    /// 목표 목록은 더 이상 상시 표시하지 않는다 — J 키 패널(ObjectiveDetailPanel)로 본다.
+    /// 시스템 참조(interactor/vitals/inventory/objectives)는 프리팹 안에 저장할 수 없으므로 비어 있으면 씬에서 찾아 쓴다.
     /// </summary>
     public class HUD : MonoBehaviour
     {
-        [Header("시스템 참조")]
+        [Header("시스템 참조 (비우면 씬에서 자동으로 찾는다)")]
         [SerializeField] private PlayerInteractor interactor;
         [SerializeField] private PlayerVitals vitals;
         [SerializeField] private InventorySystem inventory;
@@ -35,36 +39,23 @@ namespace GameGameplay
         [SerializeField] private CanvasGroup holdGroup;
         [SerializeField] private Image holdFill;
 
-        [Header("목표")]
-        [SerializeField] private TMP_Text objectiveText;
-        [SerializeField] private string objectiveHeader = "목표";
-        [SerializeField] private string mainFormat = "● {0}";
-        [SerializeField] private string subFormat = "○ {0}";
-        [SerializeField] private string completedFormat = "<s><alpha=#88>{0}</s>";
-        [SerializeField] private string failedFormat = "<color=#FF6B6B><s>{0}</s></color>";
+        [Header("새 목표 알림 (상단 중앙)")]
         [SerializeField] private CanvasGroup bannerGroup;
         [SerializeField] private TMP_Text bannerText;
-        [SerializeField] private string bannerAddedFormat = "새 목표  {0}";
-        [SerializeField] private string bannerCompletedFormat = "목표 완료  {0}";
-        [SerializeField] private string bannerFailedFormat = "목표 실패  {0}";
+        [SerializeField] private string bannerAddedFormat = "새 목표: {0}";
+        [SerializeField] private string bannerCompletedFormat = "목표 완료: {0}";
+        [SerializeField] private string bannerFailedFormat = "목표 실패: {0}";
         [SerializeField] private Color bannerAddedColor = new Color(0.18f, 0.61f, 1f);
         [SerializeField] private Color bannerCompletedColor = new Color(0.4f, 0.9f, 0.5f);
         [SerializeField] private Color bannerFailedColor = new Color(1f, 0.4f, 0.4f);
         [SerializeField] private float bannerSlideDistance = 24f;
-        [SerializeField] private float bannerFadeTime = 0.3f;
-        [SerializeField] private float bannerHoldTime = 2.2f;
-        [SerializeField, Tooltip("새 목표가 추가될 때 목표 목록이 한 번 커졌다 돌아오는 정도")] private float objectivePulseScale = 1.1f;
-        [SerializeField] private float objectivePulseTime = 0.6f;
-        [SerializeField] private Color objectivePulseColor = new Color(0.6f, 0.85f, 1f);
+        [SerializeField, Tooltip("페이드 인/아웃 시간 (초). 총 표시 시간 = 2 x 페이드 + 유지")] private float bannerFadeTime = 0.3f;
+        [SerializeField, Tooltip("완전히 보이는 시간 (초). 기본 2.4 + 페이드 0.6 = 약 3초")] private float bannerHoldTime = 2.4f;
 
-        [Header("시계")]
-
-        [Header("호흡기 게이지")]
-        [SerializeField] private CanvasGroup vitalsGroup;
-        [SerializeField] private Image vitalsFill;
-        [SerializeField] private Color vitalsColorFull = new Color(0.45f, 0.85f, 0.55f);
-        [SerializeField] private Color vitalsColorEmpty = new Color(0.95f, 0.25f, 0.2f);
-        [SerializeField] private float vitalsFadeSpeed = 4f;
+        [Header("생존 상태 (우측 상단)")]
+        [SerializeField] private SurvivalStatsPanel stats;
+        [SerializeField] private Color statGood = new Color(0.45f, 0.85f, 0.55f);
+        [SerializeField] private Color statBad = new Color(0.95f, 0.25f, 0.2f);
 
         [Header("인벤토리")]
         [SerializeField] private InventorySlotView[] slotViews;
@@ -80,25 +71,33 @@ namespace GameGameplay
         [SerializeField] private float scentHoldTime = 3.5f;
 
         private readonly Queue<(string text, Color color)> bannerQueue = new Queue<(string, Color)>();
-        private Coroutine bannerRoutine, messageRoutine, pulseRoutine;
+        private Coroutine bannerRoutine, messageRoutine;
         private RectTransform bannerRect;
         private Vector2 bannerHome;
+        private bool vitalsAllowed = true;
+
+        public static HUD Instance { get; private set; }
 
         private void Awake()
         {
+            Instance = this;
+            if (interactor == null) interactor = FindFirstObjectByType<PlayerInteractor>(FindObjectsInactive.Include);
+            if (vitals == null) vitals = FindFirstObjectByType<PlayerVitals>(FindObjectsInactive.Include);
+            if (inventory == null) inventory = FindFirstObjectByType<InventorySystem>(FindObjectsInactive.Include);
+            if (objectives == null) objectives = FindFirstObjectByType<ObjectiveSystem>(FindObjectsInactive.Include);
+            if (stats == null) stats = GetComponentInChildren<SurvivalStatsPanel>(true);
+
             if (bannerGroup != null) { bannerRect = (RectTransform)bannerGroup.transform; bannerHome = bannerRect.anchoredPosition; bannerGroup.alpha = 0f; }
             if (messageGroup != null) messageGroup.alpha = 0f;
             if (scentGroup != null) scentGroup.alpha = 0f;
             if (holdGroup != null) holdGroup.alpha = 0f;
             if (promptGroup != null) promptGroup.alpha = 0f;
-            if (vitalsGroup != null) vitalsGroup.alpha = 0f;
         }
 
         private void OnEnable()
         {
             if (objectives != null) objectives.Changed += OnObjectiveChanged;
             if (inventory != null) inventory.Changed += RefreshInventory;
-            if (vitals != null) vitals.Changed += RefreshVitals;
             EventBus.MessageRequested += ShowMessage;
             EventBus.ScentRequested += ShowScent;
         }
@@ -107,23 +106,33 @@ namespace GameGameplay
         {
             if (objectives != null) objectives.Changed -= OnObjectiveChanged;
             if (inventory != null) inventory.Changed -= RefreshInventory;
-            if (vitals != null) vitals.Changed -= RefreshVitals;
             EventBus.MessageRequested -= ShowMessage;
             EventBus.ScentRequested -= ShowScent;
         }
 
+        private void OnDestroy() { if (Instance == this) Instance = null; }
+
         private void Start()
         {
-            RefreshObjectives();
             RefreshInventory();
-            RefreshVitals();
+            RegisterVitals();
         }
 
-        private void Update()
+        private void Update() { UpdatePrompt(); }
+
+        // ───────── 생존 상태: 호흡기·화상 (연기·화재 속에서만 표시) ─────────
+        private void RegisterVitals()
         {
-            UpdatePrompt();
-            UpdateVitalsVisibility();
+            if (stats == null || vitals == null) return;
+            PlayerVitals v = vitals;
+            stats.SetStat("breath", "호흡기", () => v.Normalized, () => (v.Normalized * 100f).ToString("0"),
+                () => vitalsAllowed && (v.IsInSmoke || v.Normalized < 0.999f), statGood, statBad);
+            stats.SetStat("burn", "화상", () => v.Burn01, () => (v.Burn01 * 100f).ToString("0"),
+                () => vitalsAllowed && v.Burn01 > 0.01f, statGood, statBad, true);
         }
+
+        /// <summary>호흡기·화상 표시 허용 여부 (ScenarioDefinition.useRespiratoryGauge). false 면 연기 속에서도 숨긴다</summary>
+        public void SetVitalsAllowed(bool allowed) { vitalsAllowed = allowed; }
 
         // ───────── 프롬프트 ─────────
         private void UpdatePrompt()
@@ -149,21 +158,6 @@ namespace GameGameplay
             if (holdGroup != null) holdGroup.alpha = hold > 0f ? 1f : 0f;
         }
 
-        // ───────── 호흡기 게이지 ─────────
-        private void UpdateVitalsVisibility()
-        {
-            if (vitalsGroup == null || vitals == null) return;
-            bool show = vitals.IsInSmoke || vitals.Normalized < 0.999f;
-            vitalsGroup.alpha = Mathf.MoveTowards(vitalsGroup.alpha, show ? 1f : 0f, Time.unscaledDeltaTime * vitalsFadeSpeed);
-        }
-
-        private void RefreshVitals()
-        {
-            if (vitals == null || vitalsFill == null) return;
-            vitalsFill.fillAmount = vitals.Normalized;
-            vitalsFill.color = Color.Lerp(vitalsColorEmpty, vitalsColorFull, vitals.Normalized);
-        }
-
         // ───────── 인벤토리 ─────────
         private void RefreshInventory()
         {
@@ -176,53 +170,16 @@ namespace GameGameplay
             }
         }
 
-        // ───────── 목표 ─────────
+        // ───────── 새 목표 알림 (목록 상시 표시는 없음 — J 키 패널) ─────────
         private void OnObjectiveChanged(ObjectiveSystem.Entry entry, ObjectiveSystem.ChangeKind kind)
         {
-            RefreshObjectives();
-            if (entry == null || entry.Data == null) return;
-
+            if (entry == null || entry.Data == null || !GameSettings.ObjectiveNotice) return;
             switch (kind)
             {
-                case ObjectiveSystem.ChangeKind.Added:
-                    EnqueueBanner(string.Format(bannerAddedFormat, entry.Data.Title), bannerAddedColor);
-                    if (objectiveText != null) { if (pulseRoutine != null) StopCoroutine(pulseRoutine); pulseRoutine = StartCoroutine(PulseObjectives()); }
-                    break;
+                case ObjectiveSystem.ChangeKind.Added: EnqueueBanner(string.Format(bannerAddedFormat, entry.Data.Title), bannerAddedColor); break;
                 case ObjectiveSystem.ChangeKind.Completed: EnqueueBanner(string.Format(bannerCompletedFormat, entry.Data.Title), bannerCompletedColor); break;
                 case ObjectiveSystem.ChangeKind.Failed: EnqueueBanner(string.Format(bannerFailedFormat, entry.Data.Title), bannerFailedColor); break;
             }
-        }
-
-        /// <summary>새 목표 추가 시 목록을 잠깐 키우고 색을 밝혔다가 돌려 놓는다 (약한 강조)</summary>
-        private IEnumerator PulseObjectives()
-        {
-            Transform t = objectiveText.transform;
-            Color baseColor = objectiveText.color;
-            for (float e = 0f; e < objectivePulseTime; e += Time.unscaledDeltaTime)
-            {
-                float k = Mathf.Sin(e / objectivePulseTime * Mathf.PI);   // 0 → 1 → 0
-                t.localScale = Vector3.one * Mathf.Lerp(1f, objectivePulseScale, k);
-                objectiveText.color = Color.Lerp(baseColor, objectivePulseColor, k);
-                yield return null;
-            }
-            t.localScale = Vector3.one;
-            objectiveText.color = baseColor;
-            pulseRoutine = null;
-        }
-
-        private void RefreshObjectives()
-        {
-            if (objectiveText == null || objectives == null) return;
-            var sb = new StringBuilder();
-            if (objectives.Entries.Count > 0) sb.AppendLine(objectiveHeader);
-            foreach (ObjectiveSystem.Entry e in objectives.Entries)
-            {
-                string line = string.Format(e.Data.IsMain ? mainFormat : subFormat, e.Data.Title);
-                if (e.State == ObjectiveState.Completed) line = string.Format(completedFormat, line);
-                else if (e.State == ObjectiveState.Failed) line = string.Format(failedFormat, line);
-                sb.AppendLine(line);
-            }
-            objectiveText.text = sb.ToString();
         }
 
         private void EnqueueBanner(string text, Color color)
@@ -262,12 +219,15 @@ namespace GameGameplay
         }
 
         // ───────── 안내 문구 ─────────
-        public void ShowMessage(string text)
+        public void ShowMessage(string text) => ShowMessage(text, -1f);
+
+        /// <summary>하단 안내 문구. holdSeconds 가 0 이하이면 기본 유지 시간(messageHoldTime) 사용</summary>
+        public void ShowMessage(string text, float holdSeconds)
         {
             if (messageGroup == null || messageText == null) return;
             messageText.text = text;
             if (messageRoutine != null) StopCoroutine(messageRoutine);
-            messageRoutine = StartCoroutine(MessageRoutine());
+            messageRoutine = StartCoroutine(MessageRoutine(holdSeconds > 0f ? holdSeconds : messageHoldTime));
         }
 
         private Coroutine scentRoutine;
@@ -291,10 +251,10 @@ namespace GameGameplay
             scentRoutine = null;
         }
 
-        private IEnumerator MessageRoutine()
+        private IEnumerator MessageRoutine(float hold)
         {
             messageGroup.alpha = 1f;
-            yield return new WaitForSecondsRealtime(messageHoldTime);
+            yield return new WaitForSecondsRealtime(hold);
             for (float t = 0f; t < 1f; t += Time.unscaledDeltaTime / 0.4f)
             {
                 messageGroup.alpha = 1f - t;

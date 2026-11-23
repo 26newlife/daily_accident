@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46e21f0ddbe4c9b4eb80c7debcdc252a, type: 3}
+  m_Name: Hint_Vitals
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.HintData
+  id: hint_vitals
+  text: "\uD638\uD761\uAE30 \uAC8C\uC774\uC9C0\uAC00 0\uC774 \uB418\uBA74 \uC9C8\uC2DD\uD569\uB2C8\uB2E4."
+  trigger: 7
+  triggerValue: 0
+  triggerParam: 
+  scenarioType: 1
+  eventState: 1
+  repeat: 0
+  delay: 0.5
+  duration: 3.5
+  priority: 9
+  easyOnly: 0

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 582122d204862114b951888909a2ff97, type: 3}
+  m_Name: Evac_act4_b_exit
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.ObjectiveData
+  id: act4_b_exit
+  title: "[\uCE78\uB9C9\uC774] 1003\uD638 \uD604\uAD00\uC73C\uB85C \uB098\uAC00 \uACC4\uB2E8\uC73C\uB85C \uD0C8\uCD9C\uD558\uAE30"
+  description: 
+  isMain: 0

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46e21f0ddbe4c9b4eb80c7debcdc252a, type: 3}
+  m_Name: Hint_Broadcast
+  m_EditorClassIdentifier: Assembly-CSharp::GameGameplay.HintData
+  id: hint_broadcast
+  text: "\uC804\uAE30 \uC2A4\uC704\uCE58\uC640 \uBD88\uAF43\uC744 \uC870\uC2EC\uD558\uC138\uC694. \uAC00\uC2A4\uB97C \uCC28\uB2E8\uD558\uACE0 \uD658\uAE30\uD558\uC138\uC694."
+  trigger: 5
+  triggerValue: 8
+  triggerParam: 
+  scenarioType: 1
+  eventState: 1
+  repeat: 0
+  delay: 0
+  duration: 4.5
+  priority: 6
+  easyOnly: 1

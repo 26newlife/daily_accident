@@ -29,6 +29,9 @@ namespace GameUI.EditorTools.Interior
             Prim.Box(r, "MicrowavePanel", new Vector3(6.095f, 1.04f, 3.66f), new Vector3(0.01f, 0.2f, 0.07f), M.MetalDark);
             Prim.Box(r, "MicrowaveHandle", new Vector3(6.085f, 1.04f, 3.62f), new Vector3(0.02f, 0.16f, 0.015f), M.Chrome);
 
+            // 참고 이미지: 하부장 위 벽선반 + 식기건조대. 생수/커피포트(y~1.1) 위, 후드(z 2.65~3.35) 옆 z 3.5~4.4
+            Furn("DishShelf", r, new Vector3(6.375f, 1.55f, 3.95f), 270f, Vector3.one, "DishShelf_Kitchen");
+
             // 싱크대(수도꼭지): 북쪽 개구부 쪽 반도형(길이 0.72). 뒷면(거실 쪽)이 식탁처럼 쓰인다. 개구부는 동쪽에 0.76m 남는다
             Furn("SinkUnit", r, new Vector3(4.76f, 0f, 4.275f), 180f, new Vector3(0.8f, 1f, 0.9f));
             MoveInteractable("pickup_water_pot", new Vector3(4.7f, 0.1f, 3.8f));        // 바닥 냄비: 반도 앞 통로 밖으로 살짝 이동
