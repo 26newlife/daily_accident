@@ -246,7 +246,7 @@ namespace GameUI.EditorTools
             d.FindProperty("isPlayable").boolValue = true;
             d.FindProperty("targetPlayMinutes").floatValue = 17f;
             d.FindProperty("scenarioSceneName").stringValue = "S01_WarTime";
-            d.FindProperty("startSpawnId").stringValue = "spawn_living_room";
+            d.FindProperty("startSpawnId").stringValue = "spawn_bedroom_bed";   // 방(침실) 안에서 시작
             d.FindProperty("environmentPreset").objectReferenceValue = a.peace;
             SetStrings(d.FindProperty("actTypeNames"), new[] { "Act1_CrackInDaily", "Act2_StormEve", "Act3_IsolatedArk", "Act4_FalsePeace", "Act5_FlashAndFallout", "Act6_TrueArmistice" });
             SetObjectArray(d.FindProperty("requiredItems"), new[] { a.gasMask, a.iodine });
@@ -261,6 +261,7 @@ namespace GameUI.EditorTools
             d.FindProperty("useElevatorHazard").boolValue = false;
             d.FindProperty("useDoorPeephole").boolValue = true;
             d.FindProperty("useOutdoorTraffic").boolValue = true;
+            d.FindProperty("useWalkableStairwell").boolValue = true;   // 비상계단(1~20층·옥상, 1층 출구)
             d.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(def);
             a.definition = def;

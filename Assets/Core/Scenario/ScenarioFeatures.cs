@@ -26,7 +26,7 @@ namespace GameGameplay
                 foreach (FireManager m in Object.FindObjectsByType<FireManager>(FindObjectsInactive.Include)) m.enabled = false;
 
             if (HouseServices.Environment != null) HouseServices.Environment.ApplyScenarioFeatures(def);
-            Debug.Log($"[Scenario] '{def.Id}' 기능 플래그: 호흡기={def.UseRespiratoryGauge} 가스={def.UseGasHazard} 화재소품={def.UseFireProps} 엘리베이터위험={def.UseElevatorHazard} 도어스코프={def.UseDoorPeephole} 창밖교통={def.UseOutdoorTraffic}");
+            Debug.Log($"[Scenario] '{def.Id}' 기능 플래그: 호흡기={def.UseRespiratoryGauge} 가스={def.UseGasHazard} 화재소품={def.UseFireProps} 엘리베이터위험={def.UseElevatorHazard} 도어스코프={def.UseDoorPeephole} 창밖교통={def.UseOutdoorTraffic} 비상계단={def.UseWalkableStairwell}");
         }
     }
 }

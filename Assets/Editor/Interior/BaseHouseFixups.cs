@@ -61,6 +61,8 @@ namespace GameUI.EditorTools.Interior
             int locks = RemoveWindowLocks(houseRoot);
             GameUI.EditorTools.Art.InteriorLookBuilder.EnsureVolumes(houseRoot);   // 후처리 Volume (HouseVolumes)
             int heroes = GameUI.EditorTools.Art.HeroObjects.Apply(houseRoot);      // ③ Hero 모델 (전자레인지·멀티탭). 위치 보정 뒤에 얹는다
+            HouseStairwellBuilder.Build(houseRoot);                                // ④ 걸어서 오르내리는 비상계단 (평소 꺼짐, useWalkableStairwell 시나리오만)
+            GameUI.EditorTools.Outdoor.OutdoorEvacLandmarks.Build(houseRoot);      // ⑤ 바깥 풍경: 강 · 지진 옥외대피장소 · 지진해일 대피소 (S02 대피 지도와 같은 좌표)
             Debug.Log($"[BaseFixups] 화재 소품 태그 {tagged}개, 위치·크기 보정 {moved}건, 후처리 Volume 구성, 치우기 소품 {removables}개 확인, 창문 잠금 {locks}개 제거, Hero 모델 {heroes}개");
         }
 

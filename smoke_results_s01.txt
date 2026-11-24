@@ -1,0 +1,44 @@
+[S01Smoke] PASS  시나리오 S01 로드  S01
+[S01Smoke] PASS  Act 6개  
+[S01Smoke] PASS  WarState/HUD  
+[S01Smoke] PASS  HUD: 생존 상태 패널 등록 (보이는 행 ≥ 6)  visible=6
+[S01Smoke] PASS  HUD: 상시 목표 텍스트 제거  
+[S01Smoke] PASS  HUD: 구 S01 좌측 패널 제거  
+[S01Smoke] PASS  격리: 시나리오 3 씬 미로드  
+[S01Smoke] PASS  격리: FireSource/가스 누출/화재 관리자 없음  
+[S01Smoke] PASS  격리: 화재 소품(FireHazardProp) 활성 0개  숨김 20개
+[S01Smoke] PASS  격리: 요새화·물물교환 오브젝트 없음  
+[S01Smoke] PASS  Act 1 진행 중  
+[S01Smoke] PASS  전쟁 발발 전: 평화로운 하늘  
+[S01Smoke] PASS  재난문자 직후 전쟁 발발 연출 시작  
+[S01Smoke] PASS  Act 1 → 2 (필수품 확보)  
+[S01Smoke] PASS  라디오·식량 확보  food=4 water=4
+[S01Smoke] PASS  하늘·조명 전시 색감 전환 완료  sun=0.55
+[S01Smoke] PASS  연기 기둥 생성  plumes=5
+[S01Smoke] PASS  전투기·헬기 편대 비행 스폰  flights=1
+[S01Smoke] PASS  포격 섬광  flashes=1
+[S01Smoke] PASS  비행 기체 사운드(도플러)  
+[S01Smoke] PASS  민방위 장비함: 방독면  
+[S01Smoke] PASS  약상자: 요오드화 칼륨  
+[S01Smoke] FAIL  식량·물·약품·무기·보온 확보  food=7 water=6 med=3 comfort=27
+[S01Smoke] PASS  단파 청취·창밖 관찰로 기만 단서 확보  clues=3
+[S01Smoke] PASS  요오드 복용(낙진 전) / 방독면 착용  
+[S01Smoke] PASS  Act 3 진입  
+[S01Smoke] PASS  방문자 3명 합류  joined=3 refused=0
+[S01Smoke] PASS  합류 NPC 등장  
+[S01Smoke] PASS  Act 4 진입 (기만된 평화)  
+[S01Smoke] PASS  거짓 종전 방송  
+[S01Smoke] PASS  단서 충분 → 설득 가능  
+[S01Smoke] PASS  설득 성공  
+[S01Smoke] PASS  Act 5 진입 (섬광)  
+[S01Smoke] PASS  섬광·충격파 생존 → 낙진 시작  
+[S01Smoke] PASS  낙진 피폭 관리 성공  rad=13.2 temp=37.3 food=9 water=8
+[S01Smoke] PASS  진 엔딩  ending=ending_war_true
+[S01Smoke] PASS  사망 판정 ShockwaveDebris  reason=ShockwaveDebris
+[S01Smoke] PASS  사망 판정 NuclearFlash  reason=NuclearFlash
+[S01Smoke] PASS  씁쓸한 생존 엔딩  ending=ending_war_bitter
+[S01Smoke] PASS  피폭 사망  reason=RadiationSickness rad=100.0
+[S01Smoke] PASS  한파 사망  reason=Hypothermia temp=0.0
+[S01Smoke] PASS  재시작 후 구독 수 유지  baseline=13 now=13
+[S01Smoke] PASS  실행 중 에러 로그 없음  
+[S01Smoke] smoke test done: PASS 42 / FAIL 1

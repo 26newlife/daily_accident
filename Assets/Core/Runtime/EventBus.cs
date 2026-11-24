@@ -30,6 +30,20 @@ namespace GameCore
         RadiationSickness = 21, // 시나리오 1: 낙진 피폭 수치가 한도를 넘음
         Hypothermia = 22,      // 시나리오 1: 핵겨울 한파에 체온 저하
         Starvation = 23,       // 시나리오 1: 식량·물 고갈
+        QuakeFallingObjects = 24,   // 시나리오 2: 흔들리는 동안 몸을 보호하지 않아 떨어진 물건에 맞음
+        QuakeGasExplosion = 25,     // 시나리오 2: 가스 밸브를 잠그지 않아 본진 뒤 가스 폭발
+        QuakeElectricFire = 26,     // 시나리오 2: 차단기를 내리지 않아 빗물 누수 + 누전 화재
+        QuakeTrappedInside = 27,    // 시나리오 2: 문을 열어 출구를 확보하지 않아 집 안에 갇힘
+        QuakeStairFall = 28,        // 시나리오 2: 흔들리는 계단에서 자세를 낮추지 않아 굴러 떨어짐
+        QuakeElevatorTrapped = 29,  // 시나리오 2: 지진 중 엘리베이터 이용
+        QuakeFacadeDebris = 30,     // 시나리오 2: 여진 때 건물 외벽 가까이에 있어 떨어진 외벽 조각에 맞음
+        Tsunami = 31,               // 시나리오 2: 지진해일에 휩쓸림
+        QuakeBuildingExplosion = 32, // 시나리오 2: 본진 뒤 건물 폭발 때 아직 건물 안에 있음
+        QuakeExplosionDebris = 33,  // 시나리오 2: 폭발 잔해에 맞음 (건물 가까이)
+        QuakeSinkhole = 34,         // 시나리오 2: 싱크홀에 빠짐
+        QuakeUpperFloorCollapse = 35, // 시나리오 2: 지진 뒤 위층으로 올라가 무너지는 위층에 깔림
+        QuakeFellWhileShaking = 36, // 시나리오 2: 흔들리는 동안 선 채로 돌아다니다 넘어짐
+        QuakeGroundCrack = 37,      // 시나리오 2: 갈라진 땅 틈을 밟음
     }
 
     /// <summary>ScenarioEvent 의 종류</summary>

@@ -114,20 +114,23 @@ namespace GameUI
         private void OnStartGame()
         {
             if (isTransitioning || !GameSession.HasSelection) return;
-            if (!Application.CanStreamedLevelBeLoaded(gameSceneName))
+            // 독립 실행형 시나리오(예: 자연재해)는 자기 씬을 직접 로드한다
+            string standalone = GameSession.SelectedScenario.StandaloneSceneName;
+            string sceneName = string.IsNullOrEmpty(standalone) ? gameSceneName : standalone;
+            if (!Application.CanStreamedLevelBeLoaded(sceneName))
             {
-                Debug.LogError($"[MainMenu] 씬 '{gameSceneName}'을(를) 로드할 수 없습니다. Build Settings에 등록되어 있는지 확인하세요.");
+                Debug.LogError($"[MainMenu] 씬 '{sceneName}'을(를) 로드할 수 없습니다. Build Settings에 등록되어 있는지 확인하세요.");
                 return;
             }
-            StartCoroutine(LoadSceneRoutine());
+            StartCoroutine(LoadSceneRoutine(sceneName));
         }
 
-        private IEnumerator LoadSceneRoutine()
+        private IEnumerator LoadSceneRoutine(string sceneName)
         {
             isTransitioning = true;
             SetInteractable(mainMenuGroup, false);
             if (intro != null) yield return intro.FadeScreen(1f, sceneFadeOutDuration);
-            SceneManager.LoadSceneAsync(gameSceneName);
+            SceneManager.LoadSceneAsync(sceneName);
         }
 
         private void OnQuit()

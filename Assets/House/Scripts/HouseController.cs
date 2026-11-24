@@ -276,7 +276,10 @@ namespace GameGameplay
             }
             if (!def.UseDoorPeephole) SetInteractableEnabled(PeepholeId, false);
             if (!def.UseOutdoorTraffic) ApplyTraffic(false, false, 0f);
-            Debug.Log($"[House] 시나리오 기능 적용: 화재 소품 {(def.UseFireProps ? "켜짐" : "숨김 " + hidden + "개")}, 도어 스코프 {(def.UseDoorPeephole ? "켜짐" : "꺼짐")}, 창밖 교통 {(def.UseOutdoorTraffic ? "켜짐" : "꺼짐")}");
+            StairwellExtension stairs = StairwellExtension.Find();
+            if (stairs != null) stairs.SetWalkable(def.UseWalkableStairwell);
+            else if (def.UseWalkableStairwell) Debug.LogWarning("[House] 비상계단 확장(StairwellExtension)이 집에 없습니다. Tools > GameUI > Base House > Build Walkable Stairwell 을 실행하세요.");
+            Debug.Log($"[House] 시나리오 기능 적용: 화재 소품 {(def.UseFireProps ? "켜짐" : "숨김 " + hidden + "개")}, 도어 스코프 {(def.UseDoorPeephole ? "켜짐" : "꺼짐")}, 창밖 교통 {(def.UseOutdoorTraffic ? "켜짐" : "꺼짐")}, 비상계단 {(def.UseWalkableStairwell ? "1~20층·옥상" : "입구만")}");
         }
 
         private const string PeepholeId = "door_peephole";

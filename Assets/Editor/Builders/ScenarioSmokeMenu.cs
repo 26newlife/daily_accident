@@ -35,6 +35,43 @@ namespace GameUI.EditorTools
             EditorApplication.EnterPlaymode();
         }
 
+        [MenuItem("Tools/GameUI/Debug/Run S02 Smoke Test")]
+        public static void RunS02()
+        {
+            if (!EditorApplication.isPlaying && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            RunS02Batch();
+        }
+
+        /// <summary>배치: -executeMethod GameUI.EditorTools.ScenarioSmokeMenu.RunS02Batch (비상계단 1층·옥상 걷기 포함)</summary>
+        public static void RunS02Batch()
+        {
+            EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
+            SessionState.SetBool("S02SmokeTest.Run", true);
+            Debug.Log("[S02Smoke] entering play mode...");
+            EditorApplication.EnterPlaymode();
+        }
+
+        /// <summary>배치: S01 로 비상계단·바깥 동선 걷기 검사 (시작 위치 포함). 결과 smoke_results_stairs_s01.txt</summary>
+        public static void RunStairsS01Batch() => RunStairsBatch("Assets/Core/Data/Scenarios/Scenario_01.asset");
+
+        /// <summary>배치: S03 로 비상계단·바깥 동선 걷기 검사. 결과 smoke_results_stairs_s03.txt</summary>
+        public static void RunStairsS03Batch() => RunStairsBatch("Assets/Core/Data/Scenarios/Scenario_03.asset");
+
+        [MenuItem("Tools/GameUI/Debug/Run Stairwell Walk Test (S01)")]
+        public static void RunStairsS01() { if (!EditorApplication.isPlaying && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return; RunStairsS01Batch(); }
+
+        [MenuItem("Tools/GameUI/Debug/Run Stairwell Walk Test (S03)")]
+        public static void RunStairsS03() { if (!EditorApplication.isPlaying && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return; RunStairsS03Batch(); }
+
+        private static void RunStairsBatch(string scenarioPath)
+        {
+            EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
+            SessionState.SetString("S02SmokeTest.Scenario", scenarioPath);
+            SessionState.SetBool("S02SmokeTest.Run", true);
+            Debug.Log("[S02Smoke] stairwell walk test: " + scenarioPath);
+            EditorApplication.EnterPlaymode();
+        }
+
         public static void RunBatch()
         {
             EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);

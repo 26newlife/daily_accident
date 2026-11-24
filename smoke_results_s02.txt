@@ -1,0 +1,23 @@
+[S02Smoke] PASS  시나리오 S02 로드  S02
+[S02Smoke] PASS  같은 집(GameScene)에서 시작  GameScene
+[S02Smoke] PASS  S02 씬 Additive 로드  S02_Disaster
+[S02Smoke] PASS  Act 4개  4
+[S02Smoke] PASS  구역 판정기  
+[S02Smoke] PASS  집 안(침실 스폰)에서 시작  (1.70, 0.02, 4.00)
+[S02Smoke] PASS  비상계단 확장 존재  
+[S02Smoke] PASS  비상계단 켜짐  
+[S02Smoke] PASS  10층 입구 블록아웃 숨김  
+[S02Smoke] PASS  계단탑 활성  
+[S02Smoke] PASS  10층 층참 도착  (-18.80, 0.03, -2.38)
+[S02Smoke] PASS  1층 층참 도착  (-18.80, -26.97, -2.35)
+[S02Smoke] PASS  건물 밖 지면 도착 (y -28.5)  (-31.94, -28.47, -1.60)
+[S02Smoke] PASS  구역 = Outside  Outside
+[S02Smoke] PASS  지면 걷기  (-39.99, -28.47, 9.98)
+[S02Smoke] PASS  옥상층 층참 도착 (y 33)  (-18.80, 33.03, -0.90)
+[S02Smoke] PASS  옥상 도착 (y 33)  (-6.06, 33.03, 1.97)
+[S02Smoke] PASS  구역 = Rooftop  Rooftop
+[S02Smoke] PASS  옥상 난간이 막음  (9.49, 33.03, 2.00)
+[S02Smoke] PASS  타임라인 시작  Calm
+[S02Smoke] 타임라인 단계 Calm → Foreshock, 종료=False
+[S02Smoke] PASS  실행 중 에러 로그 없음  
+[S02Smoke] smoke test done: PASS 21 / FAIL 0

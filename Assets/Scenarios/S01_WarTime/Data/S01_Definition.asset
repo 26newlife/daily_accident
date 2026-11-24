@@ -20,7 +20,7 @@ MonoBehaviour:
   isPlayable: 1
   targetPlayMinutes: 17
   scenarioSceneName: S01_WarTime
-  startSpawnId: spawn_living_room
+  startSpawnId: spawn_bedroom_bed
   environmentPreset: {fileID: 11400000, guid: 092e1b1479f1bf5479c02bc68ddaa310, type: 2}
   actTypeNames:
   - Act1_CrackInDaily
@@ -38,6 +38,7 @@ MonoBehaviour:
   useElevatorHazard: 0
   useDoorPeephole: 1
   useOutdoorTraffic: 1
+  useWalkableStairwell: 1
   deathReasons:
   - {fileID: 11400000, guid: 51aab96093c5b7441933d62cff7e41ea, type: 2}
   - {fileID: 11400000, guid: 6660662419250ab4a9f053ab2dcabe5c, type: 2}

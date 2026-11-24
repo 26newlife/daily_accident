@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fad26c2d07373c46b7f421aa9a15644, type: 3}
+  m_Name: QuakeConfig
+  m_EditorClassIdentifier: Game.Scenarios.S02::GameGameplay.QuakeConfig
+  calmDuration: 15
+  foreshockDuration: 8
+  prepareDuration: 60
+  mainShockDuration: 30
+  aftermathDuration: 50
+  aftershockDuration: 10
+  foreshockIntensity: 0.25
+  mainShockIntensity: 1
+  aftershockIntensity: 0.5
+  rampSeconds: 2
+  cameraShakeAmplitude: 0.07
+  requiredCoverRatio: 0.7
+  shakeGraceSeconds: 2.5
+  shakeAllowedDistance: 0.8
+  facadeSafeDistance: 15
+  upperFloorsCollapse: 1
+  buildingWarningDelay: 10
+  buildingExplosionDelay: 70
+  tsunamiDrawbackEnd: 30
+  tsunamiArrivalEnd: 70
+  tsunamiHoldEnd: 85
+  waterCalmFrontZ: 300
+  waterDrawbackFrontZ: 360
+  waterPeakFrontZ: -75
+  waterPeakHeight: 5.5
+  injuredSpeed: 0.6
+  neighborCarrySpeed: 0.75
+  protectedPenalty: 15

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 582122d204862114b951888909a2ff97, type: 3}
+  m_Name: Obj_S02_A3
+  m_EditorClassIdentifier: Game.Core::GameGameplay.ObjectiveData
+  id: s02_a3_evacuate
+  title: "\uAC74\uBB3C \uBC16 \uC548\uC804\uD55C \uACF3\uC73C\uB85C \uB300\uD53C\uD55C\uB2E4"
+  description: "\uD754\uB4E4\uB9BC\uC774 \uBA48\uCDC4\uB2E4. \uC774 \uAC74\uBB3C \uC548\uC740 \uB354 \uC774\uC0C1 \uC548\uC804\uD558\uC9C0 \uC54A\uB2E4."
+  isMain: 1

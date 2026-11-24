@@ -200,6 +200,7 @@ namespace GameUI.EditorTools
             so.FindProperty("hiddenEndingFlag").stringValue = EvacKeys.FlagGrandmotherWith;
             so.FindProperty("scoreRules").objectReferenceValue = d.scoreRules;
             SetObjectArray(so.FindProperty("hints"), scenarioHints);
+            so.FindProperty("useWalkableStairwell").boolValue = true;   // 비상계단(1~20층·옥상, 1층 출구)
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(def);
             return def;

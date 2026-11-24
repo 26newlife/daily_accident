@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52c8f487675b994ab90352a70ee62d1, type: 3}
+  m_Name: Death_BuildingExplosion
+  m_EditorClassIdentifier: Game.Core::GameGameplay.DeathReasonData
+  reason: 32
+  title: "\uAC74\uBB3C \uD3ED\uBC1C\uC5D0 \uD718\uB9D0\uB838\uC2B5\uB2C8\uB2E4"
+  whyYouDied: "\uD754\uB4E4\uB9BC\uC774 \uBA48\uCD98 \uB4A4\uC5D0\uB3C4 \uBB34\uB108\uC838 \uAC00\uB294 \uAC74\uBB3C \uC548\uC5D0 \uB108\uBB34 \uC624\uB798 \uBA38\uBB3C\uB800\uB2E4... \uC11C\uB458\uB7EC \uBC16\uC73C\uB85C \uB098\uAC00\uC57C \uD588\uB2E4..."
+  correctAction: "\uD754\uB4E4\uB9BC\uC774 \uBA48\uCD94\uBA74 \uACC4\uB2E8\uC73C\uB85C \uC11C\uB458\uB7EC \uAC74\uBB3C \uBC16 \uB113\uC740 \uACF3\uC73C\uB85C \uB300\uD53C\uD55C\uB2E4."

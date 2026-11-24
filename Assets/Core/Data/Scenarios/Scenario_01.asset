@@ -19,3 +19,4 @@ MonoBehaviour:
   backgroundSprite: {fileID: 0}
   thumbnail: {fileID: 0}
   definition: {fileID: 11400000, guid: 61fef77b9927ba64f95f5132535a8715, type: 2}
+  standaloneSceneName: 

@@ -19,6 +19,8 @@ namespace GameData
         [SerializeField] private Sprite thumbnail;
         [Tooltip("이 시나리오의 실행 정의 (씬·시작 위치·환경). 비어 있으면 START GAME 시 안내 후 메인 메뉴로 돌아간다.")]
         [SerializeField] private ScenarioDefinition definition;
+        [Tooltip("비어 있지 않으면 START GAME 시 GameScene 대신 이 씬을 단독으로 로드한다 (독립 실행형 시나리오용, Build Settings 등록 필요).")]
+        [SerializeField] private string standaloneSceneName;
 
         public string Id => id;
         public string DisplayName => displayName;
@@ -27,5 +29,6 @@ namespace GameData
         public Sprite BackgroundSprite => backgroundSprite;
         public Sprite Thumbnail => thumbnail;
         public ScenarioDefinition Definition => definition;
+        public string StandaloneSceneName => standaloneSceneName;
     }
 }

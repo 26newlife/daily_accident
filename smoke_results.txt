@@ -1,0 +1,93 @@
+﻿[Smoke] smoke test start (scene=GameScene, speed x5)
+[Smoke] restart: runIds=[2,3,4,5,6] subs=[13,13,13,13,13] timers=[5,5,5,5,5]
+[Smoke] PASS  restart: RunId increments each load  
+[Smoke] PASS  restart: EventBus subscription count stable  [13,13,13,13,13]
+[Smoke] PASS  restart: active timer count stable  [5,5,5,5,5]
+[Smoke] PASS  act3: Act 3 active  
+[Smoke] PASS  act3: grandmother begins pressing elevator  PressingElevator
+[Smoke] PASS  act3: young man waiting  
+[Smoke] PASS  act3: corridor flag set  
+[Smoke]   (corridor entered) timeScale=5.0 time=38.5 gameSec=4.6 grandma=PressingElevator young=Waiting act=3
+[Smoke]   (after young-man wait) timeScale=5.0 time=53.8 gameSec=19.9 grandma=PressingElevator young=Lost act=3
+[Smoke] PASS  act3: neglected young man is lost (non-graphic)  
+[Smoke] PASS  act3: neglect opens the stair fire door  
+[Smoke]   (after grandmother wait) timeScale=5.0 time=80.6 gameSec=46.6 grandma=Dead young=Lost act=3
+[Smoke] PASS  act3: neglected grandmother boards elevator (panic → dead)  Dead
+[Smoke] PASS  act3: hidden-ending flag off when grandmother lost  
+[Smoke] PASS  act3: stair check completes Act 3 → Act 4  
+[Smoke] PASS  act3: stair flags recorded (smoke at open)  
+[Smoke] PASS  dialogue(young man): choice panel opens  
+[Smoke] PASS  young man persuaded → follows  Following
+[Smoke] PASS  young man saved flag  
+[Smoke] PASS  dialogue: choice panel opens  
+[Smoke] PASS  grandmother persuaded  Persuaded
+[Smoke] PASS  grandmother follows player  FollowingPlayer
+[Smoke] PASS  hidden-ending flag on while accompanied  
+[Smoke] PASS  towel option offered when player has wet towel  options=3
+[Smoke] PASS  towel handed to grandmother  
+[Smoke] PASS  follower AI closes distance to player  dist=1.4
+[Smoke] PASS  persuade route reaches Act 4  
+[Smoke] PASS  grandmother still accompanying into Act 4  
+[Smoke] PASS  neighbor rescued flag  
+[Smoke] PASS  routeC: committed by closing shelter door inside  C
+[Smoke] PASS  routeC: four sides sealed  sides=4
+[Smoke] PASS  routeC: seal ratio > 0.5  ratio=0.78
+[Smoke] PASS  routeC: 119 accurate recorded  
+[Smoke] PASS  routeC: ladder arrives → shelter ending  ending=ending_shelter
+[Smoke] PASS  routeC: score finalized with rules  lines=14
+[Smoke] routeC score 50/120 grade C
+[Smoke] PASS  routeA: options allow A when stairs blocked  
+[Smoke] PASS  routeA: route committed A  
+[Smoke] PASS  routeA: teleported to 14F landing  x=-38.8
+[Smoke] PASS  routeA: at 20F landing  x=-62.8
+[Smoke] PASS  routeA: fire doors managed flag  
+[Smoke] PASS  routeA: roof door stays locked without key  
+[Smoke] PASS  routeA: key box gives roof key  
+[Smoke] PASS  routeA: roof key unlocks door  
+[Smoke] PASS  routeA: rescue → rooftop ending  ending=ending_rooftop
+[Smoke] PASS  routeB: options allow B when handle hot  
+[Smoke] PASS  routeB: grandmother fallen in 1003  Fallen
+[Smoke] PASS  routeB: partition broken after hammer hits  hits=3
+[Smoke] PASS  routeB: route committed B  
+[Smoke] PASS  routeB: grandmother lifted → follows  
+[Smoke] PASS  routeB: hidden ending (grandmother accompanied)  ending=ending_hidden_grandmother
+[Smoke] PASS  routeB: base route ending remembered  ending_partition
+[Smoke] PASS  routeD: options allow D after early fire-door success  
+[Smoke] PASS  routeD: committed D  
+[Smoke] PASS  routeD: wall-hugging slows player  mult=0.55
+[Smoke] PASS  routeD: reached assembly plaza  pos=(-36.00, 0.02, 64.00)
+[Smoke] PASS  routeD: speed restored on plaza  
+[Smoke] PASS  routeD: assembly → descent ending  ending=ending_descent
+[Smoke] PASS  act4: no route chosen → ExitTimeout death with feedback  reason=ExitTimeout
+[Smoke] PASS  elevator: A/B both occur with ~50:50 weights  A=184 B=216
+[Smoke] PASS  elevator: fresh run has no scenario decided  
+[Smoke] PASS  elevator: call → DoorOpen  DoorOpen
+[Smoke] PASS  elevator(normal): no scenario rolled before fire  
+[Smoke] PASS  elevator(normal): boarded → inside cabin  x=-100.0
+[Smoke] PASS  elevator(normal): floor button lights  
+[Smoke] PASS  elevator(normal): display travels 10→14  
+[Smoke] PASS  elevator(normal): arrives and returns to 10F corridor  state=Idle pos=(-1.50, 0.02, -1.20)
+[Smoke] PASS  elevator(normal): player alive  
+[Smoke] PASS  elevator: call → DoorOpen  DoorOpen
+[Smoke] PASS  elevator(A): scenario stays A on re-call  
+[Smoke] PASS  elevator(A, press=True): pop → stalled  Stalled
+[Smoke] PASS  elevator(A): buttons do nothing while stalled  
+[Smoke] PASS  elevator(A, press=True): smoke enters  
+[Smoke] PASS  elevator(A, press=True): suffocation death  reason=ElevatorStallSmoke
+[Smoke] PASS  elevator: call → DoorOpen  DoorOpen
+[Smoke] PASS  elevator(A): scenario stays A on re-call  
+[Smoke] PASS  elevator(A, press=False): pop → stalled  Stalled
+[Smoke] PASS  elevator(A): buttons do nothing while stalled  
+[Smoke] PASS  elevator(A, press=False): smoke enters  
+[Smoke] PASS  elevator(A, press=False): suffocation death  reason=ElevatorStallSmoke
+[Smoke] PASS  elevator(B, near=True): door opens into blast  
+[Smoke] PASS  elevator(B near): fireball death  reason=ElevatorFireball
+[Smoke] PASS  elevator(B, near=False): door opens into blast  
+[Smoke] PASS  elevator(B far): survives the blast  
+[Smoke] PASS  elevator(B far): fire spreads into corridor  
+[Smoke] after-ending: runIds=[19,20] subs=[13,13] timers=[5,5]
+[Smoke] PASS  after-ending: RunId increments each load  
+[Smoke] PASS  after-ending: EventBus subscription count stable  [13,13]
+[Smoke] PASS  after-ending: active timer count stable  [5,5]
+[Smoke] PASS  no error/exception logs during run  errors=0  
+[Smoke] smoke test done: PASS 85 / FAIL 0

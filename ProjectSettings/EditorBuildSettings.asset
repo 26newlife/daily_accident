@@ -17,5 +17,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenarios/S01_WarTime/Scenes/S01_WarTime.unity
     guid: 1eff4a374bc158140bfd26e3cd9f6b7c
+  - enabled: 1
+    path: Assets/Scenarios/S02_Disaster/Scenes/S02_Disaster.unity
+    guid: 1aa98c02782b56a499d2949a541f397e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

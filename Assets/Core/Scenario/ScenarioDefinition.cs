@@ -36,6 +36,7 @@ namespace GameData
         [SerializeField, Tooltip("엘리베이터 위험 (ElevatorHazardSystem — 2종 랜덤 사망)")] private bool useElevatorHazard = true;
         [SerializeField, Tooltip("도어 스코프 (door_peephole)")] private bool useDoorPeephole = true;
         [SerializeField, Tooltip("창밖 보행자·차량")] private bool useOutdoorTraffic = true;
+        [SerializeField, Tooltip("걸어서 오르내리는 비상계단(1~20층 + 옥상, 1층 출구 + 건물 밖 지면). 끄면 10층 계단실 입구(블록아웃)만 있다")] private bool useWalkableStairwell;
 
         [Header("시나리오 전용 데이터 (시나리오 폴더에서 관리)")]
         [SerializeField] private DeathReasonData[] deathReasons;
@@ -71,5 +72,6 @@ namespace GameData
         public bool UseElevatorHazard => useElevatorHazard;
         public bool UseDoorPeephole => useDoorPeephole;
         public bool UseOutdoorTraffic => useOutdoorTraffic;
+        public bool UseWalkableStairwell => useWalkableStairwell;
     }
 }

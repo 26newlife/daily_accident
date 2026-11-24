@@ -41,6 +41,7 @@ MonoBehaviour:
   useElevatorHazard: 1
   useDoorPeephole: 1
   useOutdoorTraffic: 1
+  useWalkableStairwell: 1
   deathReasons:
   - {fileID: 11400000, guid: 5fc70dee6b3f6f14dbbc320b7a2f92d6, type: 2}
   - {fileID: 11400000, guid: 7dcf5a821c1ee8b449cffe62a482aef1, type: 2}

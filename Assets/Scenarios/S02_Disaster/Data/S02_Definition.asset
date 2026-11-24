@@ -14,26 +14,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Core::GameData.ScenarioDefinition
   id: S02
   displayName: "\uC790\uC5F0\uC7AC\uD574"
-  description: "\uC9C0\uC9C4\xB7\uCE68\uC218 \uB4F1 \uC790\uC5F0\uC7AC\uD574\uC5D0\uC11C \uC0B4\uC544\uB0A8\uC544\uB77C"
+  description: "\uD3ED\uC6B0\uAC00 \uC3DF\uC544\uC9C0\uB294 \uC800\uB141, \uC9C0\uC9C4\uACFC \uC9C0\uC9C4\uD574\uC77C \uC18D\uC5D0\uC11C \uC0B4\uC544\uB0A8\uC544\uB77C"
   backgroundSprite: {fileID: 0}
   thumbnail: {fileID: 0}
-  isPlayable: 0
-  targetPlayMinutes: 7
+  isPlayable: 1
+  targetPlayMinutes: 8
   scenarioSceneName: S02_Disaster
   startSpawnId: spawn_bedroom_bed
-  environmentPreset: {fileID: 11400000, guid: 6c6b9fb24bb08104c9eb59125e6ca682, type: 2}
-  actTypeNames: []
+  environmentPreset: {fileID: 11400000, guid: fde215153fc3ea24bb0f217c38b0e342, type: 2}
+  actTypeNames:
+  - Act1_Foreshock
+  - Act2_MainShock
+  - Act3_Evacuation
+  - Act4_Tsunami
   requiredItems: []
   useRespiratoryGauge: 0
   useGasHazard: 0
-  useFireProps: 0
+  useFireProps: 1
   useElevatorHazard: 0
   useDoorPeephole: 1
-  useOutdoorTraffic: 1
-  deathReasons: []
-  fallbackDeath: {fileID: 0}
-  endings: []
+  useOutdoorTraffic: 0
+  useWalkableStairwell: 1
+  deathReasons:
+  - {fileID: 11400000, guid: 74ea27a520ba2534abe3648f80c666fe, type: 2}
+  - {fileID: 11400000, guid: fc66cb55e2663734ab3b49b251429b69, type: 2}
+  - {fileID: 11400000, guid: c8124611c99b8d74d8f5b118ac11a6b7, type: 2}
+  - {fileID: 11400000, guid: 3da569541bf4c9f498e3341dc5f0dad9, type: 2}
+  - {fileID: 11400000, guid: 797411ac6d6506a479236c6f80d7f8fc, type: 2}
+  - {fileID: 11400000, guid: dc0e33a299960ce4d80e4d62b594af70, type: 2}
+  - {fileID: 11400000, guid: 23cd2101830610e42bbeb9a62cc33858, type: 2}
+  - {fileID: 11400000, guid: 39f84d8bc1a70e64eb22d0016c97a8f7, type: 2}
+  - {fileID: 11400000, guid: d7e3877e91bafc245b446d17157f52fa, type: 2}
+  - {fileID: 11400000, guid: 930c99d35cb2ee94d8dd30433c500b67, type: 2}
+  - {fileID: 11400000, guid: 7d53854c75cf9574587c0200938163d3, type: 2}
+  - {fileID: 11400000, guid: 19787ee6f3724bf4580b96a912311466, type: 2}
+  - {fileID: 11400000, guid: 298c2dfa4905ce14883790060eb75f8b, type: 2}
+  - {fileID: 11400000, guid: ced30e691a4184d478a8b63e32e37151, type: 2}
+  fallbackDeath: {fileID: 11400000, guid: f41672633ef3e0a43a12f7a8bc7e40b2, type: 2}
+  endings:
+  - {fileID: 11400000, guid: c58607e8f66b0ba4cb8d33984e1200c0, type: 2}
+  - {fileID: 11400000, guid: 1ac9e95065947734e945d3baacec95b9, type: 2}
+  - {fileID: 11400000, guid: f4f9359a0702bec4b8b08a69005bca38, type: 2}
   hiddenEndingId: 
   hiddenEndingFlag: 
-  scoreRules: {fileID: 0}
+  scoreRules: {fileID: 11400000, guid: 91d7e5b676d11fa46a935ee6b249394d, type: 2}
   hints: []

@@ -146,8 +146,7 @@ namespace GameUI.EditorTools
                     so.FindProperty("id").stringValue = defs[i].id;
                     so.FindProperty("displayName").stringValue = defs[i].name;
                     so.FindProperty("description").stringValue = defs[i].desc;
-                    so.FindProperty("isUnlocked").boolValue = defs[i].unlocked;
-                    // 현재 배경 이미지는 3번(아파트 화재)용. 1·2번은 비워두면 기존 배경이 유지된다
+                    so.FindProperty("isUnlocked").boolValue = defs[i].unlocked;                    // 현재 배경 이미지는 3번(아파트 화재)용. 1·2번은 비워두면 기존 배경이 유지된다
                     if (defs[i].id == "apartment_fire") so.FindProperty("backgroundSprite").objectReferenceValue = g.background;
                     so.ApplyModifiedPropertiesWithoutUndo();
                     EditorUtility.SetDirty(data);

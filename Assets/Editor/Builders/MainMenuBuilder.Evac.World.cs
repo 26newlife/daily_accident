@@ -199,8 +199,8 @@ namespace GameUI.EditorTools
         // ═════════════════════ 비상계단 입구 (위/아래 + 연기) ═════════════════════
         private static void BuildStairwellTriggers()
         {
-            // 위층으로: 계단 윗부분 서쪽 벽의 표지
-            Trig(EvacKeys.StairsUp, "위층(옥상 방향)으로 올라가기", new Vector3(-17.38f, 1.7f, -1.6f), new Vector3(0.08f, 0.7f, 1.4f), GB("StairSignUp", Hex("22C55E"), true),
+            // 위층으로: 계단실 북쪽 벽의 표지 (서쪽 벽 자리는 걸어서 오르내리는 비상계단 통로가 열리므로 비워 둔다)
+            Trig(EvacKeys.StairsUp, "위층(옥상 방향)으로 올라가기", new Vector3(-16.2f, 1.75f, -0.09f), new Vector3(1.4f, 0.7f, 0.08f), GB("StairSignUp", Hex("22C55E"), true),
                 "계단이 위로 이어진다.");
             // 아래층으로: 남쪽 벽의 어두운 계단 입구
             Trig(EvacKeys.StairsDown, "아래층으로 내려가기 (1층 방향)", new Vector3(-14.75f, 0.55f, -3.07f), new Vector3(1.0f, 1.0f, 0.08f), GB("StairDownDark", Hex("1F2937")),
