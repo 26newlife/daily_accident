@@ -12,7 +12,8 @@ namespace GameUI.EditorTools
     ///   · 층 압축 연출용 계단참 3개(14·17·20층) + 옥상, 계단 하강 3구간 + 1층 외부 집결지
     ///   · 1003호 내부(루트 B), 경량칸막이 파괴/베란다 짐 치우기 연결, 대피공간 문틈 밀봉 4면 + 구조 사다리
     ///   · 다용도실 망치
-    /// 층 구간은 1004호에서 멀리 떨어진 별도 구역에 만들고 EvacDirector 가 페이드 + 순간이동으로 이어 준다.
+    /// 층 구간은 일단 1004호에서 멀리 떨어진 별도 구역에 만들고, 빌드 마지막에 S03StairTowerRoutes 가 루트 A·D 오브젝트를
+    /// 집의 실제 계단탑(14·17층 방화문, 옥상 출입문·열쇠함, 옥상 구조 지점, 1층 밖 집결지)으로 옮기고 별도 구역을 지운다.
     /// 모든 상호작용 id 는 snake_case, 기존 id 는 바꾸지 않는다.
     /// </summary>
     public static partial class MainMenuBuilder
@@ -113,29 +114,6 @@ namespace GameUI.EditorTools
             return root;
         }
 
-        private static GameObject NpcBody(Transform parent, Color color, float height, float radius, bool withArm)
-        {
-            var visual = new GameObject("Visual");
-            visual.transform.SetParent(parent, false);
-            Material m = GB("Npc_" + ColorUtility.ToHtmlStringRGB(color), color);
-            Cyl(visual.transform, "Body", new Vector3(0f, height * 0.4f, 0f), radius, height * 0.8f, m, false);
-            GameObject head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            head.name = "Head";
-            head.transform.SetParent(visual.transform, false);
-            head.transform.localPosition = new Vector3(0f, height * 0.9f, 0f);
-            head.transform.localScale = Vector3.one * radius * 1.45f;
-            head.GetComponent<Renderer>().sharedMaterial = m;
-            Object.DestroyImmediate(head.GetComponent<Collider>());
-            if (withArm)
-            {
-                var arm = new GameObject("Arm");
-                arm.transform.SetParent(visual.transform, false);
-                arm.transform.localPosition = new Vector3(radius * 0.8f, height * 0.62f, 0.18f);
-                Box(arm.transform, "ArmBox", new Vector3(0f, 0f, 0.15f), new Vector3(0.08f, 0.08f, 0.35f), m, false);
-            }
-            return visual;
-        }
-
         // ═════════════════════ 복도 NPC ═════════════════════
         private static void BuildEvacNpcs()
         {
@@ -147,7 +125,7 @@ namespace GameUI.EditorTools
             g.transform.SetPositionAndRotation(new Vector3(-0.55f, 0.03f, -1.6f), Quaternion.Euler(0f, 180f, 0f));
             var cc = g.AddComponent<CharacterController>();
             cc.height = 1.45f; cc.radius = 0.26f; cc.center = new Vector3(0f, 0.725f, 0f); cc.stepOffset = 0.2f; cc.skinWidth = 0.03f;
-            GameObject gv = NpcBody(g.transform, new Color(0.62f, 0.52f, 0.56f), 1.45f, 0.26f, true);
+            GameObject gv = NpcLook.Build(g.transform, NpcLook.Grandmother);
             var gm = g.AddComponent<GrandmotherNpc>();
             var stand = new GameObject("ElevatorStand").transform;
             stand.SetParent(npcs, false);
@@ -170,7 +148,7 @@ namespace GameUI.EditorTools
             y.transform.SetPositionAndRotation(new Vector3(-8.6f, 0.03f, -1.3f), Quaternion.Euler(0f, 270f, 0f));
             var ycc = y.AddComponent<CharacterController>();
             ycc.height = 1.75f; ycc.radius = 0.28f; ycc.center = new Vector3(0f, 0.875f, 0f); ycc.stepOffset = 0.25f; ycc.skinWidth = 0.03f;
-            GameObject yv = NpcBody(y.transform, new Color(0.25f, 0.33f, 0.5f), 1.75f, 0.28f, false);
+            GameObject yv = NpcLook.Build(y.transform, NpcLook.YoungMan);
             var ym = y.AddComponent<YoungManNpc>();
             var runTarget = new GameObject("StairRunTarget").transform;
             runTarget.SetParent(npcs, false);
@@ -411,14 +389,13 @@ namespace GameUI.EditorTools
             evac.ambulance = amb;
 
             // 모여 있는 주민들 (캡슐 실루엣)
-            Color[] cols = { Hex("8B5E3C"), Hex("5B7FA6"), Hex("9A6B8E"), Hex("6E8B5B"), Hex("B0813E"), Hex("57606B") };
             Transform crowd = Group("Residents", g);
             for (int i = 0; i < 8; i++)
             {
                 var p = new GameObject($"Resident_{i}");
                 p.transform.SetParent(crowd, false);
                 p.transform.position = new Vector3(PlazaX + 5f + (i % 4) * 1.3f, 0f, PlazaZ + 8f + (i / 4) * 1.4f);
-                NpcBody(p.transform, cols[i % cols.Length], 1.5f + 0.05f * (i % 4), 0.25f, false);
+                NpcLook.Build(p.transform, NpcLook.Resident(i));
             }
             for (int i = 0; i < 4; i++)   // 안전 고깔
                 Cyl(g, $"Cone_{i}", new Vector3(PlazaX + 19f + i * 1.6f, 0.25f, PlazaZ + 9f), 0.14f, 0.5f, GB("Cone", Hex("F97316")), false);

@@ -12,6 +12,7 @@ namespace GameGameplay
 
         // ── 시나리오 2 전용 상호작용 id ──
         public const string Breaker = "s02_breaker";
+        public const string MultitapPlug = "multitap_plug";   // 집의 멀티탭 코드 (뽑으면 전기 조치)
         public const string EmergencyBag = "s02_emergency_bag";
         public const string Neighbor = "s02_injured_neighbor";
         public const string PhoneCallFamily = "s02_call_family";

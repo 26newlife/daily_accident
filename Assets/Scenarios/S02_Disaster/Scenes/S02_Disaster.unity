@@ -2399,7 +2399,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.5, y: 1.65, z: 0.17}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.6, y: 1.6, z: 1.6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1560433112}
@@ -9255,6 +9255,14 @@ MonoBehaviour:
     sound: {fileID: 0}
     soundAt: {x: 0, y: 0, z: 0}
     sparkAt: {x: 0, y: -999, z: 0}
+  - phase: 4
+    delay: 5
+    kind: 1
+    text: "[\uAE34\uAE09\uC7AC\uB09C\uBB38\uC790] \uC778\uADFC \uD574\uC5ED \uADDC\uBAA8 {M} \uC9C0\uC9C4 \uBC1C\uC0DD\n{DMG}"
+    skipIfDone: 
+    sound: {fileID: 0}
+    soundAt: {x: 0, y: 0, z: 0}
+    sparkAt: {x: 0, y: -999, z: 0}
   - phase: 5
     delay: 0.3
     kind: 0
@@ -9266,7 +9274,7 @@ MonoBehaviour:
   - phase: 5
     delay: 2
     kind: 1
-    text: "[\uAE34\uAE09\uC7AC\uB09C\uBB38\uC790] \uC778\uADFC \uD574\uC5ED \uADDC\uBAA8 6.7 \uC9C0\uC9C4 \uBC1C\uC0DD\n\uC9C0\uC9C4\uD574\uC77C \uACBD\uBCF4 \uBC1C\uB839. \uAC15\uAC00\xB7\uD574\uC548 \uC811\uADFC \uAE08\uC9C0, \uC989\uC2DC \uB192\uC740 \uACF3\uC73C\uB85C \uB300\uD53C \uBC14\uB78D\uB2C8\uB2E4"
+    text: "[\uAE34\uAE09\uC7AC\uB09C\uBB38\uC790] \uADDC\uBAA8 {M} \uC9C0\uC9C4 \uC601\uD5A5\uC73C\uB85C \uC9C0\uC9C4\uD574\uC77C {TS} \uBC1C\uB839\n\uAC15\uAC00\xB7\uD574\uC548 \uC811\uADFC \uAE08\uC9C0, \uC989\uC2DC \uB192\uC740 \uACF3\uC73C\uB85C \uB300\uD53C \uBC14\uB78D\uB2C8\uB2E4"
     skipIfDone: 
     sound: {fileID: 0}
     soundAt: {x: 0, y: 0, z: 0}

@@ -54,6 +54,8 @@ namespace GameGameplay
             QuakeAreas areas = QuakeAreas.Instance;
             if (areas == null) return false;
             if (areas.Current.IsEvacuationSite()) return true;   // 대피장소는 건물과 떨어진 넓은 곳
+            // 5점대(중진) 옥상: 머리 위에 떨어질 것이 없는 트인 곳이라 자세를 낮추면 보호로 친다 (6점대는 QuakeUpperCollapse 가 붕괴로 처리)
+            if (areas.Current == QuakeArea.Rooftop) return p.IsCrouching && QuakeTimeline.Instance != null && !QuakeTimeline.Instance.IsStrong;
             if (areas.Current == QuakeArea.Outside)
                 return areas.DistanceToBuilding(probe) >= QuakeTimeline.Instance.Config.facadeSafeDistance;   // 외벽에서 떨어진 넓은 곳
             return false;

@@ -124,6 +124,10 @@ namespace GameUI.EditorTools
             // 시나리오 1(전시 상황)도 같은 집 위에 함께 만든다 (실패해도 시나리오 3 빌드는 유지된다)
             try { BuildWarScenario(); }
             catch (System.Exception e) { Debug.LogError("[ApartmentBuilder] 시나리오 1 빌드 중 오류: " + e); }
+
+            // 시나리오 3 루트 A(옥상)·D(1층 하강)를 집의 실제 계단탑으로 옮긴다 (압축 연출용 별도 구역 제거)
+            try { S03StairTowerRoutes.ApplyToAssets(); }
+            catch (System.Exception e) { Debug.LogError("[ApartmentBuilder] S03 계단탑 루트 적용 중 오류: " + e); }
         }
 
         // ═════════════════════════ 데이터 에셋 ═════════════════════════

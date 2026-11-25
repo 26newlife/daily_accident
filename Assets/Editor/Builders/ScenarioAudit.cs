@@ -150,8 +150,6 @@ namespace GameUI.EditorTools
             // ─────────────── Act 4 ───────────────
             var act4 = Find<Act4_Evacuation>();
             Interact("A4-A1", EvacKeys.StairsUp, typeof(TriggerInteractable), Wire.Referenced, "계단 올라가기");
-            Interact("A4-A1", EvacKeys.StairsUp14, typeof(TriggerInteractable), Wire.Referenced, "14층");
-            Interact("A4-A1", EvacKeys.StairsUp17, typeof(TriggerInteractable), Wire.Referenced, "17층");
             Interact("A4-A2", EvacKeys.FireDoor14, typeof(ToggleInteractable), Wire.Referenced, "14층 방화문");
             Interact("A4-A2", EvacKeys.FireDoor17, typeof(ToggleInteractable), Wire.Referenced, "17층 방화문");
             Interact("A4-A3", EvacKeys.KeyBox, typeof(TimedTriggerInteractable), Wire.Referenced, "열쇠함 유리 깨기");
@@ -172,11 +170,11 @@ namespace GameUI.EditorTools
             Check("A4-C3", "Call119Controller", Find<Call119Controller>() != null && Find<ChoicePanel>() != null, "119 신고 선택지");
             Check("A4-C4", "ShelterSealSystem", Find<ShelterSealSystem>() != null, "연기 유입 + 구조 대기");
             Interact("A4-D1", EvacKeys.StairsDown, typeof(TriggerInteractable), Wire.Referenced, "계단 하강");
-            foreach (string z in new[] { EvacKeys.ZoneDescent1, EvacKeys.ZoneDescent2, EvacKeys.ZoneDescent3, "zone_descent_end_1", "zone_descent_end_2", "zone_descent_end_3" }) Zone("A4-D1", z);
+            foreach (string z in new[] { EvacKeys.ZoneDescent1, EvacKeys.ZoneDescent2, EvacKeys.ZoneDescent3 }) Zone("A4-D1", z);   // 계단탑 9~7 / 6~4 / 3~1층 (S03StairTowerRoutes)
             Zone("A4-D2", EvacKeys.ZoneAssembly);
             Check("A4-D2", "Act4.outdoor (OnFireTruckArrive)", act4 != null && Prop(act4, "outdoor") != null, "외부 집결지 연출 연동");
             Check("A4-E1", "RouteResolver", typeof(RouteResolver) != null && act4 != null, "루트 분기 로직");
-            foreach (string f in new[] { "landing14Spawn", "landing17Spawn", "landing20Spawn", "descent1Spawn", "descent2Spawn", "descent3Spawn", "plazaSpawn", "stairRoomSpawn", "grandmotherFallenPoint", "shelterSeal", "partition", "roofKeyItem", "helicopter", "rescueLadder" })
+            foreach (string f in new[] { "stairRoomSpawn", "grandmotherFallenPoint", "shelterSeal", "partition", "roofKeyItem", "helicopter", "rescueLadder" })
                 Field("A4-E1", "Act4." + f, act4, f);
             ArrayNonNull("A4-E1", "Act4.objectivePool", act4, "objectivePool");
             var def = AssetDatabase.LoadAssetAtPath<GameData.ScenarioDefinition>(MainMenuBuilder.S03Dir + "/Data/S03_Definition.asset");
@@ -193,7 +191,7 @@ namespace GameUI.EditorTools
             Check("C-4", "ScenarioDefinition.deathReasons (no null entries)", def != null && def.DeathReasons != null && def.DeathReasons.Length > 0 && !def.DeathReasons.Any(x => x == null), "사망 사유 목록");
             Check("A4-E2", "ScenarioDefinition.endings (no null entries)", def != null && def.Endings != null && def.Endings.Length > 0 && !def.Endings.Any(x => x == null), "엔딩 목록");
             foreach (DeathReason r in Enum.GetValues(typeof(DeathReason)))
-                Check("C-4", "DeathReason." + r, r == DeathReason.Unknown || IsWarOnlyReason(r) || (def != null && def.DeathReasons != null && def.DeathReasons.Any(x => x != null && x.Reason == r && !string.IsNullOrEmpty(x.WhyYouDied) && !string.IsNullOrEmpty(x.CorrectAction))), "교육 피드백 연결");
+                Check("C-4", "DeathReason." + r, r == DeathReason.Unknown || IsWarOnlyReason(r) || IsQuakeOnlyReason(r) || (def != null && def.DeathReasons != null && def.DeathReasons.Any(x => x != null && x.Reason == r && !string.IsNullOrEmpty(x.WhyYouDied) && !string.IsNullOrEmpty(x.CorrectAction))), "교육 피드백 연결");
             Check("C-5", "GameRunContext/RunCleanup", FindObjectOfType_GameSceneEntry(roots), "씬 진입 시 GameRunContext.Begin");
             Check("C-5", "EvacDirector", Find<EvacDirector>() != null, "압축 이동 코루틴 (씬 소속 → 재시작 시 정리)");
 
@@ -202,6 +200,9 @@ namespace GameUI.EditorTools
         }
 
         /// <summary>시나리오 1(전시 상황) 전용 사망 사유 — S01 정의에서 검사한다 (시나리오 3 감사 대상 아님)</summary>
+        /// <summary>시나리오 2(자연재해) 전용 사망 사유 (QuakeFallingObjects ~ QuakeGroundCrack, Tsunami) — S02 정의에서 검사한다</summary>
+        private static bool IsQuakeOnlyReason(DeathReason r) => (int)r >= (int)DeathReason.QuakeFallingObjects && (int)r <= (int)DeathReason.QuakeGroundCrack;
+
         private static bool IsWarOnlyReason(DeathReason r) => r == DeathReason.NuclearFlash || r == DeathReason.ShockwaveDebris || r == DeathReason.RadiationSickness || r == DeathReason.Hypothermia || r == DeathReason.Starvation;
 
         // ═════════════════════ 검사 헬퍼 ═════════════════════

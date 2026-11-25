@@ -134,6 +134,7 @@ namespace GameGameplay
         {
             Info($"smoke test start (scene={sceneName}, speed x{Speed})");
             yield return Safe("restart x5", RestartCycles());
+            yield return Safe("hidden npcs do not block the corridor", HiddenNpcsNoCollision());
             yield return Safe("act3 corridor / npc neglect", Act3Neglect());
             yield return Safe("act3 persuade / stairs / handoff", Act3Persuade());
             yield return Safe("route C shelter", RouteC());
@@ -329,7 +330,62 @@ namespace GameGameplay
             Info($"routeC score {ScoreSystem.Instance.Total}/{ScoreSystem.Instance.MaxTotal} grade {ScoreSystem.Instance.GetGradeLabel()}");
         }
 
-        // ───────── 루트 A: 옥상 ─────────
+        // ───────── 계단탑 걷기 (루트 A·D) ─────────
+        private string walkInfo;
+
+        /// <summary>플레이어 CharacterController 를 직접 움직여 (x, z) 경유점을 걷는다 (중력 포함, 프레임마다 진행 — 동행 NPC 가 따라올 수 있게)</summary>
+        private IEnumerator Walk(float speed, params Vector2[] pts)
+        {
+            walkInfo = null;
+            PlayerController p = Player;
+            CharacterController cc = p.GetComponent<CharacterController>();
+            p.ControlSuspended = true;
+            float vy = 0f;
+            foreach (Vector2 w in pts)
+            {
+                float best = float.MaxValue, stuck = 0f;
+                while (true)
+                {
+                    Vector3 d = new Vector3(w.x, 0f, w.y) - new Vector3(cc.transform.position.x, 0f, cc.transform.position.z);
+                    float dist = d.magnitude;
+                    if (dist < 0.1f) break;
+                    if (dist < best - 0.02f) { best = dist; stuck = 0f; }
+                    else if ((stuck += Time.deltaTime) > 2.5f) { walkInfo = $"막힘 at {cc.transform.position:F2} → ({w.x:F2}, {w.y:F2})"; p.ControlSuspended = false; yield break; }
+                    float move = Mathf.Min(speed * Time.deltaTime, dist);
+                    int sub = Mathf.Max(1, Mathf.CeilToInt(move / 0.08f));
+                    for (int i = 0; i < sub; i++)
+                    {
+                        float sdt = Time.deltaTime / sub;
+                        vy += -20f * sdt;
+                        CollisionFlags f = cc.Move(d / dist * (move / sub) + Vector3.up * vy * sdt);
+                        if ((f & CollisionFlags.Below) != 0) vy = -2f;
+                    }
+                    if (cc.transform.position.y < -40f) { walkInfo = "추락 " + cc.transform.position.ToString("F2"); p.ControlSuspended = false; yield break; }
+                    yield return null;
+                }
+            }
+            p.ControlSuspended = false;
+        }
+
+        private static readonly Vector2[] UpOneFloor = { new Vector2(-23f, -1.05f), new Vector2(-23f, -2.4f), new Vector2(-18.8f, -2.4f), new Vector2(-18.8f, -1.05f) };
+        private static readonly Vector2[] DownOneFloor = { new Vector2(-23f, -2.4f), new Vector2(-23f, -1.05f), new Vector2(-18.8f, -1.05f), new Vector2(-18.8f, -2.4f) };
+
+        // ───────── 등장 전 NPC 는 복도를 막지 않는다 ─────────
+        private IEnumerator HiddenNpcsNoCollision()
+        {
+            yield return LoadFresh();
+            GrandmotherNpc gm = GrandmotherNpc.Instance;
+            YoungManNpc ym = YoungManNpc.Instance;
+            Check("npc: grandmother hidden → no body collision", gm != null && gm.State == GrandmaState.Hidden && !gm.GetComponent<CharacterController>().enabled, gm != null ? gm.State.ToString() : "null");
+            Check("npc: young man hidden → no body collision", ym != null && ym.State == YoungManState.Hidden && !ym.GetComponent<CharacterController>().enabled, ym != null ? ym.State.ToString() : "null");
+            Check("npc: human-shaped visuals (legs/head/arms)", gm != null && gm.transform.Find("Visual/Torso/Head") != null && gm.transform.Find("Visual/Arm") != null && ym != null && ym.transform.Find("Visual/Torso/Head") != null);
+            // 엘리베이터 앞(할머니 자리)과 복도 중간(청년 자리)을 지나 계단실 방화문 앞까지 걷는다
+            TeleportTo(new Vector3(3.0f, 0.02f, -1.3f), 270f);
+            yield return Walk(3f, new Vector2(-0.55f, -1.6f), new Vector2(-8.6f, -1.3f), new Vector2(-13.2f, -1.2f));
+            Check("npc: corridor walk not blocked by hidden npcs", walkInfo == null && Player.transform.position.x < -13f, walkInfo ?? Player.transform.position.ToString("F2"));
+        }
+
+        // ───────── 루트 A: 옥상 (계단탑을 걸어 올라간다, 할머니 동행) ─────────
         private IEnumerator RouteA()
         {
             yield return LoadFresh();
@@ -337,33 +393,42 @@ namespace GameGameplay
             yield return Wait(0.4f);
             Act4_Evacuation a4 = FindFirstObjectByType<Act4_Evacuation>();
             Check("routeA: options allow A when stairs blocked", a4.Options.a && !a4.Options.b && a4.Options.c);
-            TeleportTo(new Vector3(-15.2f, 0.02f, -1.5f), 270f);
-            Use(EvacKeys.StairsUp);
-            yield return Wait(1.0f);
-            Check("routeA: route committed A", a4.CurrentRoute == Act4_Evacuation.Route.A);
-            yield return WaitUntil(() => !EvacDirector.Instance.IsTraveling, 6f);
-            Check("routeA: teleported to 14F landing", Player.transform.position.x < -30f && Player.transform.position.x > -45f, $"x={Player.transform.position.x:0.0}");
-            By<ToggleInteractable>(EvacKeys.FireDoor14).SetState(false);
-            Use(EvacKeys.StairsUp14);
-            yield return Wait(0.5f);
-            yield return WaitUntil(() => !EvacDirector.Instance.IsTraveling, 6f);
-            By<ToggleInteractable>(EvacKeys.FireDoor17).SetState(false);
-            Use(EvacKeys.StairsUp17);
-            yield return Wait(0.5f);
-            yield return WaitUntil(() => !EvacDirector.Instance.IsTraveling, 6f);
-            Check("routeA: at 20F landing", Player.transform.position.x < -58f && Player.transform.position.x > -66f, $"x={Player.transform.position.x:0.0}");
+            TeleportTo(new Vector3(-15.6f, 0.02f, -1.6f), 270f);
+            GrandmotherNpc gm = GrandmotherNpc.Instance;
+            gm.ForceState(GrandmaState.FollowingPlayer);
+            gm.Warp(new Vector3(-14.9f, 0.05f, -1.6f), 270f);
+            yield return Walk(3f, new Vector2(-18.8f, -1.6f), new Vector2(-18.8f, -1.05f));
+            for (int f = 10; f <= 20 && walkInfo == null; f++)
+            {
+                yield return Walk(3f, UpOneFloor);
+                if (f == 10) Check("routeA: walking up the tower commits A", a4.CurrentRoute == Act4_Evacuation.Route.A, a4.CurrentRoute.ToString());
+                if (f + 1 == 14 || f + 1 == 17)
+                {
+                    string id = f + 1 == 14 ? EvacKeys.FireDoor14 : EvacKeys.FireDoor17;
+                    ToggleInteractable door = By<ToggleInteractable>(id);
+                    Check($"routeA: {f + 1}F fire door open on the tower landing", door != null && door.IsOn && Vector3.Distance(door.transform.position, new Vector3(-18.24f, (f + 1 - 10) * 3f, -0.18f)) < 0.3f, door != null ? door.transform.position.ToString("F2") : "null");
+                    door.SetState(false);
+                }
+            }
+            Check("routeA: walked up to the roof floor (y 33)", walkInfo == null && Mathf.Abs(Player.transform.position.y - 33f) < 0.3f, walkInfo ?? Player.transform.position.ToString("F2"));
             Check("routeA: fire doors managed flag", ScenarioFlags.GetBool(EvacKeys.FlagFireDoorManaged));
-            Use(EvacKeys.RoofDoor);   // 열쇠 없이 → 잠김 안내 (막는 가드가 아니라 조건 안내)
-            Check("routeA: roof door stays locked without key", By<InteractableObject>(EvacKeys.RoofDoor) != null);
+            yield return Walk(3f, new Vector2(-18.8f, -1.45f), new Vector2(-15f, -1.45f));
+            Check("routeA: locked roof door blocks the doorway", Player.transform.position.x < -18.1f, Player.transform.position.ToString("F2"));
+            Use(EvacKeys.RoofDoor);   // 열쇠 없이 → 잠김 안내
+            Check("routeA: roof door stays locked without key", By<InteractableObject>(EvacKeys.RoofDoor) != null && !InventorySystem.Instance.Has(EvacKeys.ItemRoofKey));
             Use(EvacKeys.KeyBox);
             Check("routeA: key box gives roof key", InventorySystem.Instance.Has(EvacKeys.ItemRoofKey));
             Use(EvacKeys.RoofDoor);
             Check("routeA: roof key unlocks door", !InventorySystem.Instance.Has(EvacKeys.ItemRoofKey));
-            TeleportTo(new Vector3(-64f + 4.5f + 10f, 0.02f, 2f), 90f);
+            yield return Walk(3f, new Vector2(-15f, -1.45f), new Vector2(-2f, 7.3f));
+            Check("routeA: walked out onto the real roof", walkInfo == null && Player.transform.position.x > -10f && Mathf.Abs(Player.transform.position.y - 33f) < 0.3f, walkInfo ?? Player.transform.position.ToString("F2"));
+            yield return Wait(1.0f);
+            Check("routeA: grandmother followed up the stairs", gm.State == GrandmaState.FollowingPlayer && gm.transform.position.y > 30f, $"state={gm.State} pos={gm.transform.position:F1}");
             Use(EvacKeys.RoofSignal);
             bool ended = false;
-            yield return WaitUntil(() => DE.HasEnded, 20f, r => ended = r);
-            Check("routeA: rescue → rooftop ending", ended && DE.LastEndingId == EvacKeys.EndingRooftop, "ending=" + DE.LastEndingId);
+            yield return WaitUntil(() => DE.HasEnded, 25f, r => ended = r);
+            Check("routeA: rescue → hidden ending (grandmother accompanied)", ended && DE.LastEndingId == EvacKeys.EndingHidden, "ending=" + DE.LastEndingId);
+            Check("routeA: base route ending = rooftop", ScenarioFlags.GetText("ending_base_id") == EvacKeys.EndingRooftop, ScenarioFlags.GetText("ending_base_id"));
         }
 
         // ───────── 루트 B: 경량칸막이 + 히든 엔딩 ─────────
@@ -391,7 +456,7 @@ namespace GameGameplay
             Check("routeB: base route ending remembered", ScenarioFlags.GetText("ending_base_id") == EvacKeys.EndingPartition, ScenarioFlags.GetText("ending_base_id"));
         }
 
-        // ───────── 루트 D: 하강 ─────────
+        // ───────── 루트 D: 하강 (계단탑을 걸어 1층 출구 → 밖 집결지) ─────────
         private IEnumerator RouteD()
         {
             yield return LoadFresh();
@@ -399,21 +464,26 @@ namespace GameGameplay
             yield return Wait(0.4f);
             Act4_Evacuation a4 = FindFirstObjectByType<Act4_Evacuation>();
             Check("routeD: options allow D after early fire-door success", a4.Options.d);
-            TeleportTo(new Vector3(-14.7f, 0.02f, -2.4f), 180f);
-            Use(EvacKeys.StairsDown);
-            yield return Wait(0.8f);
-            yield return WaitUntil(() => !EvacDirector.Instance.IsTraveling, 6f);
-            Check("routeD: committed D", a4.CurrentRoute == Act4_Evacuation.Route.D);
-            Check("routeD: wall-hugging slows player", Mathf.Abs(Player.ScenarioSpeedMultiplier - GameTimingConfig.Current.descentSpeedMultiplier) < 0.01f, $"mult={Player.ScenarioSpeedMultiplier:0.00}");
-            for (int stage = 1; stage <= 3; stage++)
+            TeleportTo(new Vector3(-15.6f, 0.02f, -1.6f), 270f);
+            yield return Walk(3f, new Vector2(-18.8f, -1.6f), new Vector2(-18.8f, -2.4f));
+            for (int f = 10; f >= 2 && walkInfo == null; f--)
             {
-                HazardZone end = EvacDirector.FindZone("zone_descent_end_" + stage);
-                TeleportTo(end.transform.position + Vector3.up * 0.02f, 90f);
-                yield return Wait(0.6f);
-                yield return WaitUntil(() => !EvacDirector.Instance.IsTraveling, 6f);
+                yield return Walk(3f, DownOneFloor);
+                if (f == 10)
+                {
+                    Check("routeD: walking down the tower commits D", a4.CurrentRoute == Act4_Evacuation.Route.D, a4.CurrentRoute.ToString());
+                    Check("routeD: wall-hugging slows player", Mathf.Abs(Player.ScenarioSpeedMultiplier - GameTimingConfig.Current.descentSpeedMultiplier) < 0.01f, $"mult={Player.ScenarioSpeedMultiplier:0.00}");
+                }
             }
-            Check("routeD: reached assembly plaza", Vector3.Distance(Player.transform.position, new Vector3(-36f, 0f, 64f)) < 10f, $"pos={Player.transform.position}");
-            Check("routeD: speed restored on plaza", Mathf.Approximately(Player.ScenarioSpeedMultiplier, 1f));
+            Check("routeD: walked down to 1F (y -27)", walkInfo == null && Mathf.Abs(Player.transform.position.y + 27f) < 0.3f, walkInfo ?? Player.transform.position.ToString("F2"));
+            yield return Walk(3f, new Vector2(-23f, -2.4f), new Vector2(-23f, -1.6f), new Vector2(-27f, -1.6f), new Vector2(-38f, -1f));
+            Check("routeD: out of the exit onto the ground", walkInfo == null && Mathf.Abs(Player.transform.position.y + 28.5f) < 0.3f, walkInfo ?? Player.transform.position.ToString("F2"));
+            // 건물 밖은 격리 구역: 집 안 가스가 남아 있어도 체감 가스 0 (어지러움 없음)
+            HazardManager.Instance.SetGas(0.8f);
+            Check("gas: house gas does not reach the player outside (no dizziness)", HazardManager.Instance.PlayerGas < 0.01f, $"playerGas={HazardManager.Instance.PlayerGas:0.00}");
+            HazardManager.Instance.SetGas(0f);
+            yield return Wait(0.5f);
+            Check("routeD: speed restored at the assembly point", Mathf.Approximately(Player.ScenarioSpeedMultiplier, 1f), $"mult={Player.ScenarioSpeedMultiplier:0.00}");
             bool ended = false;
             yield return WaitUntil(() => DE.HasEnded, 20f, r => ended = r);
             Check("routeD: assembly → descent ending", ended && DE.LastEndingId == EvacKeys.EndingDescent, "ending=" + DE.LastEndingId);

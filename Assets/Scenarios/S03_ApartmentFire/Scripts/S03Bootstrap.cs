@@ -7,6 +7,7 @@ namespace GameGameplay
     /// <summary>
     /// 시나리오 3(아파트 화재) 시작 훅. ScenarioRunner 가 집 참조를 복원하고 내용물을 활성화한 직후 호출한다.
     ///   · 집의 중립 구역에 시나리오 규칙을 입힌다 (계단실·대피공간·엘리베이터 내부는 격리 구역 + 사망 사유)
+    ///   · 계단탑 14·17층 장식용 방화문 숨김 (시나리오의 실제 방화문으로 대체)
     ///   · 디버그 패널 확장 등록 (에디터/개발 빌드)
     /// 집 에셋은 이 값들을 모른다 — 시나리오가 시작할 때만 덧붙인다.
     /// </summary>
@@ -21,6 +22,8 @@ namespace GameGameplay
             Configure(EvacKeys.ZoneStairwell, true, 1f, DeathReason.StairwellSmoke);
             Configure(EvacKeys.ZoneShelter, true, 1f, DeathReason.ShelterSmoke);
             Configure("zone_elevator_cabin", true, 1f, DeathReason.ElevatorStallSmoke);
+            // 계단탑 14·17층: 장식용 닫힌 방화문 대신 시나리오의 실제 방화문(열려 있음)을 쓴다 (루트 A)
+            EvacTower.SetDecorDoorsVisible(false, 14, 17);
 
             // 기능 플래그: 엘리베이터 위험 (기본 켜짐 — 끄면 시스템만 멈춘다. 베이스의 엘리베이터는 그대로 동작)
             ScenarioDefinition def = ScenarioRunner.Instance != null ? ScenarioRunner.Instance.Definition : null;
@@ -34,6 +37,7 @@ namespace GameGameplay
 
         public void OnScenarioUnloading()
         {
+            EvacTower.SetDecorDoorsVisible(true, 14, 17);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (DebugExt != null) DebugPanel.Unregister(DebugExt);
             DebugExt = null;

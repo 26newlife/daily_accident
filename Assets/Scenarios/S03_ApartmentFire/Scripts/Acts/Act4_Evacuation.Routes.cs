@@ -52,14 +52,20 @@ namespace GameGameplay
         private void BeginRouteA()
         {
             Add("act4_a_stairs");
-            GoToLanding(14, landing14Spawn);
+            EventBus.ShowScent("아래층 연기를 피해 비상계단을 걸어서 옥상까지 올라가자. 열려 있는 방화문은 닫아야 연기가 따라오지 않는다.");
+            CheckLandingProgress();
         }
 
-        private static string FloorCaption(int floor) => floor == 14 ? "11층… 12층… 13층… 14층" : floor == 17 ? "15층… 16층… 17층" : "18층… 19층… 20층";
-
-        private void GoToLanding(int floor, Transform spawn)
+        /// <summary>계단탑에서 실제로 올라온 높이로 14층 / 17층 / 옥상 출입문(20층 위) 도착을 판정한다</summary>
+        private void CheckLandingProgress()
         {
-            Travel(spawn, "계단을 오른다…  " + FloorCaption(floor), StageTravelSeconds, () => ArriveLanding(floor));
+            if (player == null) return;
+            Vector3 p = player.transform.position;
+            if (!EvacTower.Contains(p) && p.y < EvacTower.RoofY - 0.5f) return;
+            int f = EvacTower.FloorOf(p.y);
+            if (arrive14 < 0f && f >= 14) ArriveLanding(14);
+            if (arrive17 < 0f && f >= 17) ArriveLanding(17);
+            if (arrive20 < 0f && p.y >= EvacTower.RoofY - 0.5f) ArriveLanding(20);
         }
 
         private void ArriveLanding(int floor)
@@ -83,7 +89,7 @@ namespace GameGameplay
                 arrive20 = Now;
                 Add("act4_a_key");
                 Add("act4_a_roof");
-                EventBus.ShowScent("20층. 옥상 출입문이 굳게 잠겨 있다. 옆에 비상 열쇠함이 보인다.");
+                EventBus.ShowScent("20층 위 옥상 출입문. 비상문 자동개폐장치가 고장 나 굳게 잠겨 있다. 옆 벽에 비상 열쇠함이 보인다.");
             }
         }
 
@@ -96,9 +102,7 @@ namespace GameGameplay
             }
             else if (e.Type == ScenarioEventType.Interacted)
             {
-                if (e.SourceId == EvacKeys.StairsUp14) GoToLanding(17, landing17Spawn);
-                else if (e.SourceId == EvacKeys.StairsUp17) GoToLanding(20, landing20Spawn);
-                else if (e.SourceId == EvacKeys.KeyBox) BreakKeyBox();
+                if (e.SourceId == EvacKeys.KeyBox) BreakKeyBox();
                 else if (e.SourceId == EvacKeys.RoofDoor) TryOpenRoofDoor();
                 else if (e.SourceId == EvacKeys.RoofSignal) StartRooftopRescue();
             }
@@ -111,6 +115,7 @@ namespace GameGameplay
 
         private void UpdateRouteA()
         {
+            CheckLandingProgress();
             float dt = Time.deltaTime;
             bool open14 = fireDoor14 != null && fireDoor14.IsOn, open17 = fireDoor17 != null && fireDoor17.IsOn;
             float chase = T.fireDoorChaseSeconds;
@@ -340,29 +345,29 @@ namespace GameGameplay
         {
             Add("act4_d_down");
             bool smoky = ScenarioFlags.GetBool(EvacKeys.FlagStairDownBlocked);
-            EventBus.ShowScent(smoky ? "계단에는 이미 연기가 가득하다. 몸을 낮추고 젖은 수건으로 입을 막아야 한다." : "연기가 올라오기 전이다. 낮은 자세로 벽을 짚으며 내려가자.");
-            Travel(descent1Spawn, "9층… 8층… 7층 (연기가 자욱한 층을 지난다)", StageTravelSeconds, () => EnterDescentStage(1));
+            EventBus.ShowScent(smoky ? "계단에는 이미 연기가 가득하다. 몸을 낮추고 젖은 수건으로 입을 막고, 벽을 짚으며 1층까지 내려가자." : "연기가 올라오기 전이다. 낮은 자세로 벽을 짚으며 1층까지 내려가 건물 밖 집결지로 가자.");
+            if (player != null) player.ScenarioSpeedMultiplier = T.descentSpeedMultiplier;   // 벽을 짚고 천천히
         }
 
+        /// <summary>하강 구간 (계단탑 높이): 1 = 9~7층, 2 = 6~4층, 3 = 3~1층. 구간이 바뀔 때 호출</summary>
         private void EnterDescentStage(int stage)
         {
             descentStage = stage;
             if (player != null) player.ScenarioSpeedMultiplier = T.descentSpeedMultiplier;   // 벽을 짚고 천천히
             if (EvacDirector.Instance != null) EvacDirector.Instance.SetAmbientBright(false);
+            if (stage == 3) EventBus.ShowMessage("3층… 조금만 더. 1층 출구로 나가면 건물 밖 집결지다.");
         }
 
         private void HandleRouteD(ScenarioEvent e)
         {
-            if (e.Type != ScenarioEventType.ZoneEntered) return;
-            if (e.SourceId == "zone_descent_end_1" && descentStage == 1)
-                Travel(descent2Spawn, "6층… 5층… 4층", StageTravelSeconds, () => EnterDescentStage(2));
-            else if (e.SourceId == "zone_descent_end_2" && descentStage == 2)
-                Travel(descent3Spawn, "3층… 2층…", StageTravelSeconds, () => EnterDescentStage(3));
-            else if (e.SourceId == "zone_descent_end_3" && descentStage == 3)
-            {
-                descentStage = 4;
-                Travel(plazaSpawn, "1층. 건물 밖으로 나왔다.", StageTravelSeconds, ArriveAssemblyPoint);
-            }
+            if (e.Type == ScenarioEventType.ZoneEntered && e.SourceId == EvacKeys.ZoneAssembly) TryArriveAssembly();
+        }
+
+        private void TryArriveAssembly()
+        {
+            if (descentStage >= 4 || !PlayerIn(EvacKeys.ZoneAssembly)) return;
+            descentStage = 4;
+            ArriveAssemblyPoint();
         }
 
         private void ArriveAssemblyPoint()
@@ -380,7 +385,13 @@ namespace GameGameplay
 
         private void UpdateRouteD()
         {
-            if (descentStage < 1 || descentStage > 3) return;
+            if (descentStage >= 4 || player == null) return;
+            // 계단탑 높이로 구간 판정 (내려갈수록 올라간다, 되돌아 올라가도 구간은 유지)
+            float y = player.transform.position.y;
+            int stage = y > -0.5f ? 0 : y > -9.5f ? 1 : y > -18.5f ? 2 : 3;
+            if (stage > descentStage) EnterDescentStage(stage);
+            TryArriveAssembly();
+            if (descentStage < 1 || descentStage > 3 || !EvacTower.Contains(player.transform.position)) return;
             float baseSmoke = StairSmoke(actStart);
             if (ScenarioFlags.GetBool(EvacKeys.FlagStairDownBlocked)) baseSmoke = Mathf.Max(baseSmoke, 0.6f);   // 연기 속을 알고 내려가는 경우
             for (int i = 0; i < descentZones.Length; i++)

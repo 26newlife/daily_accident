@@ -65,7 +65,17 @@ namespace GameGameplay
                 return null;
             }
         }
-        public float PlayerGas => Mathf.Max(gasLevel, MaxOf(z => z.GasLevel));
+        /// <summary>플레이어가 체감하는 가스. 연기와 같이 격리 구역(계단탑·옥상·건물 밖·대피공간 등) 안에서는 전역(집 안) 가스를 무시한다</summary>
+        public float PlayerGas
+        {
+            get
+            {
+                bool isolated = false;
+                foreach (HazardZone z in playerZones) if (z.Isolated) { isolated = true; break; }
+                float zoneMax = MaxOf(z => z.GasLevel);
+                return isolated ? zoneMax : Mathf.Max(gasLevel, zoneMax);
+            }
+        }
         public float PlayerTemperature => Mathf.Max(temperature, MaxOf(z => z.Temperature));
 
         private float MaxOf(Func<HazardZone, float> selector)

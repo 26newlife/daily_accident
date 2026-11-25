@@ -279,6 +279,13 @@ namespace GameGameplay
                 yield return null;
             }
             Check("옥상층 층참 도착 (y 33)", Mathf.Abs(LocalPos.y - 33f) < 0.25f, LocalPos.ToString("F2"));
+            if (scenarioId == "S03")
+            {
+                // 시나리오 3: 옥상 출입문은 잠겨 있다 (루트 A — 비상 열쇠함의 열쇠로 연다). 문이 막는지만 본다
+                WalkTo(-14f, -1.45f, 400);
+                Check("S03: 잠긴 옥상 출입문이 막음", LocalPos.x < -18.1f, LocalPos.ToString("F2"));
+                yield break;
+            }
             if (!WalkPath("옥상 출입구 → 옥상", new Vector2(-18.8f, -1.45f), new Vector2(-14f, -1.45f), new Vector2(-6f, 2f))) yield break;
             yield return null;
             Vector3 lp = LocalPos;

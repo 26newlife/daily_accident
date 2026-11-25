@@ -28,6 +28,7 @@ MonoBehaviour:
   shakeAllowedDistance: 0.8
   facadeSafeDistance: 15
   upperFloorsCollapse: 1
+  strongQuakeChance: 0.7
   buildingWarningDelay: 10
   buildingExplosionDelay: 70
   tsunamiDrawbackEnd: 30

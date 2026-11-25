@@ -8,10 +8,11 @@ namespace GameGameplay
     /// <summary>
     /// Act 4 — 대피 (4:40 ~ 7:00, 루트별 약 2분 20초 이내).
     /// 루트 판정은 RouteResolver 가 "가능한 루트"를 안내하지만 플레이어의 선택은 막지 않는다. 루트는 행동으로 확정된다:
-    ///   A  옥상:        비상계단에서 stairs_up 사용 → 14·17층 방화문 닫기 → 20층 열쇠함 유리 깨기 → 옥상 문 → 구조 신호 → 헬기/고가사다리차
+    ///   A  옥상:        계단탑을 걸어 올라간다(10층 위로 오르거나 stairs_up) → 14·17층 열린 방화문 닫기 → 옥상 출입문(20층 위) 열쇠함 유리 깨기 → 옥상 문 → 구조 신호 → 헬기/고가사다리차
     ///   B  경량칸막이:  베란다 짐 치우기 → 칸막이 타격(망치/발차기) → 1003호 할머니 구출 → 1003호 현관 → 계단
     ///   C  대피공간:    방화문 닫기 → 문틈 4면 밀봉 → 창문 환기 → 119 신고 → 구조 대기 → 고가사다리차
-    ///   D  1층 하강:    stairs_down 사용 → 낮은 자세로 벽을 짚고 3구간 하강 → 외부 집결지
+    ///   D  1층 하강:    계단탑을 걸어 내려간다(10층 아래로 내려가거나 stairs_down) → 낮은 자세로 벽을 짚고 9~7 / 6~4 / 3~1층 → 1층 출구 → 건물 밖 집결지
+    ///   계단탑 좌표는 EvacTower (HouseStairwellBuilder 와 같은 값).
     /// 월드 오브젝트(밀봉 지점, 칸막이, 방화문 등)는 Act 와 무관하게 항상 동작하고, Act 4 는 상태를 읽어 목표·엔딩을 진행한다.
     /// 어떤 루트로도 출발하지 못한 채 act4HardTimeoutSeconds 가 지나면 연기와 열기에 갇힌다(ExitTimeout 사망 + 교육 피드백).
     /// 엔딩/사망은 DeathAndEnding 이 처리하고, 할머니를 동행·구출한 상태면 히든 엔딩으로 바뀐다.
@@ -34,15 +35,8 @@ namespace GameGameplay
         [SerializeField] private YoungManNpc youngMan;
         [SerializeField, Tooltip("루트 B 에서 할머니가 쓰러져 있는 1003호 위치")] private Transform grandmotherFallenPoint;
 
-        [Header("이동 지점 (압축 연출용)")]
-        [SerializeField] private Transform landing14Spawn;
-        [SerializeField] private Transform landing17Spawn;
-        [SerializeField] private Transform landing20Spawn;
-        [SerializeField] private Transform descent1Spawn;
-        [SerializeField] private Transform descent2Spawn;
-        [SerializeField] private Transform descent3Spawn;
-        [SerializeField] private Transform plazaSpawn;
-        [SerializeField, Tooltip("루트 B: 1003호 현관을 나선 뒤 도착하는 비상계단 입구")] private Transform stairRoomSpawn;
+        [Header("이동 지점")]
+        [SerializeField, Tooltip("루트 B: 1003호 현관을 나선 뒤 도착하는 비상계단 입구 (루트 A·D 는 계단탑을 직접 걷는다)")] private Transform stairRoomSpawn;
 
         [Header("문구")]
         [SerializeField, TextArea(1, 3)] private string chooseText = "이제 결정해야 한다. 연기가 점점 차오른다.";
@@ -186,6 +180,14 @@ namespace GameGameplay
             {
                 // 이벤트를 놓쳤어도 월드 상태로 확정 (대피공간 문을 닫고 들어가 있는 경우 등)
                 if (shelterSeal != null && shelterSeal.DoorClosed && PlayerIn(EvacKeys.ZoneShelter)) CommitRoute(Route.C);
+                // 계단탑을 직접 걸어 오르내리면 그 방향으로 루트 확정 (위 = A 옥상, 아래 = D 하강)
+                else if (player != null)
+                {
+                    Vector3 p = player.transform.position;
+                    bool tower = EvacTower.Contains(p);
+                    if (tower ? p.y > 1.6f : p.y > EvacTower.RoofY - 1f) CommitRoute(Route.A);
+                    else if (tower ? p.y < -1.4f : p.y < -20f) CommitRoute(Route.D);
+                }
             }
         }
 
@@ -231,7 +233,6 @@ namespace GameGameplay
             EvacDirector.Instance.Travel(dest, caption, seconds, onArrived);
         }
 
-        private float StageTravelSeconds => Mathf.Max(1.2f, T.stairsMidFloorFadeSeconds + 1.2f);
 
         private static void Hide(GameObject g) { if (g != null) g.SetActive(false); }
         private static void Show(GameObject g) { if (g != null) g.SetActive(true); }

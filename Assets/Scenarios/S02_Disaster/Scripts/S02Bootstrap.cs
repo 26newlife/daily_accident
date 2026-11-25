@@ -27,6 +27,8 @@ namespace GameGameplay
         [SerializeField] private QuakeElevatorHazard elevator;
 
         private bool shoesOn;
+        private QuakeRiverRise river;
+        private QuakeWaveCollapse waveCollapse;
 
         public void OnScenarioLoaded()
         {
@@ -36,6 +38,12 @@ namespace GameGameplay
             if (buildingExplosion != null) buildingExplosion.Hook();
             if (indoorCollapse != null) indoorCollapse.Hook();
             if (tsunami != null) tsunami.Init();
+            river = GetComponent<QuakeRiverRise>();
+            if (river == null) river = gameObject.AddComponent<QuakeRiverRise>();   // 단지 앞 강이 폭우로 천천히 불어난다
+            river.Init();
+            waveCollapse = GetComponent<QuakeWaveCollapse>();
+            if (waveCollapse == null) waveCollapse = gameObject.AddComponent<QuakeWaveCollapse>();   // 해일에 나무·가로등·자동차가 쓰러진다
+            waveCollapse.Init();
             if (rupture != null) rupture.Init();
             if (glass != null) glass.Init();
             if (upperCollapse != null) upperCollapse.Init();
@@ -53,6 +61,8 @@ namespace GameGameplay
             if (elevator != null) elevator.Unregister();
             if (atmosphere != null) atmosphere.StopAll();
             if (timeline != null) timeline.Stop();
+            if (river != null) river.Restore();
+            if (waveCollapse != null) waveCollapse.Restore();   // 집 프리팹의 강을 원래 수위로 (다른 시나리오에 남지 않게)
             PlayerController p = FindFirstObjectByType<PlayerController>();
             if (p != null) p.ScenarioSpeedMultiplier = 1f;
         }

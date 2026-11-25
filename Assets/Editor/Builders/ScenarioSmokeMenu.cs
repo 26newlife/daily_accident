@@ -51,6 +51,22 @@ namespace GameUI.EditorTools
             EditorApplication.EnterPlaymode();
         }
 
+        [MenuItem("Tools/GameUI/Debug/Run S02 Branch Test")]
+        public static void RunS02Branches()
+        {
+            if (!EditorApplication.isPlaying && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            RunS02BranchBatch();
+        }
+
+        /// <summary>배치: -executeMethod GameUI.EditorTools.ScenarioSmokeMenu.RunS02BranchBatch (생존·사망 분기 전체, 결과 smoke_results_s02_branches.txt)</summary>
+        public static void RunS02BranchBatch()
+        {
+            EditorSceneManager.OpenScene(GameScenePath, OpenSceneMode.Single);
+            SessionState.SetBool("S02BranchTest.Run", true);
+            Debug.Log("[S02Branch] entering play mode...");
+            EditorApplication.EnterPlaymode();
+        }
+
         /// <summary>배치: S01 로 비상계단·바깥 동선 걷기 검사 (시작 위치 포함). 결과 smoke_results_stairs_s01.txt</summary>
         public static void RunStairsS01Batch() => RunStairsBatch("Assets/Core/Data/Scenarios/Scenario_01.asset");
 

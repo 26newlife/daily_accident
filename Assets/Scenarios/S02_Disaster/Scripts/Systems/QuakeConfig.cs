@@ -31,6 +31,9 @@ namespace GameGameplay
         [Tooltip("건물 외벽에서 이만큼 떨어져야 여진 때 안전한 넓은 곳")] public float facadeSafeDistance = 15f;
         [Tooltip("지진이 시작된 뒤 위층(11층 이상)으로 올라가면 무너지는 위층에 깔린다 (원본 규칙). 끄면 옥상까지 안전하다")] public bool upperFloorsCollapse = true;
 
+        [Header("본진 규모")]
+        [Range(0f, 1f), Tooltip("판마다 본진이 6점대(강진)일 확률. 나머지는 5점대. 5점대면 위층 붕괴가 없고 옥상에서 웅크려 버틸 수 있다")] public float strongQuakeChance = 0.7f;
+
         [Header("본진 뒤 건물 폭발 (본진 종료 기준, 초)")]
         public float buildingWarningDelay = 10f;
         public float buildingExplosionDelay = 70f;

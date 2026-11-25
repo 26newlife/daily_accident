@@ -87,6 +87,12 @@ namespace GameGameplay
             if (fire != DeathReason.Unknown)
             {
                 if (IsProtected()) Fail(fire);   // 대피지역 안이면 연쇄 폭발 연출 없이 감점만
+                else if (IsFarFromBuilding())
+                {
+                    // 현실성: 불과 폭발은 건물 안(과 그 바로 근처)에서만 사람을 해친다. 건물 밖으로 충분히 떨어졌으면 화를 면한다 (조치를 안 한 감점은 그대로)
+                    Debug.Log($"[Quake] 조치 안 한 화재({fire}) — 건물에서 멀리 떨어져 있어 사망하지 않음");
+                    EventBus.ShowSubtitle("(뒤쪽 건물 안에서 쾅 하는 폭음이 울린다... 일찍 빠져나와 화를 면했다.)", 5f);
+                }
                 else if (chainDisaster != null)
                 {
                     pending = true;
@@ -144,6 +150,14 @@ namespace GameGameplay
         public void OnTsunamiPassed() => Clear(QuakeClearKind.Vertical);
 
         private bool IsCovered() => Cover.CoveredRatio >= Timeline.Config.requiredCoverRatio;
+        /// <summary>건물 밖 지면에서 외벽으로부터 안전거리(QuakeConfig.facadeSafeDistance) 이상 떨어져 있는가 (옥상·건물 안은 해당 없음)</summary>
+        private bool IsFarFromBuilding()
+        {
+            QuakeArea a = Areas != null ? Areas.Current : QuakeArea.Apartment;
+            if (a != QuakeArea.Outside && a != QuakeArea.OutdoorSite && a != QuakeArea.Shelter) return false;
+            return Areas.DistanceToBuilding(Timeline.Player.transform.position) >= Timeline.Config.facadeSafeDistance;
+        }
+
         private bool IsProtected() => Areas != null && Areas.Current.IsEvacuationSite();
 
         private DeathReason FireCause()

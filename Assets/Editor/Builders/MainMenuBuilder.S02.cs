@@ -116,6 +116,7 @@ namespace GameUI.EditorTools
             ("Death_Sinkhole", DeathReason.QuakeSinkhole, "꺼진 땅속으로 떨어졌습니다", "발밑에서 땅이 갈라지는 소리가 들렸다... 금이 가기 시작한 곳에서는 바로 벗어났어야 했다...", "땅이 울리고 금이 가는 곳에서는 즉시 벗어나 단단한 지면으로 돌아간다."),
             ("Death_UpperFloorCollapse", DeathReason.QuakeUpperFloorCollapse, "무너지는 위층에 깔렸습니다", "크게 흔들린 건물의 위층은 언제 무너질지 모른다... 대피는 언제나 아래로, 밖으로 향해야 했다...", "지진 대피는 계단을 이용해 아래로, 건물 밖으로 한다."),
             ("Death_FellWhileShaking", DeathReason.QuakeFellWhileShaking, "흔들리는 중에 넘어졌습니다", "땅이 울리는 동안 선 채로 돌아다녔다... 그 자리에서 몸을 낮추고 흔들림이 멈추기를 기다렸어야 했다...", "흔들리는 동안에는 이동하지 말고 그 자리에서 자세를 낮춰 몸을 보호한다."),
+            ("Death_BuildingCollapse", DeathReason.QuakeBuildingCollapse, "손상된 건물이 무너졌습니다", "규모 6이 넘는 강진에 건물은 겉보기보다 크게 손상돼 있었다... 옥상으로 피하는 수직대피는 건물이 버틸 때만 통하는 최후의 수단이었다...", "강한 지진 뒤에는 손상된 건물 위로 올라가지 말고, 계단으로 내려가 건물 밖 넓은 곳을 거쳐 고지대 대피소로 대피한다."),
             ("Death_GroundCrack", DeathReason.QuakeGroundCrack, "갈라진 땅 틈에 빠졌습니다", "검게 벌어진 틈을 그대로 밟았다... 돌아가거나 뛰어넘었어야 했다...", "갈라진 땅은 밟지 말고 돌아가거나 안전하게 건너뛴다."),
         };
 
@@ -451,6 +452,7 @@ namespace GameUI.EditorTools
             var breakerGo = new GameObject("BreakerPanel");
             breakerGo.transform.SetParent(props, false);
             breakerGo.transform.position = new Vector3(5.5f, 1.65f, 0.17f);
+            breakerGo.transform.localScale = Vector3.one * 1.6f;   // 흰 벽에 묻혀 눈에 안 띄어서 크게 (다용도실 문을 열면 정면 벽)
             Box(breakerGo.transform, "Panel", Vector3.zero, new Vector3(0.42f, 0.52f, 0.07f), GB("S02_BreakerBox", Hex("D8D9D6")));
             Box(breakerGo.transform, "Label", new Vector3(0f, 0.2f, 0.037f), new Vector3(0.3f, 0.06f, 0.005f), GB("S02_BreakerLabel", Hex("3A3F45")), false);
             var leverGo = Box(breakerGo.transform, "Lever", new Vector3(0f, 0.03f, 0.05f), new Vector3(0.08f, 0.16f, 0.05f), GB("S02_BreakerLever", Hex("2B2E33")), false);
@@ -700,8 +702,10 @@ namespace GameUI.EditorTools
                 (QuakePhase.Prepare, 28f, QuakeClues.ClueKind.Subtitle, "(현관 문틀이 삐걱거리는 소리가 난다...)", QuakeKeys.ActDoor, "door_creak", new Vector3(3f, 1.2f, 0.2f), new Vector3(0f, -999f, 0f)),
                 (QuakePhase.Prepare, 50f, QuakeClues.ClueKind.Subtitle, "(바닥 아래에서 낮게 우르릉거리는 소리가 커진다...)", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
                 (QuakePhase.Aftermath, 1.5f, QuakeClues.ClueKind.Subtitle, "(흔들림이 멈췄다... 이 건물 안은 더 이상 안전하지 않다.)", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
+                // {M} 이번 판 본진 규모, {DMG} 규모별 안내, {TS} 지진해일 경보/주의보 (QuakeClues.Fill 이 채운다)
+                (QuakePhase.Aftermath, 5f, QuakeClues.ClueKind.Alert, "[긴급재난문자] 인근 해역 규모 {M} 지진 발생\n{DMG}", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
                 (QuakePhase.Aftershock, 0.3f, QuakeClues.ClueKind.Subtitle, "(또 흔들린다! 여진이다!)", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
-                (QuakePhase.Aftershock, 2f, QuakeClues.ClueKind.Alert, "[긴급재난문자] 인근 해역 규모 6.7 지진 발생\n지진해일 경보 발령. 강가·해안 접근 금지, 즉시 높은 곳으로 대피 바랍니다", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
+                (QuakePhase.Aftershock, 2f, QuakeClues.ClueKind.Alert, "[긴급재난문자] 규모 {M} 지진 영향으로 지진해일 {TS} 발령\n강가·해안 접근 금지, 즉시 높은 곳으로 대피 바랍니다", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
                 (QuakePhase.Tsunami, 2f, QuakeClues.ClueKind.Subtitle, "(멀리서 사이렌이 길게 울린다...)", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
                 (QuakePhase.Tsunami, 14f, QuakeClues.ClueKind.Subtitle, "(강물이 이상할 정도로 멀리 빠져나가고 있다...)", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),
                 (QuakePhase.Tsunami, 32f, QuakeClues.ClueKind.Subtitle, "(강 쪽에서 굉음이 밀려온다!)", "", "", Vector3.zero, new Vector3(0f, -999f, 0f)),

@@ -54,6 +54,8 @@ namespace GameGameplay
             HasExploded = true;
             Transform player = QuakeTimeline.Instance.Player.transform;
             bool inside = QuakeAreas.Instance != null && QuakeAreas.Instance.Current.IsInsideBuilding();
+            // 5점대(중진): 폭발은 아래층 가스관이라 옥상은 버틴다 (수직대피). 6점대는 옥상도 함께 무너진다
+            if (inside && QuakeAreas.Instance.Current == QuakeArea.Rooftop && !QuakeTimeline.Instance.IsStrong) inside = false;
             Debug.Log($"[Quake] 건물 폭발 (플레이어 구역 {QuakeAreas.Instance?.Current})");
             for (int i = 0; i < blastPoints.Length; i++)
             {

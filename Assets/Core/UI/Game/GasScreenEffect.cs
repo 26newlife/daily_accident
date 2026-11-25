@@ -17,8 +17,10 @@ namespace GameGameplay
         [SerializeField, Range(0f, 1f)] private float maxVignetteAlpha = 0.45f;
         [SerializeField, Range(0f, 1f), Tooltip("이 농도부터 어지러움 시작")] private float dizzyStart = 0.3f;
         [SerializeField] private float smoothing = 2f;
+        [SerializeField, Tooltip("어지러움이 심해지는 속도 (초당)")] private float dizzyRisePerSecond = 0.6f;
+        [SerializeField, Tooltip("가스에서 벗어난 뒤 어지러움이 풀리는 속도 (초당). 0.08 이면 최대치에서 약 12초")] private float dizzyRecoverPerSecond = 0.08f;
 
-        private float shown;
+        private float shown, dizzy;
 
         private void Awake()
         {
@@ -31,14 +33,21 @@ namespace GameGameplay
 
         private void Update()
         {
-            float gas = HazardManager.Instance != null ? HazardManager.Instance.PlayerGas : 0f;
+            // 엔딩/사망 화면에서는 가스 효과를 걷어낸다 (탈출한 뒤에도 화면이 기울어 있지 않게)
+            float gas = HazardManager.Instance != null && !GameCore.GameFlow.IsEnded ? HazardManager.Instance.PlayerGas : 0f;
             float target = Mathf.InverseLerp(vignetteStart, vignetteFull, gas);
             shown = Mathf.Lerp(shown, target, Time.unscaledDeltaTime * smoothing);
 
             if (yellowVignette != null)
                 yellowVignette.color = new Color(vignetteColor.r, vignetteColor.g, vignetteColor.b, shown * maxVignetteAlpha);
             if (player != null)
-                player.SetDizziness(Mathf.InverseLerp(dizzyStart, 1f, gas));
+            {
+                // 가스를 마시면 빠르게 어지러워지고, 신선한 공기로 나와도 바로 멀쩡해지지 않고 서서히 풀린다
+                float want = Mathf.InverseLerp(dizzyStart, 1f, gas);
+                float rate = want > dizzy ? dizzyRisePerSecond : dizzyRecoverPerSecond;
+                dizzy = Mathf.MoveTowards(dizzy, want, rate * Time.unscaledDeltaTime);
+                player.SetDizziness(dizzy);
+            }
         }
     }
 }

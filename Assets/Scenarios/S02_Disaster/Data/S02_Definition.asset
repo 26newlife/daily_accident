@@ -48,6 +48,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 930c99d35cb2ee94d8dd30433c500b67, type: 2}
   - {fileID: 11400000, guid: 7d53854c75cf9574587c0200938163d3, type: 2}
   - {fileID: 11400000, guid: 19787ee6f3724bf4580b96a912311466, type: 2}
+  - {fileID: 11400000, guid: 27548e9c204641c2bf7ce9c5d9836433, type: 2}
   - {fileID: 11400000, guid: 298c2dfa4905ce14883790060eb75f8b, type: 2}
   - {fileID: 11400000, guid: ced30e691a4184d478a8b63e32e37151, type: 2}
   fallbackDeath: {fileID: 11400000, guid: f41672633ef3e0a43a12f7a8bc7e40b2, type: 2}

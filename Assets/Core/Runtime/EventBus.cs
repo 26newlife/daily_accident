@@ -44,6 +44,7 @@ namespace GameCore
         QuakeUpperFloorCollapse = 35, // 시나리오 2: 지진 뒤 위층으로 올라가 무너지는 위층에 깔림
         QuakeFellWhileShaking = 36, // 시나리오 2: 흔들리는 동안 선 채로 돌아다니다 넘어짐
         QuakeGroundCrack = 37,      // 시나리오 2: 갈라진 땅 틈을 밟음
+        QuakeBuildingCollapse = 38, // 시나리오 2: 6점대 강진 뒤 옥상에 있다가 손상된 건물이 무너짐
     }
 
     /// <summary>ScenarioEvent 의 종류</summary>

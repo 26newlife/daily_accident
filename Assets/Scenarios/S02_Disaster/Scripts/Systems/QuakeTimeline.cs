@@ -31,6 +31,12 @@ namespace GameGameplay
         public float PhaseElapsed { get; private set; }
         public bool Running { get; private set; }
 
+        /// <summary>이번 판 본진 규모 (Begin 때 정함). 6.0 이상이면 강진 — 위층·옥상이 무너지고 건물 폭발이 옥상까지 덮친다</summary>
+        public float Magnitude { get; private set; } = 6.7f;
+        public bool IsStrong => Magnitude >= 6f;
+        /// <summary>테스트용: 0 보다 크면 무작위 대신 이 규모로 시작한다</summary>
+        public static float ForcedMagnitude;
+
         /// <summary>(새 단계) — 단계가 바뀔 때. Begin 직후 Calm 으로 한 번 호출된다</summary>
         public event Action<QuakePhase> PhaseChanged;
 
@@ -51,8 +57,18 @@ namespace GameGameplay
             Phase = QuakePhase.Calm;
             PhaseElapsed = 0f;
             Running = true;
+            Magnitude = RollMagnitude();
+            Debug.Log($"[Quake] 이번 판 본진 규모 {Magnitude:0.0} ({(IsStrong ? "강진" : "중진")})");
             ScenarioFlags.SetNumber(QuakeKeys.FlagPhase, (float)Phase);
             PhaseChanged?.Invoke(Phase);
+        }
+
+        /// <summary>6점대(strongQuakeChance) 또는 5점대, 0.1 단위</summary>
+        private float RollMagnitude()
+        {
+            if (ForcedMagnitude > 0f) return ForcedMagnitude;
+            float lo = UnityEngine.Random.value < config.strongQuakeChance ? 6f : 5f;
+            return lo + UnityEngine.Random.Range(0, 10) * 0.1f;
         }
 
         public void Stop() { Running = false; Impulse = 0f; }

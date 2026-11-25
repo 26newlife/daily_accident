@@ -83,6 +83,14 @@ namespace GameGameplay
         /// <summary>순간이동 (동행 압축 이동, 뒤처짐 보정)</summary>
         public void Warp(Vector3 position, float yaw)
         {
+            crumbs.Clear();   // 다른 곳으로 옮겨졌으니 예전 발자취는 버린다
+            crumbs.Add(position);
+            WarpKeepTrail(position, yaw);
+        }
+
+        private void WarpKeepTrail(Vector3 position, float yaw)
+        {
+            verticalVelocity = 0f;
             if (motor == null) { transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f)); return; }
             motor.enabled = false;
             transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
@@ -90,30 +98,79 @@ namespace GameGameplay
         }
 
         // ───────── 동행 ─────────
-        /// <summary>플레이어 뒤를 따라간다. 너무 멀면 멈춰서 기다려 달라고 말하고, 한참 뒤처지면 뒤로 순간이동한다</summary>
+        // 플레이어가 지나간 길(발자취)을 따라간다 — 꺾인 비상계단처럼 직선으로 갈 수 없는 길에서도 같은 길로 오르내린다
+        private const float CrumbSpacing = 0.35f;
+        private const int MaxCrumbs = 400;
+        private readonly List<Vector3> crumbs = new List<Vector3>();
+        private bool followedLastFrame;
+
+        /// <summary>발자취를 비운다 (순간이동·동행 시작 시)</summary>
+        protected void ResetTrail() { crumbs.Clear(); }
+
+        private void RecordCrumb(Vector3 p)
+        {
+            if (crumbs.Count == 0 || (crumbs[crumbs.Count - 1] - p).sqrMagnitude > CrumbSpacing * CrumbSpacing)
+            {
+                crumbs.Add(p);
+                if (crumbs.Count > MaxCrumbs) crumbs.RemoveAt(0);
+            }
+        }
+
+        /// <summary>
+        /// 플레이어 뒤를 따라간다 (발자취 경로). 거리는 높이 차까지 포함한 3D 거리다.
+        /// 너무 멀면 멈춰서 기다려 달라고 말하고, 한참 뒤처지면 플레이어 바로 뒤의 발자취 위로 순간이동한다.
+        /// </summary>
         protected void UpdateFollow(float speed, string waitLine)
         {
             Vector3 p = PlayerPos;
-            float dist = Vector3.Distance(new Vector3(p.x, 0f, p.z), new Vector3(transform.position.x, 0f, transform.position.z));
+            if (!followedLastFrame) { crumbs.Clear(); crumbs.Add(transform.position); }
+            followedLastFrame = true;
+            RecordCrumb(p);
+
+            Vector3 me = transform.position;
+            float dist = Vector3.Distance(p, me);
+
+            // 이미 지나간 발자취는 버린다 (수평 0.4m + 높이 0.8m 안)
+            while (crumbs.Count > 1)
+            {
+                Vector3 c = crumbs[0];
+                Vector3 d = c - me;
+                if (new Vector2(d.x, d.z).magnitude < 0.4f && Mathf.Abs(d.y) < 0.8f) crumbs.RemoveAt(0);
+                else break;
+            }
 
             if (dist > T.npcWaitDistance)
             {
-                ApplyMove(Vector3.zero);
                 Speak(waitLine, 3f, 6f);
                 farTimer += Time.deltaTime;
                 if (dist > T.npcWarpDistance && farTimer > 3f)
                 {
                     farTimer = 0f;
-                    Vector3 back = Player != null ? -Player.transform.forward : Vector3.back;
-                    Warp(p + back * T.npcFollowDistance, Player != null ? Player.transform.eulerAngles.y : 0f);
+                    // 플레이어 바로 뒤(따라가는 거리만큼 앞선 발자취)로 옮긴다 — 계단 위에서도 길 위에 선다
+                    Vector3 to = p - (Player != null ? Player.transform.forward : Vector3.forward) * T.npcFollowDistance;
+                    for (int i = crumbs.Count - 1; i >= 0; i--)
+                        if ((crumbs[i] - p).magnitude >= T.npcFollowDistance) { to = crumbs[i]; crumbs.RemoveRange(0, i); break; }
+                    WarpKeepTrail(to + Vector3.up * 0.05f, Player != null ? Player.transform.eulerAngles.y : 0f);
+                    return;
                 }
-                if (dist > T.npcFollowDistance) MoveToward(p, speed * 0.6f, T.npcFollowDistance);
+                FollowCrumbs(p, speed * 0.6f);
                 return;
             }
             farTimer = 0f;
-            if (dist > T.npcFollowDistance) MoveToward(p, speed, T.npcFollowDistance);
+            if (dist > T.npcFollowDistance) FollowCrumbs(p, speed);
             else { ApplyMove(Vector3.zero); FaceToward(p); }
         }
+
+        private void FollowCrumbs(Vector3 playerPos, float speed)
+        {
+            // 플레이어와 같은 높이·가까운 곳이면 바로 다가가고, 아니면 가장 오래된 발자취로 간다
+            Vector3 target = crumbs.Count > 0 ? crumbs[0] : playerPos;
+            if (Mathf.Abs(playerPos.y - transform.position.y) < 0.5f && crumbs.Count <= 3) target = playerPos;
+            MoveToward(target, speed, 0.05f);
+        }
+
+        /// <summary>동행을 쉬는 프레임 — 다음 동행 시작 때 발자취를 새로 만든다</summary>
+        protected virtual void LateUpdate() { if (!IsFollowing) followedLastFrame = false; }
 
         // ───────── 호흡 / 연기 ─────────
         /// <summary>현재 위치의 연기로 호흡 게이지가 줄어든다 (수건이 있으면 느리게). 0 이 되면 true</summary>
@@ -178,9 +235,13 @@ namespace GameGameplay
             Interactable = false;
         }
 
-        /// <summary>시각 루트 표시/숨김. 시각 루트가 자기 자신이면 비활성화하면 Update 가 멈추므로 렌더러만 끈다</summary>
+        /// <summary>
+        /// 시각 루트 표시/숨김 + 몸 충돌(CharacterController)도 같이 켜고 끈다 — 숨어 있는(등장 전) NPC 에 걸리지 않게.
+        /// 시각 루트가 자기 자신이면 비활성화하면 Update 가 멈추므로 렌더러만 끈다.
+        /// </summary>
         protected void SetVisible(bool visible)
         {
+            if (motor != null) motor.enabled = visible;
             if (visualRoot == null) return;
             if (visualRoot == transform)
             {

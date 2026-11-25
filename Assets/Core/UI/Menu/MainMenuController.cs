@@ -47,6 +47,9 @@ namespace GameUI
         private void Awake()
         {
             GameRunContext.Cleanup("main-menu-enter");   // 게임에서 돌아온 경우 timeScale/오디오/static 상태 복구
+            // 게임 중 숨겨 둔 마우스 커서를 되돌린다 (결과 화면 버튼을 누른 프레임에 플레이어가 한 번 더 커서를 잠글 수 있다)
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             if (startButton != null) startButton.onClick.AddListener(OnStartGame);
             if (scenarioButton != null) scenarioButton.onClick.AddListener(OnScenarioSelect);
             if (settingsButton != null) settingsButton.onClick.AddListener(OnSettings);
@@ -59,6 +62,8 @@ namespace GameUI
 
         private void Start()
         {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             // 입력 모듈이 OnEnable에서 기본 액션을 할당할 수 있으므로 Start에서 구독
             if (inputModule != null && inputModule.cancel != null) cancelAction = inputModule.cancel.action;
             if (cancelAction != null) cancelAction.performed += OnCancelPerformed;

@@ -8,7 +8,7 @@ namespace GameGameplay
     /// <summary>
     /// 매뉴얼 조치(가스·차단기·문·신발·비상 가방)가 지금 완료 상태인지 기록한다 (원본 SafetyChecklist 이식).
     /// 집 오브젝트(가스 메인 밸브·퓨즈콕·현관문·신발장)와 시나리오 소품(차단기·비상 가방)의 이벤트를 듣는다.
-    ///   가스 = 메인 밸브나 퓨즈콕 중 하나라도 잠김 / 차단기 = 내림 / 문 = 현관문 열림 / 신발 = 신발장에서 신음 / 가방 = 챙김
+    ///   가스 = 메인 밸브나 퓨즈콕 중 하나라도 잠김 / 전기 = 차단기를 내리거나 멀티탭 코드를 뽑음 / 문 = 현관문 열림 / 신발 = 신발장에서 신음 / 가방 = 챙김
     /// 본진 판정 뒤에는 가스·차단기를 잠가(Lock) 점수가 바뀌지 않게 한다.
     /// </summary>
     public class QuakeChecklist : MonoBehaviour
@@ -55,6 +55,8 @@ namespace GameGameplay
                 case QuakeKeys.GasValveMain when e.Type == ScenarioEventType.ValveChanged: mainOpen = e.State; Set(QuakeKeys.ActGas, !mainOpen || !fuseOpen); break;
                 case QuakeKeys.FuseCock when e.Type == ScenarioEventType.ValveChanged: fuseOpen = e.State; Set(QuakeKeys.ActGas, !mainOpen || !fuseOpen); break;
                 case QuakeKeys.Breaker when e.Type == ScenarioEventType.Toggled: breakerOn = e.State; Set(QuakeKeys.ActBreaker, !breakerOn); break;
+                // 불꽃이 튀는 콘센트의 멀티탭 코드를 뽑아도 누전을 막은 것으로 친다 (차단기를 내리는 것과 같은 조치)
+                case QuakeKeys.MultitapPlug when e.Type == ScenarioEventType.Interacted && e.State: Set(QuakeKeys.ActBreaker, true); break;
                 case QuakeKeys.FrontDoor when e.Type == ScenarioEventType.Toggled: Set(QuakeKeys.ActDoor, e.State); break;
                 case QuakeKeys.ShoeCabinet when e.Type == ScenarioEventType.Interacted: Set(QuakeKeys.ActShoes, true); break;
                 case QuakeKeys.EmergencyBag when e.Type == ScenarioEventType.Interacted || e.Type == ScenarioEventType.ItemAcquired: Set(QuakeKeys.ActBag, true); break;

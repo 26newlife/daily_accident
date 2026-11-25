@@ -62,8 +62,9 @@ namespace GameUI.EditorTools
                 EnsureHint("Hint_Smoke", "hint_smoke", "연기가 짙으면 [{crouch}]로 자세를 낮추고, 젖은 수건으로 코와 입을 막으세요.", HintTrigger.SmokeEntered, 0.05f, "", true, 7, 0.4f, 4.5f),
                 EnsureHint("Hint_DoorHandle", "hint_door_handle", "문을 열기 전에 손등으로 손잡이 온도를 확인하세요.", HintTrigger.NearInteractable, 1.6f, "door_front", true, 4, 0.5f),
             };
-            // 시나리오 3 전용 힌트(소화기·가스·방송·연기·손잡이)는 ScenarioDefinition 이 런타임에 덧붙인다. 나머지는 공용 힌트
-            var scenario = new System.Collections.Generic.HashSet<string> { "hint_extinguisher", "hint_gas", "hint_broadcast", "hint_smoke", "hint_door_handle" };
+            // 시나리오 3 전용 힌트(소화기·가스·방송·연기·손잡이·창밖 구조대)는 ScenarioDefinition 이 런타임에 덧붙인다. 나머지는 공용 힌트
+            // (창밖 구조대 힌트가 공용이면 S01/S02 에서 창문을 볼 때 S03 화재 구조 문구가 떴다)
+            var scenario = new System.Collections.Generic.HashSet<string> { "hint_extinguisher", "hint_gas", "hint_broadcast", "hint_smoke", "hint_door_handle", "hint_window_outside" };
             var common = new System.Collections.Generic.List<HintData>(); var mine = new System.Collections.Generic.List<HintData>();
             foreach (HintData h in all) { if (scenario.Contains(h.Id)) mine.Add(h); else common.Add(h); }
             s3Hints = mine.ToArray();

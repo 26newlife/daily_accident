@@ -178,6 +178,10 @@ namespace GameGameplay
             if (exit != null) exit.SetOn(true);
             RenderSettings.ambientLight = new Color(blackoutAmbient, blackoutAmbient, blackoutAmbient * 1.1f);
 
+            // 폭발로 라인 가스 공급이 끊긴다: 남은 가스를 비우고 누출도 멈춘다
+            // (밸브를 다 못 잠근 채 넘어와도 가스가 다시 차올라 Act 2~4 내내 어지러움이 남지 않게)
+            if (gas != null) gas.StopLeak();
+            else if (GasLeakController.Instance != null) GasLeakController.Instance.StopLeak();
             if (HazardManager.Instance != null) HazardManager.Instance.SetGas(0f);
             EventBus.ShowMessage(explosionText);
             Record(recExplosionAt, Now);
