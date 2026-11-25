@@ -28,7 +28,7 @@ namespace GameUI.EditorTools
             public Transform root, spawns;
             public GrandmotherNpc grandmother;
             public YoungManNpc youngMan;
-            public Transform landing14, landing17, landing20, descent1, descent2, descent3, plaza, stairRoom, grandFallen;
+            public Transform landing14, landing17, landing20, descent1, descent2, descent3, plaza, stairRoom, grandFallen, grandHome;
             public Transform heliStart, heliEnd, roofLadderPivot, rescueLadderPivot;
             public GameObject roofDoor, keyBoxGlass, helicopter, roofLadder, rescueLadder, fireTruck, ambulance;
             public ParticleSystem keyShards, stairSmoke;
@@ -405,30 +405,138 @@ namespace GameUI.EditorTools
         }
 
         // ═════════════════════ 1003호 (루트 B) ═════════════════════
+        /// <summary>
+        /// 1003호 = 1004호와 같은 평면(방 배치·문·창 위치)을 x 축으로 뒤집은 집 (x -6.6 ~ 0, 공유 벽 x=0).
+        /// 벽 구조는 같고, 가구 배치·재질·색은 완전히 다르다 (할머니의 집: 좌식 거실, 장롱과 요 이불, 화분 가득한 베란다).
+        /// 내부 문/창은 1004호 id 와 겹치지 않도록 u1003_ 접두어를 쓴다. 창은 고정 유리 (장식).
+        /// </summary>
         private static void BuildUnit1003()
         {
             Transform g = Group("Unit1003", evac.root);
-            // 바닥/천장 슬래브는 Level 의 큰 슬래브(x -18~10, z -3.6~9.4)가 이미 덮고 있다. 서쪽/북쪽 벽만 세운다
-            BuildWall("U1003_West", false, -6.6f, 0f, BalconyD, WallTExt);
-            BuildWall("U1003_North", true, BalconyD, -6.6f, 0f, WallTExt);
-            FloorPatch("Unit1003", -6.6f, 0f, 0f, BalconyD, Wood());
+            Material wallMat = GB("U1003Wall", Hex("E6D9C0"));
+            Material doorMat = Furn("U1003Door", "A68A64");
 
-            // 가구 (서쪽·북쪽 벽 쪽으로 붙여 칸막이 구멍 ↔ 현관 동선을 비운다)
-            Box(g, "Sofa", new Vector3(-5.9f, 0.4f, 6.0f), new Vector3(0.9f, 0.8f, 2.2f), Furn("Sofa1003", "8A7F8F"));
-            Box(g, "TVBoard", new Vector3(-6.3f, 0.3f, 3.0f), new Vector3(0.4f, 0.6f, 1.6f), Furn("TV1003", "3B3F46"));
-            Box(g, "Table", new Vector3(-4.6f, 0.35f, 7.8f), new Vector3(1.2f, 0.7f, 0.7f), Furn("Table1003", "8A6F55"));
-            Box(g, "Cabinet", new Vector3(-6.3f, 0.9f, 1.2f), new Vector3(0.4f, 1.8f, 1.2f), Furn("Cab1003", "5A4636"));
+            // ── 벽: 1004호 BuildApartmentWalls 를 x → -x 로 뒤집은 것 ──
+            void W(string name, bool alongX, float line, float a0, float a1, float t, params Opening[] ops)
+            {
+                BuildWall(name, alongX, line, a0, a1, t, ops);
+                Transform wg = lvStructure.Find(name);
+                if (wg == null) return;
+                foreach (Renderer r in wg.GetComponentsInChildren<Renderer>())
+                    if (r.sharedMaterial == Wall()) r.sharedMaterial = wallMat;
+            }
+            W("U1003_West", false, -AptW, 0f, BalconyD, WallTExt,
+                Op(OpenKind.FixedGlass, 3.5f, 1.4f, 1.0f, 2.1f, "u1003_window_kitchen"),
+                Op(OpenKind.FixedGlass, 8.2f, 0.8f, 1.1f, 2.1f, "u1003_window_shelter"));
+            W("U1003_North", true, AptD, -AptW, 0f, WallTExt,
+                Op(OpenKind.FixedGlass, -1.3f, 1.4f, 0.9f, 2.1f, "u1003_window_bedroom"),
+                Op(OpenKind.FixedGlass, -3.2f, 1.0f, 0.9f, 2.1f, "u1003_window_living"),
+                Op(OpenKind.SlideDoor, -4.5f, 1.3f, 0f, 2.1f, "u1003_door_balcony", "베란다 문 닫기", "베란다 문 열기", inward: -1));
+            W("U1003_BalconyNorth", true, BalconyD, -AptW, 0f, WallTExt,
+                Op(OpenKind.FixedGlass, -2.7f, 3.6f, 0.9f, 2.1f, "u1003_balcony_glass"));
+            W("U1003_Shelter", false, -5.4f, AptD, BalconyD, WallT,
+                Op(OpenKind.Door, 8.2f, 0.9f, 0f, DoorH, "u1003_fire_door_shelter", "방화문 닫기", "방화문 열기", swing: -1, inward: -1, mat: FireDoorMat()));
+            W("U1003_BedroomEast", false, -2.6f, 2.4f, AptD, WallT,
+                Op(OpenKind.Door, 3.3f, 0.85f, 0f, DoorH, "u1003_door_bedroom", "문 닫기", "문 열기", swing: 1, inward: 1, mat: doorMat));
+            W("U1003_BedroomSouth", true, 2.4f, -2.6f, 0f, WallT);
+            W("U1003_BathEast", false, -1.9f, 0f, 2.4f, WallT,
+                Op(OpenKind.Door, 1.2f, 0.8f, 0f, DoorH, "u1003_door_bathroom", "문 닫기", "문 열기", swing: 1, inward: 1, mat: doorMat));
+            W("U1003_EntryEast", false, -4.1f, 0f, 2.4f, WallT);
+            W("U1003_KitchenSouth", true, 2.4f, -AptW, -3.9f, WallT,
+                Op(OpenKind.Door, -5.35f, 0.8f, 0f, DoorH, "u1003_door_utility", "문 닫기", "문 열기", swing: 1, inward: -1, mat: doorMat));
+            W("U1003_KitchenWest", false, -3.9f, 2.4f, 4.6f, WallT, Op(OpenKind.Gap, 3.5f, 1.2f, 0f, WallH));
+            W("U1003_KitchenNorth", true, 4.6f, -AptW, -3.9f, WallT, Op(OpenKind.Gap, -5.25f, 1.8f, 0f, WallH));
+
+            // ── 바닥 마감: 1004호와 다른 재질 ──
+            Material lam = GB("U1003Floor_Lam", Hex("B89B72")), lamLight = GB("U1003Floor_LamL", Hex("CDB48A"));
+            Material tileWarm = GB("U1003Floor_TileW", Hex("D8CFC0")), tileGreen = GB("U1003Floor_TileG", Hex("BFD3CB"));
+            Material vinylY = GB("U1003Floor_Vinyl", Hex("D9C9A3")), tileUtil = GB("U1003Floor_Util", Hex("C4BDB0"));
+            FloorPatch("U1003_Bedroom", -2.6f, 0f, 2.4f, AptD, lam);
+            FloorPatch("U1003_LivingA", -3.9f, -2.6f, 2.4f, AptD, lamLight);
+            FloorPatch("U1003_LivingB", -AptW, -3.9f, 4.6f, AptD, lamLight);
+            FloorPatch("U1003_Kitchen", -AptW, -3.9f, 2.4f, 4.6f, vinylY);
+            FloorPatch("U1003_Entry", -4.1f, -1.9f, 0f, 2.4f, tileWarm);
+            FloorPatch("U1003_Bathroom", -1.9f, 0f, 0f, 2.4f, tileGreen);
+            FloorPatch("U1003_Utility", -AptW, -4.1f, 0f, 2.4f, tileUtil);
+            FloorPatch("U1003_Balcony", -5.4f, 0f, AptD, BalconyD, tileUtil);
+            FloorPatch("U1003_Shelter", -AptW, -5.4f, AptD, BalconyD, tileUtil);
+
+            // ── 조명: 평소엔 켜져 있다가 정전 때 꺼진다 (LightGroup) + 비상 보조등 ──
+            Transform savedLights = lvLights;
+            lvLights = Group("Lights1003", evac.root);
+            AddLightGroup("unit1003", true, new Vector3(-1.3f, 2.25f, 4.9f), new Vector3(-4.6f, 2.25f, 5.9f), new Vector3(-5.2f, 2.25f, 3.5f),
+                new Vector3(-3.0f, 2.25f, 1.2f), new Vector3(-2.7f, 2.25f, 8.2f), new Vector3(-0.95f, 2.25f, 1.2f));
+            lvLights = savedLights;
             EmergencyLight(g, "Light1003", new Vector3(-3.2f, 2.2f, 4.5f), 0.8f);
 
-            // 현관 안쪽: 문을 열고 복도로 나간다 (복도 쪽 장식 문 door_1003 의 안쪽 면)
-            var leaf = new GameObject(EvacKeys.Door1003Inside);
-            leaf.transform.SetParent(lvInteract, false);
-            leaf.transform.position = new Vector3(-3.6f, 0f, 0.2f);
-            Box(leaf.transform, "Visual", new Vector3(0f, 1.0f, 0f), new Vector3(0.95f, 2.0f, 0.06f), FireDoorMat());
-            Box(leaf.transform, "Handle", new Vector3(0.35f, 1.0f, 0.06f), new Vector3(0.06f, 0.18f, 0.06f), Metal(), false);
-            AddTrigger(leaf, EvacKeys.Door1003Inside, "1003호 현관문 열고 복도로 나가기", "");
+            // ── 가구 (평면은 같고 배치는 다르다) ──
+            Material wd = Furn("U1003Wood", "6B4A35"), wm = Furn("U1003WoodMid", "8A6A4A"), cream = Furn("U1003Cream", "EDE3D0");
+            Material pink = Furn("U1003Bedding", "D88A9B"), sofa = Furn("U1003Sofa", "9B6F5E"), tv = Furn("U1003TV", "15181D");
+            Material rug = Furn("U1003Rug", "8C4A4A"), leaf = Furn("U1003Plant", "4F7F4A"), pot = Furn("U1003Pot", "B5654A");
+            Material steel = Furn("U1003Steel", "B8BCC2"), white = Furn("U1003White", "E5E7EB"), frame = Furn("U1003Frame", "C9A56A");
 
-            evac.grandFallen = Spawn("Spawn_GrandmotherFallen", new Vector3(-2.2f, 0.03f, 4.6f), 90f);
+            // 안방 (장롱 · 바닥 요 · 서랍장 · 화장대)
+            Box(g, "Wardrobe", new Vector3(-0.45f, 0.95f, 4.2f), new Vector3(0.6f, 1.9f, 1.8f), wd);
+            Box(g, "Wardrobe_Inlay", new Vector3(-0.74f, 1.0f, 4.2f), new Vector3(0.02f, 1.3f, 1.4f), frame, false);
+            Box(g, "Bedding", new Vector3(-1.5f, 0.07f, 5.0f), new Vector3(1.0f, 0.14f, 2.0f), pink);
+            Box(g, "Pillow", new Vector3(-1.5f, 0.18f, 5.8f), new Vector3(0.6f, 0.1f, 0.3f), cream, false);
+            Box(g, "Drawers", new Vector3(-0.4f, 0.4f, 6.3f), new Vector3(0.5f, 0.8f, 0.9f), wm);
+            Box(g, "VanityTable", new Vector3(-1.9f, 0.37f, 7.1f), new Vector3(0.9f, 0.74f, 0.4f), wm);
+            Box(g, "VanityMirror", new Vector3(-1.9f, 1.15f, 7.3f), new Vector3(0.6f, 0.7f, 0.03f), steel, false);
+
+            // 거실 (좌식: 좌탁 + 방석, 장식장 TV, 1인 의자, 수납장, 러그, 화분 선반)
+            Box(g, "Rug", new Vector3(-4.6f, 0.012f, 5.7f), new Vector3(2.4f, 0.02f, 1.8f), rug, false);
+            Box(g, "TVCabinet", new Vector3(-6.35f, 0.3f, 5.9f), new Vector3(0.5f, 0.6f, 1.8f), wd);
+            Box(g, "TV", new Vector3(-6.4f, 1.0f, 5.9f), new Vector3(0.08f, 0.55f, 0.95f), tv, false);
+            Box(g, "LowTable", new Vector3(-5.45f, 0.2f, 6.4f), new Vector3(1.0f, 0.4f, 0.7f), wm);
+            foreach (float x in new[] { -5.75f, -5.15f }) Box(g, "Zabuton", new Vector3(x, 0.04f, 5.7f), new Vector3(0.5f, 0.08f, 0.5f), sofa, false);
+            Box(g, "Armchair", new Vector3(-2.95f, 0.4f, 6.4f), new Vector3(0.7f, 0.8f, 0.7f), sofa);
+            Box(g, "SideChest", new Vector3(-2.78f, 0.5f, 5.0f), new Vector3(0.35f, 1.0f, 0.9f), wd);
+            Box(g, "FamilyPhoto_A", new Vector3(-6.56f, 1.7f, 6.4f), new Vector3(0.03f, 0.5f, 0.7f), frame, false);
+            Box(g, "FamilyPhoto_B", new Vector3(-6.56f, 1.65f, 5.4f), new Vector3(0.03f, 0.4f, 0.55f), frame, false);
+            Box(g, "WallClock", new Vector3(-2.64f, 1.95f, 6.0f), new Vector3(0.03f, 0.3f, 0.3f), steel, false);
+            Box(g, "PlantShelf", new Vector3(-6.1f, 0.45f, 7.15f), new Vector3(0.8f, 0.9f, 0.4f), wm);
+            Cyl(g, "ShelfPot_A", new Vector3(-6.3f, 1.05f, 7.15f), 0.13f, 0.3f, pot, false);
+            Cyl(g, "ShelfPlant_A", new Vector3(-6.3f, 1.35f, 7.15f), 0.17f, 0.3f, leaf, false);
+
+            // 주방 (냉장고 · 싱크대 · 작은 가스대 · 원형 식탁)
+            Box(g, "Fridge", new Vector3(-6.2f, 0.9f, 2.85f), new Vector3(0.7f, 1.8f, 0.7f), white);
+            Box(g, "SinkUnit", new Vector3(-6.3f, 0.45f, 3.85f), new Vector3(0.6f, 0.9f, 1.1f), cream);
+            Box(g, "SinkTop", new Vector3(-6.3f, 0.92f, 3.85f), new Vector3(0.62f, 0.04f, 1.12f), steel, false);
+            Box(g, "StoveCounter", new Vector3(-4.35f, 0.45f, 2.65f), new Vector3(0.9f, 0.9f, 0.4f), cream);
+            Box(g, "Stove", new Vector3(-4.35f, 0.92f, 2.65f), new Vector3(0.6f, 0.05f, 0.34f), tv, false);
+            Cyl(g, "DiningTable", new Vector3(-5.1f, 0.37f, 3.6f), 0.4f, 0.74f, wm);
+            foreach (Vector3 st in new[] { new Vector3(-5.1f, 0.22f, 4.1f), new Vector3(-5.6f, 0.22f, 3.45f) }) Cyl(g, "Stool", st, 0.18f, 0.44f, sofa);
+
+            // 다용도실 (세탁기 · 빨래 선반) / 현관 (신발장) / 화장실 (변기 · 세면대)
+            Box(g, "WashingMachine", new Vector3(-6.2f, 0.45f, 0.5f), new Vector3(0.6f, 0.9f, 0.6f), white);
+            Box(g, "LaundryShelf", new Vector3(-6.35f, 0.9f, 1.7f), new Vector3(0.4f, 1.8f, 1.2f), steel);
+            Box(g, "ShoeCabinet", new Vector3(-3.92f, 0.5f, 1.5f), new Vector3(0.35f, 1.0f, 1.2f), wd);
+            Box(g, "Toilet", new Vector3(-0.45f, 0.22f, 2.0f), new Vector3(0.4f, 0.45f, 0.6f), white);
+            Box(g, "BathSink", new Vector3(-0.35f, 0.45f, 0.45f), new Vector3(0.5f, 0.9f, 0.5f), white);
+
+            // 베란다 (화분 줄 · 빨래 건조대) / 대피공간 (정리함)
+            for (int i = 0; i < 4; i++)
+            {
+                float px = -1.0f - i * 0.6f;
+                Cyl(g, $"BalconyPot_{i}", new Vector3(px, 0.2f, 8.75f), 0.2f, 0.4f, pot, false);
+                Cyl(g, $"BalconyPlant_{i}", new Vector3(px, 0.55f, 8.75f), 0.2f, 0.3f, leaf, false);
+            }
+            Box(g, "DryingRack", new Vector3(-3.0f, 0.7f, 8.65f), new Vector3(1.2f, 1.4f, 0.4f), steel);
+            Box(g, "DryingClothes", new Vector3(-3.0f, 1.0f, 8.65f), new Vector3(1.0f, 0.7f, 0.1f), Furn("U1003Clothes", "A8C4E0"), false);
+            Box(g, "ShelterBoxes", new Vector3(-6.2f, 0.3f, 8.6f), new Vector3(0.5f, 0.6f, 0.5f), wm);
+
+            // 현관 안쪽: 문을 열고 복도로 나간다 (복도 쪽 장식 문 door_1003 의 안쪽 면)
+            var leafGo = new GameObject(EvacKeys.Door1003Inside);
+            leafGo.transform.SetParent(lvInteract, false);
+            leafGo.transform.position = new Vector3(-3.0f, 0f, 0.2f);
+            Box(leafGo.transform, "Visual", new Vector3(0f, 1.0f, 0f), new Vector3(0.95f, 2.0f, 0.06f), FireDoorMat());
+            Box(leafGo.transform, "Handle", new Vector3(0.35f, 1.0f, 0.06f), new Vector3(0.06f, 0.18f, 0.06f), Metal(), false);
+            AddTrigger(leafGo, EvacKeys.Door1003Inside, "1003호 현관문 열고 복도로 나가기", "");
+
+            // 할머니 자리: 평소 거실 러그 위 / 쓰러질 때는 연기 속 거실 바닥
+            evac.grandHome = Spawn("Spawn_GrandmotherHome", new Vector3(-4.4f, 0.03f, 5.3f), 90f);
+            evac.grandFallen = Spawn("Spawn_GrandmotherFallen", new Vector3(-4.6f, 0.03f, 5.6f), 90f);
             EvacZone(EvacKeys.Zone1003, new Vector3(-6.4f, 0f, 0.3f), new Vector3(-0.2f, 2.4f, 8.9f), true, 1f, DeathReason.Suffocation);
         }
 

@@ -44,6 +44,12 @@ namespace GameUI.EditorTools
             a3.FindProperty("frontDoor").objectReferenceValue = T(Ids.FrontDoor);
             a3.FindProperty("stairDoor").objectReferenceValue = T(Ids.StairFireDoor);
             a3.FindProperty("grandmother").objectReferenceValue = evac.grandmother;
+            if (evac.grandmother != null && evac.grandHome != null)
+            {
+                var gmSo = SO(evac.grandmother);
+                gmSo.FindProperty("homePoint").objectReferenceValue = evac.grandHome;
+                gmSo.ApplyModifiedPropertiesWithoutUndo();
+            }
             a3.FindProperty("youngMan").objectReferenceValue = evac.youngMan;
             a3.FindProperty("corridorZone").objectReferenceValue = Z(EvacKeys.ZoneCorridor);
             a3.FindProperty("stairZone").objectReferenceValue = Z(EvacKeys.ZoneStairwell);
@@ -58,13 +64,6 @@ namespace GameUI.EditorTools
             a4.FindProperty("grandmother").objectReferenceValue = evac.grandmother;
             a4.FindProperty("youngMan").objectReferenceValue = evac.youngMan;
             a4.FindProperty("grandmotherFallenPoint").objectReferenceValue = evac.grandFallen;
-            a4.FindProperty("landing14Spawn").objectReferenceValue = evac.landing14;
-            a4.FindProperty("landing17Spawn").objectReferenceValue = evac.landing17;
-            a4.FindProperty("landing20Spawn").objectReferenceValue = evac.landing20;
-            a4.FindProperty("descent1Spawn").objectReferenceValue = evac.descent1;
-            a4.FindProperty("descent2Spawn").objectReferenceValue = evac.descent2;
-            a4.FindProperty("descent3Spawn").objectReferenceValue = evac.descent3;
-            a4.FindProperty("plazaSpawn").objectReferenceValue = evac.plaza;
             a4.FindProperty("stairRoomSpawn").objectReferenceValue = evac.stairRoom;
             // 루트 A
             a4.FindProperty("fireDoor14").objectReferenceValue = T(EvacKeys.FireDoor14);

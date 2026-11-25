@@ -36,7 +36,8 @@ namespace GameGameplay
             // 엔딩/사망 화면에서는 가스 효과를 걷어낸다 (탈출한 뒤에도 화면이 기울어 있지 않게)
             float gas = HazardManager.Instance != null && !GameCore.GameFlow.IsEnded ? HazardManager.Instance.PlayerGas : 0f;
             float target = Mathf.InverseLerp(vignetteStart, vignetteFull, gas);
-            shown = Mathf.Lerp(shown, target, Time.unscaledDeltaTime * smoothing);
+            // 가스에서 벗어나도 노란 비네트가 한순간에 사라지지 않고 서서히 걷힌다 (올라갈 때보다 3배 느리게)
+            shown = Mathf.Lerp(shown, target, Time.unscaledDeltaTime * (target > shown ? smoothing : smoothing * 0.35f));
 
             if (yellowVignette != null)
                 yellowVignette.color = new Color(vignetteColor.r, vignetteColor.g, vignetteColor.b, shown * maxVignetteAlpha);

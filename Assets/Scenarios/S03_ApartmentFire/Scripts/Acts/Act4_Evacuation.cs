@@ -65,6 +65,7 @@ namespace GameGameplay
 
             Add("act4_main");
             Add("act4_choose");
+            PhoneSms.Send("119 상황실", "구조대 출동 중입니다. 대피공간이라면 문틈을 막고 119에 정확한 호수(1004호)를 알려주세요. 낮은 자세를 유지하세요.");
             GoToStep("choose");
             EventBus.ShowSubtitle(chooseText, 4f);
             EventBus.ShowScent(RouteResolver.Describe(options));

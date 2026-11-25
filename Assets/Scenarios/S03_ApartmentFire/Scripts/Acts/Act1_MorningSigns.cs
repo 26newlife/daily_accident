@@ -143,6 +143,13 @@ namespace GameGameplay
             if (alarmSource != null && alarmSource.clip != null) alarmSource.Play();
             Add(objMorning);
             Add(objAlarm);
+
+            PhoneSms.Reset();
+            if (Clock != null)
+            {
+                Clock.ScheduleAt(Now + 6f, () => PhoneSms.Send("엄마", "일어났니? 오늘 저녁에 들를게. 밥은 챙겨 먹고 나가."));
+                Clock.ScheduleAt(T.act1SignsTime + 8f, () => PhoneSms.Send("관리사무소", "[공지] 10층 라인 도시가스 배관 압력 점검 중입니다. 잠시 후 안내방송이 나갑니다."));
+            }
         }
 
         protected override void OnExit()
@@ -181,6 +188,7 @@ namespace GameGameplay
                 case GameTimingConfig.BeatKind.Subtitle: EventBus.ShowSubtitle(beat.text, beat.seconds); break;
                 default: EventBus.ShowMessage(beat.text); break;
             }
+            EventBus.RaiseEmergencyVehicle(beat.dispatch);   // 사이렌 대사에 맞춰 창밖 도로로 실제 차량이 지나간다
         }
 
         /// <summary>하드 타이머: 조치를 끝내지 못했어도 폭발(Act 2)로 넘어간다 (조치 수에 따른 영향은 기존 로직 유지)</summary>
@@ -243,6 +251,7 @@ namespace GameGameplay
             Add(objVentilate);
             Add(objMultitap);
 
+            PhoneSms.Send("관리사무소", "[긴급] 10층 라인 가스 누출 감지. 전등·가전·후드 조작 금지, 밸브 잠그고 창문을 열어 환기하세요.");
             GoToStep("response");
             Evaluate();
         }

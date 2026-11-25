@@ -521,30 +521,6 @@ namespace GameUI.EditorTools
 
                     var tog = root.AddComponent<ToggleInteractable>();
                     ConfigureToggle(tog, op, pane.transform, paneOff, paneOn, Vector3.zero, Vector3.zero, 0.8f);
-
-                    if (op.lockable)
-                    {
-                        var lockGo = new GameObject(op.id + "_lock");
-                        lockGo.transform.SetParent(lvInteract, false);
-                        lockGo.transform.position = Pt(op.center + op.width * 0.5f - 0.12f, op.bottom + h * 0.5f, line + op.inward * (t * 0.5f + 0.03f));
-                        Box(lockGo.transform, "Visual", Vector3.zero, new Vector3(0.1f, 0.1f, 0.1f), Hot("Lock", "F59E0B"));
-                        var lk = lockGo.AddComponent<LockInteractable>();
-                        var lso = SO(lk);
-                        lso.FindProperty("id").stringValue = op.id + "_lock";
-                        lso.FindProperty("prompt").stringValue = "잠금장치";
-                        lso.FindProperty("target").objectReferenceValue = tog;
-                        lso.FindProperty("startLocked").boolValue = true;
-                        lso.FindProperty("promptWhenLocked").stringValue = "창문 잠금 풀기";
-                        lso.FindProperty("promptWhenUnlocked").stringValue = "창문 잠그기";
-                        lso.FindProperty("holdSeconds").floatValue = WindowLockHoldSeconds;
-                        lso.ApplyModifiedPropertiesWithoutUndo();
-
-                        var tso = SO(tog);
-                        tso.FindProperty("startLocked").boolValue = true;
-                        tso.FindProperty("lockedMessage").stringValue = "창문이 잠겨 있다. 잠금장치를 먼저 풀어야 한다.";
-                        tso.FindProperty("holdSeconds").floatValue = WindowHoldSeconds;
-                        tso.ApplyModifiedPropertiesWithoutUndo();
-                    }
                     break;
                 }
 
@@ -893,7 +869,7 @@ namespace GameUI.EditorTools
             // 복도 북쪽 벽(= 세대 현관 벽): 1004호 현관문(작동) + 옆집 장식 문
             BuildWall("Wall_CorridorNorth", true, 0f, -17.5f, 9.5f, WallTExt,
                 Op(OpenKind.Door, 3.0f, 0.95f, 0f, DoorH, Ids.FrontDoor, "현관문 닫기", "현관문 열기", swing: -1, inward: 1, mat: FireDoorMat()),
-                Op(OpenKind.FlatDoor, -3.6f, 0.95f, 0f, DoorH, Ids.Door1003, "1003호 현관문", message: "옆집(1003호) 현관문이다. 잠겨 있다.", inward: -1, mat: FireDoorMat()),
+                Op(OpenKind.FlatDoor, -3.0f, 0.95f, 0f, DoorH, Ids.Door1003, "1003호 현관문", message: "옆집(1003호) 현관문이다. 잠겨 있다.", inward: -1, mat: FireDoorMat()),
                 Op(OpenKind.FlatDoor, -10.2f, 0.95f, 0f, DoorH, Ids.Door1002, "1002호 현관문", message: "1002호 현관문이다. 잠겨 있다.", inward: -1, mat: FireDoorMat()));
 
             // 복도 남쪽 벽: 엘리베이터

@@ -39,6 +39,7 @@ MonoBehaviour:
     kind: 1
     text: "\uBA40\uB9AC\uC11C \uAD6C\uAE09\uCC28 \uC0AC\uC774\uB80C \uC18C\uB9AC\uAC00 \uB4E4\uB824\uC628\uB2E4."
     seconds: 4
+    dispatch: 1
   act2FireDelay: 9
   act2CorridorFireDelay: 45
   act2EndDelay: 85
@@ -56,6 +57,7 @@ MonoBehaviour:
     kind: 1
     text: "\uBA40\uB9AC\uC11C \uC0AC\uC774\uB80C \uC18C\uB9AC\uAC00 \uC810\uC810 \uAC00\uAE4C\uC6CC\uC9C4\uB2E4."
     seconds: 4
+    dispatch: 3
   holdOverrides:
   - id: window_living_lock
     seconds: 0.8

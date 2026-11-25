@@ -199,6 +199,7 @@ namespace GameGameplay
             if (initialFires != null) foreach (FireSource f in initialFires) if (f != null) f.Ignite();
 
             Add(objMain); Add(objExtinguisher); Add(objSuppress); Add(objTowel); Add(objBottle); Add(objHandle);
+            PhoneSms.Send("재난안전문자", "[긴급] OO아파트 8층 가스 폭발·화재 발생. 엘리베이터 이용 금지. 불길이 작으면 소화기, 크면 젖은 수건으로 호흡을 막고 대피하세요.");
             EventBus.ShowMessage(fireText);
             EventBus.ShowScent(smokeText);
             Record(recFireAt, Now);
@@ -211,6 +212,7 @@ namespace GameGameplay
             // handle cool and the player already left via Act 3 corridor route: do not ignite the fire at the door
             if (cleared && !handleHot) return;
             corridorFire.Ignite();
+            PhoneSms.Send("관리사무소", "10층 복도에 연기 확산. 현관 손잡이가 뜨거우면 절대 열지 말고 대피공간 또는 베란다 칸막이로 이동하세요.");
             TimingLog.Mark("Act2 corridor fire");
             ScenarioFlags.Set(flagCorridorHot, true);
             if (exploded) EventBus.ShowScent(corridorFireText);
@@ -226,6 +228,7 @@ namespace GameGameplay
                 case GameTimingConfig.BeatKind.Subtitle: EventBus.ShowSubtitle(beat.text, beat.seconds); break;
                 default: EventBus.ShowMessage(beat.text); break;
             }
+            EventBus.RaiseEmergencyVehicle(beat.dispatch);   // 사이렌 대사에 맞춰 창밖 도로로 실제 차량이 지나간다
         }
 
         private void OnTimeout()

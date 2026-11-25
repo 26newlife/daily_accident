@@ -25,6 +25,13 @@ namespace GameGameplay
             // 계단탑 14·17층: 장식용 닫힌 방화문 대신 시나리오의 실제 방화문(열려 있음)을 쓴다 (루트 A)
             EvacTower.SetDecorDoorsVisible(false, 14, 17);
 
+            // 옆집(1003호): Act 1~3 동안은 격리하지 않는다. 격리(Isolated)이면 플레이어 집의 가스·연기를 무시해
+            // 칸막이를 일찍 부수고 건너가면 가스 어지러움이 순식간에 사라진다. Act 4 시작 때 Act4_Evacuation 이 다시 격리한다
+            HazardZone z1003 = HazardManager.Instance != null ? HazardManager.Instance.FindZone(EvacKeys.Zone1003) : null;
+            if (z1003 != null) z1003.Isolated = false;
+            // 할머니는 복도에 나오기 전까지 자기 집에 있다
+            if (GrandmotherNpc.Instance != null) GrandmotherNpc.Instance.BeginAtHome();
+
             // 기능 플래그: 엘리베이터 위험 (기본 켜짐 — 끄면 시스템만 멈춘다. 베이스의 엘리베이터는 그대로 동작)
             ScenarioDefinition def = ScenarioRunner.Instance != null ? ScenarioRunner.Instance.Definition : null;
             if (def != null && !def.UseElevatorHazard)

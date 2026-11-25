@@ -376,7 +376,7 @@ namespace GameGameplay
             yield return LoadFresh();
             GrandmotherNpc gm = GrandmotherNpc.Instance;
             YoungManNpc ym = YoungManNpc.Instance;
-            Check("npc: grandmother hidden → no body collision", gm != null && gm.State == GrandmaState.Hidden && !gm.GetComponent<CharacterController>().enabled, gm != null ? gm.State.ToString() : "null");
+            Check("npc: grandmother starts at home inside unit 1003 (not in the corridor)", gm != null && gm.State == GrandmaState.AtHome && gm.transform.position.x < -0.5f && gm.transform.position.z > 0.5f, gm != null ? $"{gm.State} {gm.transform.position:F1}" : "null");
             Check("npc: young man hidden → no body collision", ym != null && ym.State == YoungManState.Hidden && !ym.GetComponent<CharacterController>().enabled, ym != null ? ym.State.ToString() : "null");
             Check("npc: human-shaped visuals (legs/head/arms)", gm != null && gm.transform.Find("Visual/Torso/Head") != null && gm.transform.Find("Visual/Arm") != null && ym != null && ym.transform.Find("Visual/Torso/Head") != null);
             // 엘리베이터 앞(할머니 자리)과 복도 중간(청년 자리)을 지나 계단실 방화문 앞까지 걷는다

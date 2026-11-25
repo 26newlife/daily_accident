@@ -106,6 +106,7 @@ namespace GameCore
         public static event Action<string> ScentRequested;      // 냄새 등 감각 묘사 (옅은 노란 글씨)
         public static event Action<string, float> SubtitleRequested; // 자막 (문구, 표시 시간)
         public static event Action Explosion;                   // 아래층 가스 폭발 발생 (창밖 연출/가이드 구독)
+        public static event Action<EmergencyKind, bool> EmergencyVehicleRequested;   // 구급차/소방차가 단지 앞 도로를 지나간다 (종류, 건물 앞에 정차할지)
 
         public static void Raise(ScenarioEvent e)
         {
@@ -126,6 +127,7 @@ namespace GameCore
 
         public static void Raise(ScenarioEventType type, string sourceId, bool state = false) => Raise(new ScenarioEvent(type, sourceId, state));
         public static void RaiseExplosion() => Explosion?.Invoke();
+        public static void RaiseEmergencyVehicle(EmergencyKind kind, bool stopAtBuilding = false) { if (kind != EmergencyKind.None) EmergencyVehicleRequested?.Invoke(kind, stopAtBuilding); }
         public static void RaisePlayerDied(DeathReason reason) => PlayerDied?.Invoke(reason);
         public static void RaiseObjectiveAdded(string id) => ObjectiveAdded?.Invoke(id);
         public static void RaiseObjectiveCompleted(string id) => ObjectiveCompleted?.Invoke(id);
@@ -142,7 +144,7 @@ namespace GameCore
             int n = 0;
             n += Count(ScenarioEventRaised); n += Count(Interacted); n += Count(ItemAcquired); n += Count(PlayerDied);
             n += Count(ObjectiveAdded); n += Count(ObjectiveCompleted); n += Count(ObjectiveFailed); n += Count(EndingReached);
-            n += Count(ActChanged); n += Count(MessageRequested); n += Count(ScentRequested); n += Count(SubtitleRequested); n += Count(Explosion);
+            n += Count(ActChanged); n += Count(MessageRequested); n += Count(ScentRequested); n += Count(SubtitleRequested); n += Count(Explosion); n += Count(EmergencyVehicleRequested);
             return n;
         }
 
@@ -153,7 +155,9 @@ namespace GameCore
         {
             ScenarioEventRaised = null; Interacted = null; ItemAcquired = null; PlayerDied = null;
             ObjectiveAdded = null; ObjectiveCompleted = null; ObjectiveFailed = null;
-            EndingReached = null; ActChanged = null; MessageRequested = null; ScentRequested = null; SubtitleRequested = null; Explosion = null;
+            EndingReached = null; ActChanged = null; MessageRequested = null; ScentRequested = null; SubtitleRequested = null; Explosion = null; EmergencyVehicleRequested = null;
         }
     }
+    /// <summary>창밖 도로를 지나가는 긴급 차량 종류</summary>
+    public enum EmergencyKind { None = 0, Ambulance = 1, FireTruck = 2, Both = 3 }
 }

@@ -209,7 +209,7 @@ namespace GameGameplay
             Add("act4_b_break");
             Add("act4_b_neighbor");
             Add("act4_b_exit");
-            if (grandmother != null && grandmother.State == GrandmaState.Hidden && grandmotherFallenPoint != null)
+            if (grandmother != null && (grandmother.State == GrandmaState.Hidden || grandmother.State == GrandmaState.AtHome) && grandmotherFallenPoint != null)
                 grandmother.BeginFallen(grandmotherFallenPoint.position, grandmotherFallenPoint.eulerAngles.y);
             EventBus.ShowScent("얇은 석고보드 칸막이 너머는 옆집(1003호) 베란다다. 망치가 있으면 더 빨리 부술 수 있다.");
             UpdateRouteB();

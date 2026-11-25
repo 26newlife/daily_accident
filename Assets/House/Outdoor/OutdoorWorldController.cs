@@ -42,6 +42,12 @@ namespace GameGameplay
         [SerializeField, Min(0f)] private float sirenDelay = 14f;
         [SerializeField] private AudioSource sirenSource;
 
+        [Header("긴급 차량 (사이렌 대사에 맞춰 도로를 지나간다)")]
+        [SerializeField, Tooltip("단지 앞 도로(Road_A) 차선의 z 좌표")] private float roadLaneZ = 32.5f;
+        [SerializeField, Tooltip("정차 지점에서 출발/퇴장 지점까지 거리(m)")] private float roadRunLength = 170f;
+        [SerializeField, Min(5f)] private float emergencySpeed = 17f;
+
+        private readonly List<EmergencyVehicle> emergencyVehicles = new List<EmergencyVehicle>();
         private readonly HashSet<string> openWindows = new HashSet<string>();
         private float volumeScale;
         private bool exploded;
@@ -65,12 +71,14 @@ namespace GameGameplay
         {
             EventBus.Explosion += OnExplosion;
             EventBus.ScenarioEventRaised += OnScenarioEvent;
+            EventBus.EmergencyVehicleRequested += DispatchEmergency;
         }
 
         private void OnDisable()
         {
             EventBus.Explosion -= OnExplosion;
             EventBus.ScenarioEventRaised -= OnScenarioEvent;
+            EventBus.EmergencyVehicleRequested -= DispatchEmergency;
         }
 
         private void Update()
@@ -87,6 +95,13 @@ namespace GameGameplay
             if (ambientSlots != null)
                 foreach (AmbientSlot s in ambientSlots)
                     if (s.source != null) s.source.volume = s.baseVolume * volumeScale * (exploded ? 0.5f : 1f);   // 폭발 후에는 일상 소음이 잦아든다
+
+            // 사이렌: 창문을 닫으면 작게, 열면 크게 들린다 (환경음과 같은 배율)
+            for (int i = emergencyVehicles.Count - 1; i >= 0; i--)
+            {
+                if (emergencyVehicles[i] == null) { emergencyVehicles.RemoveAt(i); continue; }
+                emergencyVehicles[i].SetVolumeScale(Mathf.Lerp(0.35f, 1f, Mathf.InverseLerp(closedVolumeScale, openVolumeScale, volumeScale)));
+            }
         }
 
         private void OnScenarioEvent(ScenarioEvent e)
@@ -119,8 +134,64 @@ namespace GameGameplay
             if (sirenSource != null && sirenSource.clip != null) sirenSource.Play();
         }
 
+        // ───────── 긴급 차량 ─────────
+        /// <summary>
+        /// 구급차/소방차를 단지 앞 도로로 보낸다. 플레이어 집 앞에서 멀리 떨어진 도로 끝에서 출발해 건물 앞을 지나간다
+        /// (stopAtBuilding 이면 건물 앞에 서서 경광등만 켜 둔다). Both 는 소방차 뒤로 구급차가 몇 초 늦게 따라온다.
+        /// </summary>
+        public void DispatchEmergency(EmergencyKind kind, bool stopAtBuilding)
+        {
+            if (kind == EmergencyKind.None) return;
+            if (kind == EmergencyKind.Both)
+            {
+                SpawnEmergency(EmergencyKind.FireTruck, stopAtBuilding, 0f);
+                SpawnEmergency(EmergencyKind.Ambulance, stopAtBuilding, 3.5f);
+            }
+            else SpawnEmergency(kind, stopAtBuilding, 0f);
+        }
+
+        private void SpawnEmergency(EmergencyKind kind, bool stopAtBuilding, float delay)
+        {
+            if (delay > 0f) { StartCoroutine(SpawnLater(kind, stopAtBuilding, delay)); return; }
+
+            Material template = null;
+            float roadY = float.NaN;
+            if (movingVehicles != null)
+                foreach (VehicleController v in movingVehicles)
+                {
+                    if (v == null) continue;
+                    roadY = v.transform.position.y;
+                    Renderer r = v.GetComponentInChildren<Renderer>();
+                    if (r != null) template = r.sharedMaterial;
+                    break;
+                }
+            if (float.IsNaN(roadY))
+            {
+                GameObject road = GameObject.Find("Road_A");
+                roadY = road != null ? road.transform.position.y + 0.05f : (player != null ? player.position.y - 27f : 0f);
+            }
+
+            float x = player != null ? player.position.x : 0f;
+            x = Mathf.Clamp(x, -60f, 60f);
+            Vector3 a = new Vector3(x - roadRunLength, roadY, roadLaneZ);
+            Vector3 b = new Vector3(x + roadRunLength, roadY, roadLaneZ);
+            Vector3 stop = new Vector3(x + (kind == EmergencyKind.FireTruck ? 0f : -9f), roadY, roadLaneZ);   // 구급차는 소방차 뒤에 선다
+            EmergencyVehicle ev = EmergencyVehicle.Spawn(kind, a, b, stop, stopAtBuilding, template, emergencySpeed);
+            emergencyVehicles.Add(ev);
+        }
+
+        private System.Collections.IEnumerator SpawnLater(EmergencyKind kind, bool stopAtBuilding, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            SpawnEmergency(kind, stopAtBuilding, 0f);
+        }
+
         // ───────── Act 4 훅 ─────────
-        /// <summary>소방차/구급차 도착 연출의 진입점 (현재는 빈 이벤트)</summary>
-        public void OnFireTruckArrive() => FireTruckArrived?.Invoke();
+        /// <summary>소방차/구급차 도착: 건물 앞 도로에 소방차와 구급차가 사이렌을 울리며 와서 선다</summary>
+        public void OnFireTruckArrive()
+        {
+            DispatchEmergency(EmergencyKind.Both, true);
+            FireTruckArrived?.Invoke();
+        }
     }
 }

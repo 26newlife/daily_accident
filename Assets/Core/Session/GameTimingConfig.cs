@@ -26,6 +26,7 @@ namespace GameCore
             public BeatKind kind;
             [TextArea(1, 2)] public string text;
             [Min(0.5f)] public float seconds;
+            [Tooltip("이 대사가 나올 때 창밖 도로로 실제 긴급 차량(사이렌)이 지나간다")] public EmergencyKind dispatch;
         }
 
         [Serializable]
@@ -58,7 +59,7 @@ namespace GameCore
         [Tooltip("Act 1 환경 연출 (시작 후 초)")] public TimedBeat[] act1Beats =
         {
             new TimedBeat { time = 55f, kind = BeatKind.Scent, text = "복도에서 사람들이 웅성거리는 소리가 들린다.", seconds = 4f },
-            new TimedBeat { time = 80f, kind = BeatKind.Message, text = "멀리서 구급차 사이렌 소리가 들려온다.", seconds = 4f },
+            new TimedBeat { time = 80f, kind = BeatKind.Message, text = "멀리서 구급차 사이렌 소리가 들려온다.", seconds = 4f, dispatch = EmergencyKind.Ambulance },
         };
 
         // ───────── Act 2 ─────────
@@ -71,7 +72,7 @@ namespace GameCore
         {
             new TimedBeat { time = 24f, kind = BeatKind.Scent, text = "천장에서 갈라지는 소리가 난다.", seconds = 4f },
             new TimedBeat { time = 55f, kind = BeatKind.Message, text = "이웃집에서 비명이 들린다.", seconds = 4f },
-            new TimedBeat { time = 70f, kind = BeatKind.Message, text = "멀리서 사이렌 소리가 점점 가까워진다.", seconds = 4f },
+            new TimedBeat { time = 70f, kind = BeatKind.Message, text = "멀리서 사이렌 소리가 점점 가까워진다.", seconds = 4f, dispatch = EmergencyKind.Both },
         };
 
         // ───────── 상호작용 소요 시간 ─────────

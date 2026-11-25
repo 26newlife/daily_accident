@@ -59,11 +59,13 @@ namespace GameGameplay
             if (Score != null && !Score.HasRecord(EvacKeys.RecExplosionTime)) Score.Record(EvacKeys.RecExplosionTime, Now);   // 디버그 점프 대비
 
             Add("act3_main");
+            PhoneSms.Send("아들(할머니 가족)", "1003호에 어머니 계신데 전화를 안 받으세요. 엘리베이터 말고 계단으로 모시고 가주세요. 부탁드립니다.");
             if (blocked)
             {
                 GoToStep("blocked");
                 Add("act3_assess");
                 EventBus.ShowScent(blockedText);
+                EventBus.RaiseEmergencyVehicle(EmergencyKind.FireTruck);   // 대사의 소방 사이렌: 실제로 소방차가 도로를 지나간다
                 SetPeepholeFlags(true);   // 문구멍으로 복도 이웃이 보인다
                 if (Clock != null) Clock.ScheduleAt(Now + T.act3BlockedSeconds, FinishBlocked, "act3 blocked end");
             }
@@ -155,6 +157,7 @@ namespace GameGameplay
             SetPeepholeFlags(true);
             EventBus.ShowScent(corridorEnterText);
             Done("act3_corridor");
+            PhoneSms.Send("소방청", "고층 화재: 아래층 연기가 심하면 내려가지 말고 방화문을 닫고 옥상 또는 대피공간으로 이동하세요.");
             if (grandmother != null) grandmother.BeginAtElevator();
             if (youngMan != null) youngMan.BeginWaiting();
             GoToStep("neighbors");

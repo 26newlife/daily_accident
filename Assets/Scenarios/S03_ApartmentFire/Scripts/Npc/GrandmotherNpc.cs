@@ -15,6 +15,7 @@ namespace GameGameplay
         Fallen = 5,           // (루트 B) 1003호 안에서 연기에 쓰러져 호흡이 곤란하다
         Rescued = 6,          // 구출 완료 (엔딩 직전)
         Dead = 7,             // 엘리베이터에 탑승했거나 연기로 쓰러짐 (비그래픽: 화면 밖 / 자막)
+        AtHome = 8,           // 자기 집(1003호) 거실에 있다 (복도에 나오기 전. 칸막이를 일찍 부수고 들어와도 만날 수 있다)
     }
 
     /// <summary>
@@ -30,6 +31,7 @@ namespace GameGameplay
         [SerializeField, Tooltip("호출 버튼을 누르는 팔 (위아래로 움직인다). 선택")] private Transform arm;
         [SerializeField, Tooltip("엘리베이터 문 앞 위치 (Panic 때 걸어가는 목적지). 비우면 현재 위치")] private Transform elevatorStandPoint;
         [SerializeField] private AudioSource buttonAudio;
+        [SerializeField, Tooltip("1003호 안에서 지내는 자리 (Spawn_GrandmotherHome). 비우면 이름으로 찾는다")] private Transform homePoint;
 
         [Header("대사")]
         [SerializeField] private string[] pressLines = { "왜 이렇게 안 오지… 엘리베이터가 안 와요.", "(딸깍, 딸깍) 아이고, 불이 났다는데 왜 안 오는 거야.", "콜록, 콜록… 빨리 내려가야 하는데." };
@@ -46,6 +48,9 @@ namespace GameGameplay
         private float nextPressAt;
         private float panicDeadline;
         private bool begun;
+        private Vector3 corridorPos;
+        private float corridorYaw;
+        private bool warnedAboutGas;
 
         public static GrandmotherNpc Instance { get; private set; }
         public GrandmaState State { get; private set; } = GrandmaState.Hidden;
@@ -54,6 +59,8 @@ namespace GameGameplay
         {
             base.Awake();
             Instance = this;
+            corridorPos = transform.position;       // 씬에 놓인 자리 = 복도 엘리베이터 앞
+            corridorYaw = transform.eulerAngles.y;
             SetState(GrandmaState.Hidden);
             SetVisible(false);
         }
@@ -64,18 +71,31 @@ namespace GameGameplay
         /// <summary>복도 엘리베이터 앞에서 호출 버튼을 반복해서 누르기 시작한다 (Act 3: 플레이어가 복도에 나왔을 때)</summary>
         public void BeginAtElevator()
         {
-            if (begun) return;
+            if (begun && State != GrandmaState.AtHome) return;
             begun = true;
+            if (State == GrandmaState.AtHome) Warp(corridorPos, corridorYaw);   // 집에 있던 할머니가 현관을 나와 엘리베이터 앞으로 간다
             Show();
             SetState(GrandmaState.PressingElevator);
             panicDeadline = Time.time + T.grandmotherPanicSeconds;
             nextPressAt = Time.time + 1f;
         }
 
+        /// <summary>시나리오 시작: 자기 집(1003호) 거실에 서 있다. 칸막이를 일찍 부수고 들어와도 할머니를 만날 수 있다</summary>
+        public void BeginAtHome()
+        {
+            if (begun) return;
+            Transform p = homePoint != null ? homePoint : (GameObject.Find("Spawn_GrandmotherHome") is GameObject g ? g.transform : null);
+            if (p == null) return;
+            begun = true;
+            Show();
+            Warp(p.position, p.eulerAngles.y);
+            SetState(GrandmaState.AtHome);
+        }
+
         /// <summary>루트 B: 1003호 안에 쓰러져 있는 상태로 시작한다 (연기 속 호흡 곤란)</summary>
         public void BeginFallen(Vector3 position, float yaw)
         {
-            if (begun && State != GrandmaState.Hidden) return;
+            if (begun && State != GrandmaState.Hidden && State != GrandmaState.AtHome) return;
             begun = true;
             Show();
             Warp(position, yaw);
@@ -129,6 +149,11 @@ namespace GameGameplay
 
             switch (State)
             {
+                case GrandmaState.AtHome:
+                    if (Vector3.Distance(PlayerPos, transform.position) < 5f) FaceToward(PlayerPos);
+                    ApplyMove(Vector3.zero);
+                    break;
+
                 case GrandmaState.PressingElevator:
                     UpdatePressing();
                     if (UpdateBreathing(dt)) Collapse();
@@ -257,6 +282,20 @@ namespace GameGameplay
 
             switch (State)
             {
+                case GrandmaState.AtHome:
+                    if (!ScenarioFlags.GetBool(ElevatorHazardSystem.FireModeFlag))
+                    {
+                        body = "할머니가 코를 막고 두리번거린다. \"어디서 가스 냄새가 나는 것 같은데…\"";
+                        options.Add(new ChoicePanel.Option("가스 냄새가 나요. 불이나 스위치는 켜지 말고 창문을 열어 두세요", WarnAboutGas));
+                    }
+                    else
+                    {
+                        body = "할머니가 겁에 질려 있다. \"방금 쾅 소리가 났어요! 무슨 일이야, 이게…\"";
+                        options.Add(new ChoicePanel.Option("저와 함께 나가요 (동행)", StartFollowing));
+                        if (PlayerHasWetTowel) options.Add(new ChoicePanel.Option("젖은 수건을 건네고 함께 가기", () => { if (TryGiveWetTowel()) Speak(towelThanksLine, 3.5f); StartFollowing(); }));
+                    }
+                    break;
+
                 case GrandmaState.PressingElevator:
                 case GrandmaState.Panic:
                     body = "할머니가 엘리베이터 버튼을 계속 누르고 있다. 기침이 심하다.";
@@ -278,6 +317,14 @@ namespace GameGameplay
                     break;
             }
             panel.Show("1003호 할머니", body, options);
+        }
+
+        private void WarnAboutGas()
+        {
+            if (warnedAboutGas) return;
+            warnedAboutGas = true;
+            Speak("그래요? 그럼 창문부터 열어야겠네. 알려줘서 고마워요.", 4f);
+            if (ScoreSystem.Instance != null) ScoreSystem.Instance.Increment("neighbor_grandmother_warned");
         }
 
         private void Persuade()

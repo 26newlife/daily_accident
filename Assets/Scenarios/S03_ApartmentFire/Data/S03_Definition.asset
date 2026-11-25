@@ -72,9 +72,9 @@ MonoBehaviour:
   hiddenEndingFlag: evac_grandmother_with_player
   scoreRules: {fileID: 11400000, guid: bc4af86a151161a4f81e2ab3ad1180d1, type: 2}
   hints:
+  - {fileID: 11400000, guid: afa80360a90fd654ebef357e98efca24, type: 2}
   - {fileID: 11400000, guid: 9362dd137ca83a248afb50aa3391015a, type: 2}
   - {fileID: 11400000, guid: ff17768642699be4da3542c79faa96bb, type: 2}
   - {fileID: 11400000, guid: 6d422ec3455f7a24db8cb0ebd5156f82, type: 2}
   - {fileID: 11400000, guid: b6fec5cf29857724aa86e27c417b75b3, type: 2}
   - {fileID: 11400000, guid: fe915152f9e945f448f874e87380ae52, type: 2}
-  - {fileID: 11400000, guid: afa80360a90fd654ebef357e98efca24, type: 2}
